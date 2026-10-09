@@ -13,6 +13,8 @@
 - (BOOL)draw;
 - (BOOL)undo;
 - (NSInteger)foundationFor:(NSInteger)source index:(NSInteger)index;
+// Where a tap sends the card at index: its foundation, else a tableau pile, or NSNotFound.
+- (NSInteger)bestDestinationFrom:(NSInteger)source index:(NSInteger)index;
 - (void)save;
 - (void)pauseTimer;
 - (void)resumeTimer;

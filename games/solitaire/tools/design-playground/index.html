@@ -72,6 +72,10 @@
 <main>
 
 <section class="tab active" id="tab-cards">
+  <div class="panel" id="setsPanel" hidden style="margin-bottom:16px">
+    <div class="row"><strong>Candidate sets</strong><div class="seg" id="setSeg"></div>
+      <span class="hint">From <code>docs/card-designs/sets/</code>; rebuild with <code>scripts/make-card-svgs.py</code>, then reload.</span></div>
+  </div>
   <div class="drop" id="cardDrop">
     Drop the card art folder here (e.g. <code>Resources/Cards/</code>), or
     <label class="btn">Choose folder…<input type="file" id="cardFolder" webkitdirectory multiple></label>
@@ -147,6 +151,42 @@ const art = new Map();          // name -> HTMLImageElement
 let extras = [];                // unexpected filenames
 let badFiles = [];              // files that failed to decode
 
+// Served over HTTP (e.g. python3 -m http.server from games/solitaire), the generated candidate sets
+// load by URL instead of through a file picker.
+const SETS_URL = "../../docs/card-designs/sets/";
+async function loadSet(id) {
+  for (const img of art.values()) URL.revokeObjectURL(img.src);
+  art.clear(); extras = []; badFiles = [];
+  await Promise.all(EXPECTED.map(async name => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const img = new Image();
+      img.src = `${SETS_URL}${id}/${name}.png?${Date.now()}-${attempt}`;
+      try { await img.decode(); art.set(name, img); return; } catch {}
+    }
+    badFiles.push(name + ".png");
+  }));
+  renderCards();
+}
+async function loadSetIcon(id) {
+  try {
+    const res = await fetch(`${SETS_URL}${id}/icon-1024.png`, { cache: "no-store" });
+    if (res.ok) loadIcon(new File([await res.blob()], `${id}/icon-1024.png`, { type: "image/png" }));
+  } catch {}
+}
+async function initSets() {
+  if (!location.protocol.startsWith("http")) return;
+  let sets;
+  try { sets = await (await fetch(SETS_URL + "sets.json", { cache: "no-store" })).json(); } catch { return; }
+  if (!sets.length) return;
+  const seg = document.getElementById("setSeg");
+  const wanted = new URLSearchParams(location.search).get("set");
+  const first = sets.find(x => x.id === wanted) || sets[0];
+  seg.innerHTML = sets.map(x => `<button data-v="${x.id}"${x === first ? ' class="on"' : ""}>${x.label}</button>`).join("");
+  document.getElementById("setsPanel").hidden = false;
+  segmented("setSeg", id => { history.replaceState(null, "", "?set=" + id); loadSet(id); loadSetIcon(id); });
+  loadSet(first.id); loadSetIcon(first.id);
+}
+
 async function loadCardFiles(files) {
   for (const img of art.values()) URL.revokeObjectURL(img.src);
   art.clear(); extras = []; badFiles = [];
@@ -191,7 +231,7 @@ function drawCard(ctx, id, faceUp, x, y, w, h) {
   const r = { x: x + 2, y: y + 2, w: w - 4, h: h - 4 };
   const shape = () => { ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, 7); };
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 2; ctx.shadowOffsetY = 2;
+  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 2; ctx.shadowOffsetY = 0.5;
   ctx.fillStyle = "rgb(237,237,237)"; shape(); ctx.fill();
   ctx.restore();
   ctx.save();
@@ -208,6 +248,9 @@ function drawCard(ctx, id, faceUp, x, y, w, h) {
     drawFallbackBack(ctx, r);
   }
   ctx.restore();
+  // CardNode's hairline edge.
+  ctx.beginPath(); ctx.roundRect(r.x + 0.25, r.y + 0.25, r.w - 0.5, r.h - 0.5, 7);
+  ctx.strokeStyle = "rgba(23,18,31,.45)"; ctx.lineWidth = 0.5; ctx.stroke();
 }
 
 function drawFallbackFace(ctx, id, x, y, w, h) {
@@ -243,7 +286,7 @@ function drawFallbackBack(ctx, r) {
 }
 
 // Layout math mirrors Application/Scenes/GameScene.m. Keep the two in sync.
-const BAR = 52;  // GameViewController: controls bar height at the bottom of the screen
+const BAR = 52;  // GameViewController: controls bar height; the scene runs full-screen underneath it
 const marginFor = w => Math.max(14, w * 0.025);
 function cardSizeFor(w) { const cw = Math.min(112, (w - 2 * marginFor(w) - 6 * 12) / 7); return { w: cw, h: cw * 1.4 }; }
 
@@ -253,11 +296,10 @@ function layout(sceneW, sceneH, piles) {
   const gap = (sceneW - 2 * margin - 7 * card.w) / 6;
   const faceUpStep = sceneH > sceneW ? 0.32 : 0.24;
   const origin = p => {
-    const step = card.w + gap, x = margin + card.w / 2, top = sceneH - card.h / 2 - 8;
-    if (p === 0) return { x, y: top };
-    if (p === 1) return { x: x + step, y: top };
-    if (p < 6) return { x: x + (p + 1) * step, y: top };
-    return { x: x + (p - 6) * step, y: sceneH - card.h * 1.5 - 32 };
+    const step = card.w + gap, x = margin + card.w / 2, top = sceneH - Math.max(20, sceneH * 0.06) - card.h / 2;
+    // Foundations on the left, waste then stock on the right.
+    if (p < 6) return { x: x + (p === 0 ? 6 : p === 1 ? 5 : p - 2) * step, y: top };
+    return { x: x + (p - 6) * step, y: top - card.h - 24 };
   };
   const position = (p, i) => {
     const pos = origin(p);
@@ -265,7 +307,7 @@ function layout(sceneW, sceneH, piles) {
       const pile = piles[p];
       let desired = 0;
       for (let j = 0; j < pile.length - 1; j++) desired += card.h * (pile[j].up ? faceUpStep : 0.105);
-      const room = Math.max(0, pos.y - card.h / 2 - 12), factor = desired > 0 ? Math.min(1, room / desired) : 1;
+      const room = Math.max(0, pos.y - card.h / 2 - 12 - BAR), factor = desired > 0 ? Math.min(1, room / desired) : 1;
       for (let j = 0; j < i; j++) pos.y -= card.h * (pile[j].up ? faceUpStep : 0.105) * factor;
     }
     return pos;
@@ -290,9 +332,12 @@ function prepareCanvas(canvas, w, h) {
 
 function drawSlot(ctx, cx, cy, card, label) {
   ctx.beginPath(); ctx.roundRect(cx - card.w / 2 + 2, cy - card.h / 2 + 2, card.w - 4, card.h - 4, 7);
-  ctx.strokeStyle = "rgb(51,51,51)"; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = "rgba(255,255,255,.035)"; ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; ctx.stroke();
   if (label) {
-    ctx.fillStyle = "rgb(77,77,77)"; ctx.font = '300 24px "Helvetica Neue", sans-serif';
+    const arrow = label === "↻";
+    ctx.fillStyle = `rgba(255,255,255,${arrow ? .32 : .1})`;
+    ctx.font = arrow ? '300 26px "Helvetica Neue", sans-serif' : `600 ${card.w * 0.36}px "Avenir Next Condensed", sans-serif`;
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(label, cx, cy); ctx.textAlign = "start";
   }
 }
@@ -303,7 +348,7 @@ function drawScene(ctx, sceneW, sceneH, piles, offsetY = 0, slots = true) {
   const toY = y => offsetY + sceneH - y;  // SpriteKit y-up to canvas y-down
   if (slots) for (let p = 0; p < 13; p++) {
     const o = L.origin(p);
-    drawSlot(ctx, o.x, toY(o.y), L.card, p === 0 ? "↻" : (p >= 2 && p < 6 ? ["♥", "♦", "♣", "♠"][p - 2] : ""));
+    drawSlot(ctx, o.x, toY(o.y), L.card, ["↻", "", "A", "K"][p >= 6 ? 3 : Math.min(p, 2)]);
   }
   for (let p = 0; p < 13; p++) piles[p].forEach((c, i) => {
     if (p < 6 && i < piles[p].length - 1) return;  // only the top card of stock, waste, foundations shows
@@ -328,15 +373,24 @@ function deal() {
   return piles;
 }
 
+// GameScene's background: a radial gradient from the top-left corner, matching the app icon.
+// GameScene backgroundTextureForSize: near-black with a faint violet glow from the top edge.
+function drawBackground(ctx, w, h) {
+  const g = ctx.createRadialGradient(w / 2, -h * 0.1, 0, w / 2, -h * 0.1, Math.hypot(w, h) * 0.85);
+  g.addColorStop(0, "rgb(30,21,53)"); g.addColorStop(0.55, "rgb(15,12,23)"); g.addColorStop(1, "rgb(10,9,14)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+}
+
 function drawControlsBar(ctx, w, y) {
-  ctx.fillStyle = "#000"; ctx.fillRect(0, y, w, BAR);
-  ctx.fillStyle = "rgb(140,140,140)"; ctx.font = "14px -apple-system, sans-serif"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "rgba(10,9,14,.82)"; ctx.fillRect(0, y, w, BAR);
+  ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fillRect(0, y, w, 0.5);
+  ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "14px -apple-system, sans-serif"; ctx.textBaseline = "middle";
   ctx.fillText("0:28   •   0 moves", 24, y + BAR / 2);
   // Icon placeholders at the same frames as GameControls.m: three 56pt buttons, 12pt from the right edge.
   const icons = [drawUndoIcon, drawNewGameIcon, drawGearIcon];
   icons.forEach((draw, i) => {
     const bx = w - (3 - i) * 56 - 12;
-    ctx.save(); ctx.translate(bx + 16, y + 14); draw(ctx, i === 0 ? "rgb(77,77,77)" : "rgb(217,217,217)"); ctx.restore();
+    ctx.save(); ctx.translate(bx + 16, y + 14); draw(ctx, i === 0 ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.78)"); ctx.restore();
   });
 }
 function drawUndoIcon(ctx, color) {
@@ -373,13 +427,14 @@ function renderBoard() {
   const portrait = document.querySelector("#orientSeg .on").dataset.v === "portrait";
   const W = portrait ? 768 : 1024, H = portrait ? 1024 : 768;
   const ctx = prepareCanvas(document.getElementById("board"), W, H);
-  drawScene(ctx, W, H - BAR, board);
+  drawBackground(ctx, W, H);
+  drawScene(ctx, W, H, board);
   drawControlsBar(ctx, W, H - BAR);
 }
 
 function renderStress() {
   const portrait = document.querySelector("#orientSeg .on").dataset.v === "portrait";
-  const W = portrait ? 768 : 1024, sceneH = (portrait ? 1024 : 768) - BAR;
+  const W = portrait ? 768 : 1024, sceneH = portrait ? 1024 : 768;
   // A K→A run alternating red and black: K♠ Q♥ J♣ 10♦ …
   const run = Array.from({ length: 13 }, (_, i) => ({ id: [3, 0, 2, 1][i % 4] * 13 + (12 - i), up: true }));
   const views = [["stressRun", run], ["stressCompressed", [...Array.from({ length: 6 }, (_, i) => ({ id: 13 * 3 + i, up: false })), ...run]]];
@@ -389,7 +444,7 @@ function renderStress() {
     const L = layout(W, sceneH, piles), o = L.origin(12);
     // Crop to the rightmost column so the view stays narrow.
     const cropX = o.x - L.card.w / 2 - 12, cropW = L.card.w + 24, cropTop = sceneH - (o.y + L.card.h / 2) - 12;
-    const canvas = document.getElementById(canvasId), ctx = prepareCanvas(canvas, cropW, sceneH - cropTop);
+    const canvas = document.getElementById(canvasId), ctx = prepareCanvas(canvas, cropW, sceneH - BAR - cropTop);
     ctx.save(); ctx.translate(-cropX, -cropTop); drawScene(ctx, W, sceneH, piles, 0, false); ctx.restore();
   }
 }
@@ -585,6 +640,7 @@ window.addEventListener("resize", renderHome);
 
 renderCards();
 renderIcon();
+initSets();
 </script>
 </body>
 </html>

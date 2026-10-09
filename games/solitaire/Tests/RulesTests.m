@@ -164,6 +164,28 @@ static void TestFoundations(void) {
     g = Fixture(@{@6 : @[ @[ @0, @YES ], @[ @38, @YES ] ]});
     CHECK(![g canMoveFrom:6 index:0 to:2]);
 }
+static void TestBestDestination(void) {
+    // Hearts 0–12, diamonds 13–25, clubs 26–38, spades 39–51; rank = id % 13 + 1.
+    SolitaireGame *g = Fixture(
+        @{@1 : @[ @[ @0, @YES ] ],
+          @2 : @[],
+          @6 : @[ @[ @51, @YES ] ],
+          @7 : @[ @[ @49, @NO ], @[ @11, @YES ], @[ @36, @YES ] ],
+          @8 : @[ @[ @25, @YES ] ]});
+    CHECK([g bestDestinationFrom:1 index:0] == 2);           // ace to its foundation
+    CHECK([g bestDestinationFrom:6 index:0] == NSNotFound);  // lone king stays put
+    CHECK([g bestDestinationFrom:7 index:1] == 6);           // Q♥ J♣ run onto K♠
+    CHECK([g bestDestinationFrom:7 index:2] == NSNotFound);  // J♣ has nowhere to go
+    CHECK([g bestDestinationFrom:7 index:0] == NSNotFound);  // face-down card
+    CHECK([g moveFrom:7 index:1 to:6]);
+    CHECK([g bestDestinationFrom:8 index:0] == NSNotFound);  // nor does a lone king on the other side
+    CHECK([g bestDestinationFrom:7 index:0] == NSNotFound);  // flipped J♠: J♣ now covers Q♥
+    Conserved(g);
+    g = Fixture(@{@1 : @[ @[ @12, @YES ] ], @6 : @[ @[ @0, @NO ], @[ @38, @YES ] ], @7 : @[ @[ @1, @YES ] ]});
+    CHECK([g bestDestinationFrom:1 index:0] == 8);  // waste king to the first empty pile
+    CHECK([g bestDestinationFrom:6 index:1] == 8);  // K♣ off a face-down card
+    CHECK([g bestDestinationFrom:7 index:0] == NSNotFound);
+}
 static void TestWinAndStats(void) {
     NSMutableDictionary *rows = [NSMutableDictionary dictionary];
     for (NSInteger suit = 0; suit < 4; suit++) {
@@ -254,6 +276,7 @@ int main(void) {
         TestDealAndStock();
         TestTableau();
         TestFoundations();
+        TestBestDestination();
         TestWinAndStats();
         TestTimer();
         TestRandomPlay();

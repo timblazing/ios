@@ -12,15 +12,20 @@
 @property(nonatomic, strong) NSArray<CardNode *> *lifted;
 @property(nonatomic, strong) NSArray<NSValue *> *origins;
 @property(nonatomic, strong) UITouch *activeTouch;
+@property(nonatomic, strong) SKSpriteNode *background;
 @end
 @implementation GameScene
 - (instancetype)initWithSize:(CGSize)size {
     if ((self = [super initWithSize:size])) {
-        self.backgroundColor = [SKColor blackColor];
+        self.backgroundColor = [SKColor colorWithRed:0.039 green:0.035 blue:0.055 alpha:1];
         self.scaleMode = SKSceneScaleModeResizeFill;
         _cards = [NSMutableDictionary dictionary];
         _slots = [NSMutableArray array];
         _selectedPile = -1;
+        _background = [SKSpriteNode node];
+        _background.anchorPoint = CGPointZero;
+        _background.zPosition = -10;
+        [self addChild:_background];
     }
     return self;
 }
@@ -39,18 +44,19 @@
 - (CGFloat)faceUpStep {
     return self.size.height > self.size.width ? 0.32 : 0.24;
 }
+// Leaves room above the top row so the stock and foundations aren't a stretch to reach.
+- (CGFloat)topRowY {
+    return self.size.height - MAX(20, self.size.height * 0.06) - self.cardSize.height / 2;
+}
 - (CGFloat)gap {
     return (self.size.width - 2 * self.margin - 7 * self.cardSize.width) / 6;
 }
 - (CGPoint)originForPile:(NSInteger)p {
     CGFloat step = self.cardSize.width + self.gap, x = self.margin + self.cardSize.width / 2;
-    if (p == 0)
-        return CGPointMake(x, self.size.height - self.cardSize.height / 2 - 8);
-    if (p == 1)
-        return CGPointMake(x + step, self.size.height - self.cardSize.height / 2 - 8);
+    // Foundations on the left, waste then stock on the right.
     if (p < 6)
-        return CGPointMake(x + (p + 1) * step, self.size.height - self.cardSize.height / 2 - 8);
-    return CGPointMake(x + (p - 6) * step, self.size.height - self.cardSize.height * 1.5 - 32);
+        return CGPointMake(x + (p == 0 ? 6 : p == 1 ? 5 : p - 2) * step, self.topRowY);
+    return CGPointMake(x + (p - 6) * step, self.topRowY - self.cardSize.height - 24);
 }
 - (CGPoint)positionForPile:(NSInteger)p index:(NSInteger)i {
     CGPoint pos = [self originForPile:p];
@@ -59,7 +65,7 @@
         CGFloat desired = 0;
         for (NSInteger j = 0; j < (NSInteger)pile.count - 1; j++)
             desired += self.cardSize.height * (((Card *)pile[j]).faceUp ? self.faceUpStep : 0.105);
-        CGFloat room = MAX(0, pos.y - self.cardSize.height / 2 - 12),
+        CGFloat room = MAX(0, pos.y - self.cardSize.height / 2 - 12 - self.bottomInset),
                 factor = desired > 0 ? MIN(1, room / desired) : 1;
         for (NSInteger j = 0; j < i; j++)
             pos.y -= self.cardSize.height * (((Card *)pile[j]).faceUp ? self.faceUpStep : 0.105) * factor;
@@ -74,6 +80,22 @@
         [NSValue valueWithCGSize:[GameScene cardSizeForWidth:shortSide]]
     ]];
 }
+// Near-black with a faint violet glow from the top edge, like the icon's backdrop.
++ (SKTexture *)backgroundTextureForSize:(CGSize)size {
+    UIGraphicsBeginImageContextWithOptions(size, YES, 1);
+    CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
+    CGFloat components[] = {0.118, 0.082, 0.208, 1, 0.059, 0.047, 0.09, 1, 0.039, 0.035, 0.055, 1},
+            locations[] = {0, 0.55, 1};
+    CGGradientRef gradient = CGGradientCreateWithColorComponents(space, components, locations, 3);
+    CGPoint top = CGPointMake(size.width / 2, -size.height * 0.1);
+    CGContextDrawRadialGradient(UIGraphicsGetCurrentContext(), gradient, top, 0, top,
+                                hypot(size.width, size.height) * 0.85, kCGGradientDrawsAfterEndLocation);
+    CGGradientRelease(gradient);
+    CGColorSpaceRelease(space);
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return [SKTexture textureWithImage:image];
+}
 - (void)didChangeSize:(CGSize)oldSize {
     if (self.game) {
         [self cancelInteraction];
@@ -84,12 +106,15 @@
     if (!self.game)
         return;
     self.cardSize = [GameScene cardSizeForWidth:self.size.width];
+    if (!CGSizeEqualToSize(self.background.size, self.size)) {
+        self.background.texture = [GameScene backgroundTextureForSize:self.size];
+        self.background.size = self.size;
+    }
     for (SKNode *s in self.slots)
         [s removeFromParent];
     [self.slots removeAllObjects];
     for (NSInteger p = 0; p < 13; p++) {
-        NSString *label = p == 0 ? @"↻" : (p >= 2 && p < 6 ? @[ @"♥", @"♦", @"♣", @"♠" ][p - 2] : @"");
-        PileNode *slot = [[PileNode alloc] initWithSize:self.cardSize label:label];
+        PileNode *slot = [[PileNode alloc] initWithSize:self.cardSize label:@[ @"↻", @"", @"A", @"K" ][MIN(p, 6) == 6 ? 3 : MIN(p, 2)]];
         slot.position = [self originForPile:p];
         [self.slots addObject:slot];
         [self addChild:slot];
@@ -147,12 +172,16 @@
     return -1;
 }
 - (void)showSelection {
-    for (NSInteger p = 0; p < (NSInteger)self.slots.count; p++)
-        [self.slots[p] setHighlighted:self.selectedPile >= 0 && [self.game canMoveFrom:self.selectedPile
-                                                                                 index:self.selectedIndex
-                                                                                    to:p]];
+    for (NSInteger p = 0; p < (NSInteger)self.slots.count; p++) {
+        BOOL legal = self.selectedPile >= 0 && [self.game canMoveFrom:self.selectedPile index:self.selectedIndex to:p];
+        [self.slots[p] setHighlighted:legal];
+        // Outline the card a stack would land on, not the empty slot under the column.
+        NSInteger count = self.game.piles[p].count;
+        self.slots[p].position = legal && p >= 6 && count ? [self positionForPile:p index:count - 1]
+                                                          : [self originForPile:p];
+    }
     for (CardNode *node in self.cards.allValues) {
-        node.color = [SKColor colorWithRed:0.5 green:0.7 blue:1 alpha:1];
+        node.color = [SKColor colorWithRed:0.455 green:0.271 blue:0.902 alpha:1];
         node.colorBlendFactor =
             (node.pile == self.selectedPile && node.index >= self.selectedIndex) ? 0.16 : 0;
     }
@@ -213,8 +242,7 @@
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     if (!self.activeTouch || ![touches containsObject:self.activeTouch])
         return;
-    UITouch *touch = self.activeTouch;
-    CGPoint point = [touch locationInNode:self];
+    CGPoint point = [self.activeTouch locationInNode:self];
     self.activeTouch = nil;
     NSInteger destination = [self pileAt:point];
     if (self.dragging) {
@@ -234,24 +262,30 @@
         return;
     }
     CardNode *node = [self cardAt:point];
-    if (self.selectedPile >= 0 && [self.game moveFrom:self.selectedPile
-                                                index:self.selectedIndex
-                                                   to:destination]) {
-        [self changed];
+    if (!node || ![self.game canLiftFrom:node.pile index:node.index])
         return;
-    }
-    if (node && [self.game canLiftFrom:node.pile index:node.index]) {
-        NSInteger foundation = [self.game foundationFor:node.pile index:node.index];
-        if (foundation != NSNotFound && (touch.tapCount >= 2 || self.selectedPile == node.pile)) {
-            [self.game moveFrom:node.pile index:node.index to:foundation];
-            [self changed];
-            return;
-        }
-        self.selectedPile = node.pile;
-        self.selectedIndex = node.index;
+    NSInteger best = [self.game bestDestinationFrom:node.pile index:node.index];
+    if (best != NSNotFound) {
+        [self.game moveFrom:node.pile index:node.index to:best];
+        [self changed];
     } else
-        self.selectedPile = -1;
-    [self showSelection];
+        [self shakePile:node.pile index:node.index];
+}
+// A short sideways nudge says "nowhere to go" without moving anything.
+- (void)shakePile:(NSInteger)p index:(NSInteger)index {
+    if (UIAccessibilityIsReduceMotionEnabled())
+        return;
+    for (NSInteger i = index; i < (NSInteger)self.game.piles[p].count; i++) {
+        CardNode *n = self.cards[@(self.game.piles[p][i].identifier)];
+        CGPoint home = [self positionForPile:p index:i];
+        [n removeActionForKey:@"move"];
+        n.position = home;
+        SKAction *shake = [SKAction sequence:@[
+            [SKAction moveByX:-6 y:0 duration:0.04], [SKAction moveByX:12 y:0 duration:0.07],
+            [SKAction moveByX:-10 y:0 duration:0.06], [SKAction moveTo:home duration:0.05]
+        ]];
+        [n runAction:shake withKey:@"move"];
+    }
 }
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self cancelInteraction];

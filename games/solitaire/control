@@ -1,6 +1,6 @@
 Package: com.local.solitaire
 Name: Solitaire
-Version: 2.0.0
+Version: 2.2.0
 Architecture: iphoneos-arm
 Description: Minimal offline Draw-1 Klondike for iPad
 Maintainer: Solitaire

@@ -37,7 +37,9 @@ Run on the iPad mini 2 with iOS 10.3.3.
 
 - Draw all 24 stock cards, recycle, and check the same draw order returns. Undo a draw and a recycle.
 - Drag one card and a multi-card stack to legal and illegal destinations. Invalid drops return without incrementing moves.
-- Tap a card and then a destination, including an empty king column. Double-tap an ace or the next foundation card. Covered waste and foundation cards cannot be moved.
+- Tap a waste card, a tableau top card, and a card partway down a face-up run. Each moves to its foundation if it can, otherwise onto a tableau card, otherwise a king to an empty column. A card with no move shakes and the move count doesn't change. A lone king at the bottom of a column doesn't hop to another empty column. Covered waste and foundation cards cannot be moved.
+- While dragging, the outline sits on the card a stack would land on, not over the top of the column.
+- The top row reads foundations left, waste and stock right, with space above it. Empty foundations are plain outlines. The purple gradient fills the screen, including behind the controls bar, in both orientations.
 - Move a tableau stack that exposes a face-down card. Confirm it flips, then undo and confirm it becomes face-down again.
 - Background the app for a minute. The game timer does not advance, and relaunching restores the board.
 - Enable Reduce Motion. Move and victory animations are suppressed.

@@ -18,4 +18,12 @@ Every game uses the same stack: Objective-C, UIKit, and SpriteKit, built with Th
 
 ## Install on the iPad
 
-With TNS Sockport active and AppSync Unified installed, use Legacy iOS Kit: `./restore.sh` → App Management → Install IPA (ideviceinstaller) → pick `games/<name>/dist/*.ipa`.
+Plug the iPad in over USB with TNS Sockport active and AppSync Unified installed, then run:
+
+```sh
+./install.sh
+```
+
+Pick a game (or "Select IPA file..." to choose any IPA in Finder), pick a build from its `dist/` folder, and confirm. The confirm screen shows the app, the connected device, and the currently installed version. Unlock the iPad and tap Trust if it asks.
+
+This is a slimmed-down version of Legacy iOS Kit's App Management → Install IPA (ideviceinstaller), using the same bundled macOS tools in `tools/libimobiledevice/macos/`. It runs on macOS only.

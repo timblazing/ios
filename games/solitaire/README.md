@@ -4,22 +4,22 @@ Offline Draw-1 Klondike in Objective-C, UIKit, and SpriteKit. Targets ARM64 and 
 
 ## Install this build
 
-Use `packages/com.local.solitaire_2.0.0_iphoneos-arm.deb` on the jailbroken iPad. Copy it to the device and install it with Filza or run as root:
+Use `packages/com.local.solitaire_2.2.0_iphoneos-arm.deb` on the jailbroken iPad. Copy it to the device and install it with Filza or run as root:
 
 ```sh
-dpkg -i com.local.solitaire_2.0.0_iphoneos-arm.deb
+dpkg -i com.local.solitaire_2.2.0_iphoneos-arm.deb
 ```
 
 The package refreshes the icon cache. If the icon is missing, run `uicache` as mobile and return to the Home screen.
 
-`dist/Solitaire-2.0.0.ipa` contains the same app. It is ad-hoc signed for a jailbroken installation environment. An IPA installer must support that signing setup, such as an AppSync-enabled installer. It is not an Apple-provisioned IPA for a stock device. The `.deb` is the intended route for this target.
+`dist/Solitaire-2.2.0.ipa` contains the same app. It is ad-hoc signed for a jailbroken installation environment. An IPA installer must support that signing setup, such as an AppSync-enabled installer. It is not an Apple-provisioned IPA for a stock device. The `.deb` is the intended route for this target.
 
 ## Play
 
+- The top row has the four foundations on the left and the waste and stock on the right, with some room above it so it's an easier reach.
 - Tap the stock to draw one card. Tap its empty outline to recycle the waste.
-- Drag a face-up card or a descending, alternating-color stack onto a legal pile.
-- Or tap a card, then tap its destination. Blue outlines mark legal destinations.
-- Double-tap a card to move it to its foundation. Tapping an already-selected card also attempts this.
+- Tap a face-up card to send it, with any cards on top of it, to the best legal pile: its foundation first, then a tableau card, then an empty column (kings only, and only if that uncovers something). A card with nowhere to go gives a short shake.
+- Or drag a face-up card or a descending, alternating-color stack onto a legal pile. Outlines mark legal destinations while dragging.
 - Exposed face-down tableau cards flip automatically.
 - Undo restores the previous move, including a draw, recycle, or automatic flip. The last 200 actions are available during the current session.
 - The controls bar sits at the bottom: time and moves on the left, then Undo (back arrow), New game (circular arrow), and Settings (gear).
@@ -33,11 +33,13 @@ The app uses one card design from `Resources/Cards/`: `back.png` plus 52 faces n
 
 Any missing or unreadable card falls back to the built-in drawn card (rank text and suit symbol, or the slate lattice back). An empty folder gives the v1 look, so a partial set works while you design. Missing filenames are logged once at launch. All textures are rendered on a background queue at launch for both orientations, so the first flip doesn't hitch.
 
-Only the top ~24% of a face-up card shows in a landscape tableau column (32% in portrait), and less when a long column compresses. Keep the top-left rank and suit legible in that strip.
+Candidate designs are in `docs/card-designs/sets/<set>/`: one SVG and one 250×350 PNG per card, with the same names. `scripts/make-card-svgs.py` builds them (it overwrites that folder, so copy a set elsewhere before reworking it by hand); each set is a palette plus a court style, with suit shapes matching the app icon and court figures from CC0 art in `docs/card-designs/courts/`. To compare sets on a simulated board, serve the game folder (`python3 -m http.server 8765`) and open `http://127.0.0.1:8765/tools/design-playground/`. The app ships the `violet-gold` set. To switch, copy another set's card PNGs into `Resources/Cards/` and its `icon-1024.png` into `Resources/Icon/`.
+
+Only the top ~24% of a face-up card shows in a landscape tableau column (32% in portrait), and as little as ~14% when a long column compresses. The generated sets keep the rank and suit side by side in the top 62 px and start pips and court art below that, so a compressed column reads cleanly.
 
 ## App icon
 
-Put a 1024×1024, fully opaque, square PNG at `Resources/Icon/icon-1024.png`. Don't round the corners; iOS masks the icon. `make` runs `scripts/make-icons.sh`, which uses macOS `sips` to write the seven bundle sizes (`Icon-29.png` through `Icon-83.5@2x.png`). Without the master, or without `sips`, the existing icons are kept. The home screen uses the 152 px icon, so design for that size.
+Put a 1024×1024, fully opaque, square PNG at `Resources/Icon/icon-1024.png`. `scripts/make-card-svgs.py` writes one per set (the set's back and A♠ fanned on the board color); the previous icon is kept at `docs/card-designs/previous-icon-1024.png`. Don't round the corners; iOS masks the icon. `make` runs `scripts/make-icons.sh`, which uses macOS `sips` to write the seven bundle sizes (`Icon-29.png` through `Icon-83.5@2x.png`). Without the master, or without `sips`, the existing icons are kept. The home screen uses the 152 px icon, so design for that size.
 
 iOS may keep showing the old icon after an update. Run `uicache` as mobile or respring.
 

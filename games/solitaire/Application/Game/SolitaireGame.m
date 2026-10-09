@@ -202,4 +202,21 @@
             return d;
     return NSNotFound;
 }
+- (NSInteger)bestDestinationFrom:(NSInteger)s index:(NSInteger)i {
+    if (s >= 6 || s == 1) {
+        NSInteger foundation = [self foundationFor:s index:i];
+        if (foundation != NSNotFound)
+            return foundation;
+    }
+    // Prefer building on a card; an empty pile only helps if it uncovers something.
+    NSInteger empty = NSNotFound;
+    for (NSInteger d = 6; d < 13; d++)
+        if ([self canMoveFrom:s index:i to:d]) {
+            if (self.piles[d].count)
+                return d;
+            if (empty == NSNotFound && !(s >= 6 && i == 0))
+                empty = d;
+        }
+    return empty;
+}
 @end

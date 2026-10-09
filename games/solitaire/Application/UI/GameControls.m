@@ -1,5 +1,8 @@
 #import "GameControls.h"
 static const CGFloat kIconSize = 24;
+@interface GameControls ()
+@property(nonatomic, strong) UIView *rule;
+@end
 @implementation GameControls
 typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, ControlIconSettings };
 // Icons are drawn in code on a 24pt grid, so they need no assets and stay sharp at any scale.
@@ -60,11 +63,11 @@ typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, C
 }
 - (UIButton *)buttonWithIcon:(ControlIcon)icon label:(NSString *)label {
     UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
-    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:0.85 alpha:1]]
+    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:1 alpha:0.78]]
        forState:UIControlStateNormal];
-    [b setImage:[GameControls imageForIcon:icon color:[UIColor whiteColor]]
+    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithRed:0.937 green:0.788 blue:0.396 alpha:1]]
        forState:UIControlStateHighlighted];
-    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:0.3 alpha:1]]
+    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:1 alpha:0.2]]
        forState:UIControlStateDisabled];
     b.accessibilityLabel = label;
     [self addSubview:b];
@@ -72,12 +75,15 @@ typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, C
 }
 - (instancetype)initWithFrame:(CGRect)frame {
     if ((self = [super initWithFrame:frame])) {
-        self.backgroundColor = [UIColor blackColor];
+        self.backgroundColor = [UIColor colorWithRed:0.039 green:0.035 blue:0.055 alpha:0.82];
+        _rule = [UIView new];
+        _rule.backgroundColor = [UIColor colorWithWhite:1 alpha:0.08];
+        [self addSubview:_rule];
         _undoButton = [self buttonWithIcon:ControlIconUndo label:@"Undo"];
         _restartButton = [self buttonWithIcon:ControlIconNewGame label:@"New game"];
         _settingsButton = [self buttonWithIcon:ControlIconSettings label:@"Settings"];
         _status = [UILabel new];
-        _status.textColor = [UIColor colorWithWhite:0.55 alpha:1];
+        _status.textColor = [UIColor colorWithWhite:1 alpha:0.55];
         _status.font = [UIFont monospacedDigitSystemFontOfSize:14 weight:UIFontWeightRegular];
         [self addSubview:_status];
     }
@@ -86,6 +92,7 @@ typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, C
 - (void)layoutSubviews {
     [super layoutSubviews];
     CGFloat w = self.bounds.size.width, h = self.bounds.size.height, button = 56;
+    self.rule.frame = CGRectMake(0, 0, w, 1 / [UIScreen mainScreen].scale);
     self.status.frame = CGRectMake(24, 0, MAX(0, w - 24 - 3 * button - 24), h);
     self.undoButton.frame = CGRectMake(w - 3 * button - 12, 0, button, h);
     self.restartButton.frame = CGRectMake(w - 2 * button - 12, 0, button, h);

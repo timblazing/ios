@@ -9,6 +9,8 @@ Small native games for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2
 ```
 games/<name>/      one self-contained Theos project per game (Makefile, control, Resources/, scripts/, Tests/, docs/)
 docs/              shared notes, including the original stack research
+install.sh         interactive IPA installer for the USB-connected iPad (macOS)
+tools/             shared tooling: bundled libimobiledevice binaries for install.sh
 .clang-format      applies to all games
 ```
 
@@ -55,9 +57,9 @@ vtool -show-build .theos/_/Applications/<App>.app/<App>   # expect LC_VERSION_MI
 
 ## Installing on the iPad
 
-The user installs IPAs with Legacy iOS Kit: `./restore.sh` → App Management → Install IPA (ideviceinstaller), with TNS Sockport active and AppSync Unified installed. The `.deb` also works (`dpkg -i`, or Filza). If the home screen icon is stale, run `uicache` as mobile or respring.
+Run `./install.sh` from the repo root with the iPad on USB, TNS Sockport active, and AppSync Unified installed. It's an interactive menu: pick a game (from `games/`) or "Select IPA file..." for a Finder picker, pick a build from that game's `dist/`, then confirm. The confirm screen shows the app, the device, and the installed version. It's a slimmed-down version of Legacy iOS Kit's App Management → Install IPA (ideviceinstaller), using the same macOS binaries, copied to `tools/libimobiledevice/macos/` (see `NOTICE.md` there). The `.deb` also works (`dpkg -i`, or Filza). If the home screen icon is stale, run `uicache` as mobile or respring.
 
-You can't reach the device. Anything that needs real hardware (install, rotation, touch feel, A7 frame rate) goes in the game's `Tests/DEVICE_CHECKLIST.md` for the user to run. Don't claim it's verified.
+When the iPad is plugged in you can read from it with the bundled tools, e.g. `tools/libimobiledevice/macos/ideviceinfo -s -k ProductVersion` or `ideviceinstaller list --user`. Don't install or uninstall anything without the user's go-ahead. Checks that need a person (touch feel, rotation, frame rate) go in the game's `Tests/DEVICE_CHECKLIST.md` for the user to run. Don't claim they're verified.
 
 ## Writing code for iOS 10
 

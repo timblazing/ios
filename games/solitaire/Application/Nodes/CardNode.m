@@ -109,7 +109,7 @@
     CGRect rect = CGRectInset((CGRect){CGPointZero, size}, 2, 2);
     UIBezierPath *shape = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:7];
     CGContextSaveGState(ctx);
-    CGContextSetShadowWithColor(ctx, CGSizeMake(0, 2), 2, [UIColor colorWithWhite:0 alpha:0.5].CGColor);
+    CGContextSetShadowWithColor(ctx, CGSizeMake(0, 0.5), 2, [UIColor colorWithWhite:0 alpha:0.55].CGColor);
     [[UIColor colorWithWhite:0.93 alpha:1] setFill];
     [shape fill];
     CGContextRestoreGState(ctx);
@@ -127,6 +127,11 @@
     else
         [self drawFallbackBackInRect:rect];
     CGContextRestoreGState(ctx);
+    // A hairline edge, so the top of each card in an overlapping column reads against the one beneath.
+    UIBezierPath *edge = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(rect, 0.25, 0.25) cornerRadius:7];
+    edge.lineWidth = 0.5;
+    [[UIColor colorWithRed:0.09 green:0.07 blue:0.12 alpha:0.45] setStroke];
+    [edge stroke];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;

@@ -11,23 +11,25 @@
 @property(nonatomic, strong) NSTimer *timer;
 @property(nonatomic) BOOL showingVictory;
 @end
+static const CGFloat kBarHeight = 52;
 @implementation GameViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor blackColor];
+    self.view.backgroundColor = [UIColor colorWithRed:0.039 green:0.035 blue:0.055 alpha:1];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults registerDefaults:@{@"soundEnabled" : @NO}];
     // v1 settings that no longer exist.
     [defaults removeObjectForKey:@"cardBack"];
     [defaults removeObjectForKey:@"drawMode"];
     self.board = [[SKView alloc] initWithFrame:self.view.bounds];
-    self.board.backgroundColor = [UIColor blackColor];
+    self.board.backgroundColor = self.view.backgroundColor;
     self.board.ignoresSiblingOrder = YES;
     self.board.preferredFramesPerSecond = 60;
     self.board.multipleTouchEnabled = NO;
     [self.view addSubview:self.board];
     self.scene = [[GameScene alloc] initWithSize:self.board.bounds.size];
     self.scene.game = [SolitaireGame new];
+    self.scene.bottomInset = kBarHeight;
     __weak typeof(self) weakSelf = self;
     self.scene.gameChanged = ^{
         [weakSelf updateStatus];
@@ -48,7 +50,9 @@
     self.victory = [UILabel new];
     self.victory.textColor = [UIColor whiteColor];
     self.victory.textAlignment = NSTextAlignmentCenter;
-    self.victory.font = [UIFont systemFontOfSize:26 weight:UIFontWeightLight];
+    self.victory.font = [UIFont fontWithName:@"AvenirNext-Medium" size:20];
+    self.victory.shadowColor = [UIColor colorWithWhite:0 alpha:0.8];
+    self.victory.shadowOffset = CGSizeMake(0, 1);
     self.victory.numberOfLines = 0;
     self.victory.hidden = YES;
     [self.view addSubview:self.victory];
@@ -67,8 +71,9 @@
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CGSize size = self.view.bounds.size;
-    CGFloat bar = 52, boardHeight = size.height - bar;
-    self.board.frame = CGRectMake(0, 0, size.width, boardHeight);
+    CGFloat bar = kBarHeight, boardHeight = size.height - bar;
+    // The board runs full-screen so its glow continues under the translucent controls bar.
+    self.board.frame = self.view.bounds;
     self.controls.frame = CGRectMake(0, boardHeight, size.width, bar);
     self.scene.size = self.board.bounds.size;
     self.victory.frame = CGRectMake(24, boardHeight * 0.48, size.width - 48, 150);
@@ -109,9 +114,23 @@
     self.controls.undoButton.enabled = self.scene.game.canUndo;
     if (self.scene.game.won) {
         self.victory.hidden = NO;
-        self.victory.text =
-            [NSString stringWithFormat:@"Nicely played.\n%@   ·   %ld moves\nTap the new game button to play again",
-                                       time, (long)self.scene.game.moves];
+        NSMutableAttributedString *text = [[NSMutableAttributedString alloc]
+            initWithString:@"Nicely played.\n"
+                attributes:@{NSFontAttributeName : [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:44]}];
+        [text appendAttributedString:[[NSAttributedString alloc]
+                                         initWithString:[NSString stringWithFormat:@"%@   ·   %ld moves\n", time,
+                                                                                   (long)self.scene.game.moves]
+                                             attributes:@{
+                                                 NSForegroundColorAttributeName :
+                                                     [UIColor colorWithRed:0.937 green:0.788 blue:0.396 alpha:1]
+                                             }]];
+        [text appendAttributedString:[[NSAttributedString alloc]
+                                         initWithString:@"Tap the new game button to play again"
+                                             attributes:@{
+                                                 NSForegroundColorAttributeName : [UIColor colorWithWhite:1 alpha:0.5],
+                                                 NSFontAttributeName : [UIFont fontWithName:@"AvenirNext-Regular" size:15]
+                                             }]];
+        self.victory.attributedText = text;
         if (!self.showingVictory)
             [self.scene celebrate];
         self.showingVictory = YES;
