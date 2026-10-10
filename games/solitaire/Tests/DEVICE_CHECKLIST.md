@@ -33,7 +33,9 @@ Run on the iPad mini 2 with iOS 10.3.3.
 
 ## Settings
 
-- Settings shows only Statistics (games played, wins, current win streak). There is no Card back or Draw mode section, and every row is visible without scrolling in both orientations.
+- Settings shows Statistics (games played, wins, current win streak) and Celebration (Preview celebration) in felt green with gold values, and every row is visible without scrolling in both orientations.
+- Preview celebration closes Settings and plays the full celebration over the current game. Tapping the board, or any bar button, ends it and the game is unchanged.
+- Empty foundations are plain outlines with no letter.
 
 ## Unchanged from v1
 

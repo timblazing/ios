@@ -5,6 +5,6 @@
 // Height of the controls bar; the stats sit just above it.
 @property(nonatomic) CGFloat bottomInset;
 @property(nonatomic, readonly) BOOL showing;
-- (void)showWithTime:(NSString *)time moves:(NSInteger)moves;
+- (void)showWithTime:(NSString *)time moves:(NSInteger)moves hint:(NSString *)hint;
 - (void)hide;
 @end

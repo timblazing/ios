@@ -11,6 +11,7 @@
 @property(nonatomic, strong) CelebrationView *celebration;
 @property(nonatomic, strong) NSTimer *timer;
 @property(nonatomic) BOOL showingVictory;
+@property(nonatomic) BOOL previewing;
 @end
 static const CGFloat kBarHeight = 52;
 @implementation GameViewController
@@ -34,6 +35,9 @@ static const CGFloat kBarHeight = 52;
     __weak typeof(self) weakSelf = self;
     self.scene.gameChanged = ^{
         [weakSelf updateStatus];
+    };
+    self.scene.previewEnded = ^{
+        [weakSelf endPreview];
     };
     [self.board presentScene:self.scene];
     [self.scene preloadTextures];
@@ -91,6 +95,7 @@ static const CGFloat kBarHeight = 52;
                                                  repeats:YES];
 }
 - (void)background {
+    [self endPreview];
     [self.scene cancelInteraction];
     [self.scene refreshAnimated:NO];
     [self.scene.game pauseTimer];
@@ -111,8 +116,12 @@ static const CGFloat kBarHeight = 52;
         [NSString stringWithFormat:@"%@   •   %ld moves", time, (long)self.scene.game.moves];
     self.controls.undoButton.enabled = self.scene.game.canUndo;
     self.controls.autoWinButton.hidden = !self.scene.game.canAutoWin || self.scene.autoPlaying;
+    if (self.previewing)
+        return;
     if (self.scene.game.won) {
-        [self.celebration showWithTime:time moves:self.scene.game.moves];
+        [self.celebration showWithTime:time
+                                 moves:self.scene.game.moves
+                                  hint:@"Tap the new game button to play again"];
         if (!self.showingVictory)
             [self.scene celebrate];
         self.showingVictory = YES;
@@ -121,17 +130,35 @@ static const CGFloat kBarHeight = 52;
         self.showingVictory = NO;
     }
 }
+- (void)previewCelebration {
+    self.previewing = YES;
+    [self.celebration hide];
+    [self.scene previewCelebration];
+    [self.celebration showWithTime:@"3:14" moves:99 hint:@"Celebration preview · tap the board to close"];
+}
+- (void)endPreview {
+    if (!self.previewing)
+        return;
+    self.previewing = NO;
+    [self.scene endPreview];
+    [self.celebration hide];
+    self.showingVictory = NO;
+    [self updateStatus];
+}
 - (void)autoWin {
+    [self endPreview];
     [self.scene autoWin];
     [self updateStatus];
 }
 - (void)undo {
+    [self endPreview];
     [self.scene cancelInteraction];
     [self.scene.game undo];
     [self.scene refreshAnimated:YES];
     [self updateStatus];
 }
 - (void)confirmNewGame {
+    [self endPreview];
     [self.scene cancelInteraction];
     [self.scene refreshAnimated:NO];
     if (self.scene.game.won) {
@@ -158,12 +185,16 @@ static const CGFloat kBarHeight = 52;
     [self updateStatus];
 }
 - (void)settings {
+    [self endPreview];
     [self.scene cancelInteraction];
     [self.scene refreshAnimated:NO];
     SettingsViewController *settings = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
     __weak typeof(self) weakSelf = self;
     settings.onClose = ^{
         [weakSelf.scene refreshAnimated:NO];
+    };
+    settings.onPreviewCelebration = ^{
+        [weakSelf previewCelebration];
     };
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:settings];
     nav.modalPresentationStyle = UIModalPresentationFormSheet;

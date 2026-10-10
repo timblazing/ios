@@ -15,6 +15,8 @@
 @property(nonatomic, strong) SKSpriteNode *background;
 @property(nonatomic) BOOL autoPlaying;
 @property(nonatomic) BOOL celebrating;
+@property(nonatomic, strong) NSArray<CardNode *> *previewDancers;
+@property(nonatomic) BOOL previewing;
 @end
 @implementation GameScene
 - (instancetype)initWithSize:(CGSize)size {
@@ -116,7 +118,7 @@
         [s removeFromParent];
     [self.slots removeAllObjects];
     for (NSInteger p = 0; p < 13; p++) {
-        PileNode *slot = [[PileNode alloc] initWithSize:self.cardSize label:@[ @"↻", @"", @"A", @"K" ][MIN(p, 6) == 6 ? 3 : MIN(p, 2)]];
+        PileNode *slot = [[PileNode alloc] initWithSize:self.cardSize label:@[ @"↻", @"", @"", @"K" ][MIN(p, 6) == 6 ? 3 : MIN(p, 2)]];
         slot.position = [self originForPile:p];
         [self.slots addObject:slot];
         [self addChild:slot];
@@ -157,6 +159,8 @@
     self.celebrating = self.celebrating && self.game.won;
     if (self.celebrating)
         [self danceAnimated:!UIAccessibilityIsReduceMotionEnabled()];
+    if (self.previewDancers)
+        [self dance:self.previewDancers animated:!UIAccessibilityIsReduceMotionEnabled()];
 }
 - (CardNode *)cardAt:(CGPoint)point {
     CardNode *best = nil;
@@ -210,6 +214,12 @@
         self.gameChanged();
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    if (self.previewing) {
+        [self endPreview];
+        if (self.previewEnded)
+            self.previewEnded();
+        return;
+    }
     if (self.game.won || self.activeTouch || self.autoPlaying)
         return;
     UITouch *touch = touches.anyObject;
@@ -327,25 +337,56 @@
     self.celebrating = YES;
     [self danceAnimated:!UIAccessibilityIsReduceMotionEnabled()];
 }
-// The kings and queens step off the foundations into a chorus line across the lower board and dance,
-// alternating red and black, each a beat behind its neighbor.
+// Kings and queens alternating red and black: K♥ Q♠ K♣ Q♦ K♦ Q♣ K♠ Q♥.
+static const NSInteger kDancers[] = {12, 50, 38, 24, 25, 37, 51, 11};
+- (void)previewCelebration {
+    [self cancelInteraction];
+    [self endPreview];
+    self.previewing = YES;
+    if (self.game.won)
+        return;  // the real dancers are already out
+    NSMutableArray *dancers = [NSMutableArray array];
+    for (NSUInteger i = 0; i < 8; i++) {
+        Card *card = [[Card alloc] initWithIdentifier:kDancers[i]];
+        card.faceUp = YES;
+        CardNode *n = [[CardNode alloc] initWithCard:card size:self.cardSize];
+        n.position = [self originForPile:0];
+        [self addChild:n];
+        [dancers addObject:n];
+    }
+    self.previewDancers = dancers;
+    [self dance:dancers animated:!UIAccessibilityIsReduceMotionEnabled()];
+}
+- (void)endPreview {
+    for (CardNode *n in self.previewDancers)
+        [n removeFromParent];
+    self.previewDancers = nil;
+    self.previewing = NO;
+}
+// The kings and queens step off the foundations into a chorus line across the lower board and dance.
 - (void)danceAnimated:(BOOL)motion {
-    NSArray<NSArray<NSNumber *> *> *order =
-        @[ @[ @2, @12 ], @[ @5, @11 ], @[ @4, @12 ], @[ @3, @11 ], @[ @3, @12 ], @[ @4, @11 ], @[ @5, @12 ], @[ @2, @11 ] ];
+    NSMutableArray *dancers = [NSMutableArray array];
+    for (NSUInteger i = 0; i < 8; i++) {
+        Card *c = self.game.piles[2 + kDancers[i] / 13][kDancers[i] % 13];
+        [dancers addObject:self.cards[@(c.identifier)]];
+        // The jacks stay behind, so the foundations still look complete.
+        self.cards[@(((Card *)self.game.piles[2 + kDancers[i] / 13][10]).identifier)].hidden = NO;
+    }
+    [self dance:dancers animated:motion];
+}
+// A chorus line across the lower board, each card a beat behind its neighbor.
+- (void)dance:(NSArray<CardNode *> *)order animated:(BOOL)motion {
     CGFloat available = self.size.width - 2 * self.margin, spacing = MIN(self.cardSize.width * 1.2, available / order.count),
             scale = MIN(1.1, spacing / (self.cardSize.width * 1.12)),
             y = self.bottomInset + (self.size.height - self.bottomInset) * 0.3;
     for (NSUInteger i = 0; i < order.count; i++) {
-        NSArray *pile = self.game.piles[order[i][0].integerValue];
-        CardNode *n = self.cards[@(((Card *)pile[order[i][1].integerValue]).identifier)];
+        CardNode *n = order[i];
+        [n refreshWithSize:self.cardSize animated:NO];
         CGPoint spot = CGPointMake(self.size.width / 2 + (i - (order.count - 1) / 2.0) * spacing, y);
         [n removeActionForKey:@"move"];
         [n removeActionForKey:@"victory"];
         n.hidden = NO;
         n.zPosition = 900 + i;
-        // The jacks stay behind, so the foundations still look complete.
-        CardNode *jack = self.cards[@(((Card *)pile[10]).identifier)];
-        jack.hidden = NO;
         if (!motion) {
             n.position = spot;
             [n setScale:scale];

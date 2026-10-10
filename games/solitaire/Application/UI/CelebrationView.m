@@ -216,7 +216,7 @@ static NSString *const kMessage = @"Congrats Reagan!";
     self.confetti.emitterPosition = CGPointMake(size.width / 2, -20);
     self.confetti.emitterSize = CGSizeMake(size.width, 1);
 }
-- (void)showWithTime:(NSString *)time moves:(NSInteger)moves {
+- (void)showWithTime:(NSString *)time moves:(NSInteger)moves hint:(NSString *)hint {
     UIColor *edge = [UIColor colorWithRed:0.02 green:0.14 blue:0.05 alpha:1];
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc]
         initWithString:[NSString stringWithFormat:@"%@   ·   %ld moves\n", time, (long)moves]
@@ -225,7 +225,7 @@ static NSString *const kMessage = @"Congrats Reagan!";
                 NSForegroundColorAttributeName : [UIColor colorWithRed:1 green:0.9 blue:0.3 alpha:1],
                 NSStrokeColorAttributeName : edge, NSStrokeWidthAttributeName : @-4
             }];
-    [text appendAttributedString:[[NSAttributedString alloc] initWithString:@"Tap the new game button to play again"
+    [text appendAttributedString:[[NSAttributedString alloc] initWithString:hint
                                                                  attributes:@{
                                                                      NSFontAttributeName : [UIFont fontWithName:@"ChalkboardSE-Regular" size:17],
                                                                      NSForegroundColorAttributeName : [UIColor whiteColor],

@@ -13,4 +13,9 @@
 - (void)autoWin;
 // Lines up the kings and queens to dance until the next game.
 - (void)celebrate;
+// Dances a stand-in line of kings and queens without winning; any touch on the board ends it.
+@property(nonatomic, readonly) BOOL previewing;
+@property(nonatomic, copy) void (^previewEnded)(void);
+- (void)previewCelebration;
+- (void)endPreview;
 @end

@@ -50,10 +50,10 @@ SETS = {
                     field="#1b1236", glow="#4b2f9a", glowSuit="#ef5a6e"),
     "minimal": dict(label="Minimal courts", red="#7445e6", blue="#2c1a52", yellow="#ddd2ff", courts="letters",
                     field="#1a0f31", glow="#5b33b8", glowSuit="#a88bff"),
-    # True red and black faces, a red back with a white lattice, and the icon on the board's green felt.
-    "traditional": dict(label="Traditional", red="#d0101e", blue="#1f3c8f", yellow="#f3c22c", courts="figures",
+    # True red and black faces, the cat on a purple back, and the icon on the board's green felt.
+    "traditional": dict(label="Traditional + cat", red="#d0101e", blue="#1f3c8f", yellow="#f3c22c", courts="figures",
                         ink="#111111", field="#b3101c", line="#ffffff", glow="#e8434d", glowSuit="#ffffff",
-                        felt=("#3a9d55", "#1a6a33", "#0a3a1a")),
+                        felt=("#3a9d55", "#1a6a33", "#0a3a1a"), back="cat"),
 }
 SOURCE = {"red": (0xff, 0x55, 0x55), "blue": (0x55, 0x55, 0xaa), "yellow": (0xff, 0xff, 0x55),
           "black": (0, 0, 0), "white": (0xff, 0xff, 0xff)}
@@ -214,6 +214,72 @@ def back(palette):
             f'</svg>\n')
 
 
+# The cat back: a purple gradient field with the cat (docs/card-designs/cat/cat.png, background already cut
+# out) gradient-mapped to the same purples, so she reads as part of the print rather than a photo on top.
+CAT = DESIGNS / "cat" / "cat.png"
+CAT_FIELD = ("#2a0a5e", "#5b1fb0", "#a23fd6", "#e07ae6")
+CAT_TONES = ((0, (0x16, 0x03, 0x38)), (.4, (0x6a, 0x22, 0xb8)), (.8, (0xd9, 0x8c, 0xf5)), (1, (0xff, 0xec, 0xff)))
+
+
+def cat_image(width, height):
+    """The cat, duotoned to purples and faded out at the bottom, as a PNG data URI sized for the field."""
+    import io
+    from PIL import Image, ImageOps
+    cat = Image.open(CAT).convert("RGBA")
+    cat = cat.resize((width * 3, round(width * 3 * cat.height / cat.width)), Image.LANCZOS)
+    gray = ImageOps.autocontrast(cat.convert("L"), cutoff=2)
+    lut = []
+    for c in range(3):
+        for v in range(256):
+            t = v / 255
+            (t0, a), (t1, b) = next((CAT_TONES[i], CAT_TONES[i + 1]) for i in range(len(CAT_TONES) - 1)
+                                    if t <= CAT_TONES[i + 1][0])
+            f = (t - t0) / (t1 - t0)
+            lut.append(round(a[c] + (b[c] - a[c]) * f))
+    tinted = Image.merge("RGB", (gray, gray, gray)).point(lut)
+    alpha = cat.getchannel("A")
+    fade = Image.linear_gradient("L").resize(alpha.size)  # 0 at the top, 255 at the bottom
+    fade = fade.point(lambda v: 255 if v < 150 else max(0, 255 - (v - 150) * 255 // 105))
+    tinted.putalpha(Image.composite(alpha, Image.new("L", alpha.size, 0), fade))
+    buf = io.BytesIO()
+    tinted.save(buf, "PNG", optimize=True)
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+def cat_back(palette):
+    fx, fy, fw, fh = 11, 11, W - 22, H - 22
+    cx = W / 2
+    stops = "".join(f'<stop offset="{i / (len(CAT_FIELD) - 1):g}" stop-color="{c}"/>' for i, c in enumerate(CAT_FIELD))
+    dots = (f'<pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse" '
+            f'patternTransform="rotate(45)"><circle cx="7" cy="7" r="1.1" fill="#ffffff" fill-opacity=".16"/>'
+            f'</pattern>')
+    glow = (f'<radialGradient id="halo" cx="{cx:g}" cy="{fy + fh * .36:g}" r="{fw * .62:g}" '
+            f'gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f6c7ff" stop-opacity=".55"/>'
+            f'<stop offset="1" stop-color="#f6c7ff" stop-opacity="0"/></radialGradient>')
+    cw = fw - 18
+    ch = round(cw * 1021 / 675)
+    rule = lambda inset, width, opacity: (
+        f'<rect x="{fx + inset:g}" y="{fy + inset:g}" width="{fw - 2 * inset:g}" height="{fh - 2 * inset:g}" '
+        f'rx="{max(2, 10 - inset / 2):g}" fill="none" stroke="#ffffff" stroke-opacity="{opacity}" '
+        f'stroke-width="{width}"/>')
+    sparkle = lambda x, y, r: (f'<path d="M{x:g},{y - r:g}Q{x:g},{y:g} {x + r:g},{y:g}Q{x:g},{y:g} {x:g},{y + r:g}'
+                               f'Q{x:g},{y:g} {x - r:g},{y:g}Q{x:g},{y:g} {x:g},{y - r:g}Z" fill="#ffffff" '
+                               f'fill-opacity=".85"/>')
+    sparkles = "".join(sparkle(x, y, r) for x, y, r in ((40, 44, 7), (212, 62, 5), (205, 128, 8), (47, 150, 5),
+                                                         (30, 96, 4), (222, 190, 4)))
+    corners = "".join(f'<path d="{diamond(x, y, 12, 16)}" fill="#ffffff"/>'
+                      for x in (fx + 9, fx + fw - 9) for y in (fy + 9, fy + fh - 9))
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
+            f'<defs><linearGradient id="field" x1="0" y1="0" x2="1" y2="1">{stops}</linearGradient>{dots}{glow}'
+            f'<clipPath id="inside"><rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" rx="10"/></clipPath></defs>\n'
+            f'<rect width="{W}" height="{H}" fill="#ffffff"/>\n'
+            f'<g clip-path="url(#inside)"><rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" fill="url(#field)"/>'
+            f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" fill="url(#dots)"/>'
+            f'<rect x="{fx}" y="{fy}" width="{fw}" height="{fh}" fill="url(#halo)"/>{sparkles}'
+            f'<image href="{cat_image(cw, fh)}" x="{cx - cw / 2:g}" y="{fy + 26:g}" width="{cw}" height="{ch}"/></g>\n'
+            f'{rule(6, 1.6, .9)}{rule(10, .8, .5)}\n{corners}\n</svg>\n')
+
+
 def icon(name, palette):
     """1024px app icon: the set's back and ace of spades fanned on the board color (near-black, or felt)."""
     out = OUT / name
@@ -249,7 +315,7 @@ def icon(name, palette):
 def build(name, palette):
     out = OUT / name
     out.mkdir(parents=True, exist_ok=True)
-    cards = {"back": back(palette)}
+    cards = {"back": cat_back(palette) if palette.get("back") == "cat" else back(palette)}
     for letter in "SHDC":
         for rank in RANKS:
             cards[rank + letter] = face(rank, letter, palette)
