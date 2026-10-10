@@ -2,7 +2,9 @@
 #import <QuartzCore/QuartzCore.h>
 static NSString *const kMessage = @"Congrats Reagan!";
 @interface CelebrationView ()
-@property(nonatomic, strong) UIImageView *wordArt;
+@property(nonatomic, strong) UIView *wordArt;
+@property(nonatomic, strong) NSArray<UIView *> *letters;
+@property(nonatomic) BOOL looping;
 @property(nonatomic, strong) NSArray<UIImageView *> *stars;
 @property(nonatomic, strong) UILabel *stats;
 @property(nonatomic, strong) CAEmitterLayer *confetti;
@@ -14,7 +16,7 @@ static NSString *const kMessage = @"Congrats Reagan!";
     if ((self = [super initWithFrame:frame])) {
         self.userInteractionEnabled = NO;
         self.hidden = YES;
-        _wordArt = [UIImageView new];
+        _wordArt = [UIView new];
         _wordArt.isAccessibilityElement = YES;
         _wordArt.accessibilityLabel = kMessage;
         [self addSubview:_wordArt];
@@ -36,92 +38,93 @@ static NSString *const kMessage = @"Congrats Reagan!";
     return self;
 }
 // Classic 90s WordArt: letters on an upward arch, each filled with a top-to-bottom rainbow, a thick navy
-// outline, a deep purple extrusion, and a drop shadow under the lot.
-+ (UIImage *)wordArtForWidth:(CGFloat)width {
+// outline, a deep purple extrusion, and a drop shadow. Each letter is its own image so they can bounce
+// separately; drawing left to right, each letter's face covers its left neighbor's extrusion, as in one image.
++ (NSArray<UIImageView *> *)wordArtLettersForWidth:(CGFloat)width canvas:(CGSize *)canvas {
     UIFont *font = [UIFont fontWithName:@"HelveticaNeue-CondensedBlack" size:100] ?: [UIFont boldSystemFontOfSize:100];
     font = [font fontWithSize:floor(100 * width * 0.84 / [kMessage sizeWithAttributes:@{NSFontAttributeName : font}].width)];
-    NSUInteger count = kMessage.length;
+    NSDictionary *plain = @{NSFontAttributeName : font};
     CGFloat size = font.pointSize, stretch = 1.3, depth = MAX(5, round(size * 0.08)), arc = 0.7;
-    CGFloat total = [kMessage sizeWithAttributes:@{NSFontAttributeName : font}].width, radius = total / arc;
+    CGFloat total = [kMessage sizeWithAttributes:plain].width, radius = total / arc;
     CGFloat height = font.lineHeight * stretch, top = size * 0.12 + height / 2;
-    CGSize canvas = CGSizeMake(width, ceil(top + height / 2 + radius * (1 - cos(arc / 2)) + depth + size * 0.12));
-    NSMutableArray<NSValue *> *centers = [NSMutableArray array];
-    NSMutableArray<NSNumber *> *angles = [NSMutableArray array];
-    CGFloat x = 0;
-    for (NSUInteger i = 0; i < count; i++) {
-        CGFloat w = [[kMessage substringWithRange:NSMakeRange(i, 1)] sizeWithAttributes:@{NSFontAttributeName : font}].width;
-        CGFloat a = (x + w / 2 - total / 2) / radius;
-        [centers addObject:[NSValue valueWithCGPoint:CGPointMake(width / 2 + radius * sin(a), top + radius * (1 - cos(a)))]];
-        [angles addObject:@(a)];
-        x += w;
-    }
-    // Runs body once per letter in that letter's upright, stretched frame, centered on its line box.
-    void (^letters)(CGSize, void (^)(NSString *, CGSize)) = ^(CGSize offset, void (^body)(NSString *, CGSize)) {
-        CGContextRef ctx = UIGraphicsGetCurrentContext();
-        for (NSUInteger i = 0; i < count; i++) {
-            NSString *ch = [kMessage substringWithRange:NSMakeRange(i, 1)];
-            CGPoint c = centers[i].CGPointValue;
-            CGContextSaveGState(ctx);
-            CGContextTranslateCTM(ctx, c.x + offset.width, c.y + offset.height);
-            CGContextRotateCTM(ctx, angles[i].doubleValue);
-            CGContextScaleCTM(ctx, 1, stretch);
-            body(ch, [ch sizeWithAttributes:@{NSFontAttributeName : font}]);
-            CGContextRestoreGState(ctx);
-        }
-    };
-    void (^draw)(NSDictionary *, CGSize) = ^(NSDictionary *attributes, CGSize offset) {
-        letters(offset, ^(NSString *ch, CGSize s) {
-            [ch drawAtPoint:CGPointMake(-s.width / 2, -s.height / 2) withAttributes:attributes];
-        });
-    };
-    // The rainbow: white letters, then each letter's own gradient painted only where it is opaque.
-    UIGraphicsBeginImageContextWithOptions(canvas, NO, 0);
-    draw(@{NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor]}, CGSizeZero);
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    CGContextSetBlendMode(ctx, kCGBlendModeSourceIn);
+    *canvas = CGSizeMake(width, ceil(top + height / 2 + radius * (1 - cos(arc / 2)) + depth + size * 0.12));
+    UIColor *navy = [UIColor colorWithRed:0.1 green:0.08 blue:0.4 alpha:1],
+            *extrusion = [UIColor colorWithRed:0.3 green:0.1 blue:0.45 alpha:1];
     CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
     CGFloat colors[] = {0.95, 0.1, 0.18, 1, 1, 0.55, 0.05, 1, 1, 0.92, 0.12, 1,
                         0.2, 0.82, 0.25, 1, 0.12, 0.5, 1, 1, 0.6, 0.22, 0.9, 1},
             locations[] = {0.05, 0.25, 0.45, 0.6, 0.78, 0.98};
     CGGradientRef rainbow = CGGradientCreateWithColorComponents(space, colors, locations, 6);
-    letters(CGSizeZero, ^(NSString *ch, CGSize s) {
-        CGFloat baseline = -s.height / 2 + font.ascender;
-        CGContextClipToRect(ctx, CGRectMake(-s.width / 2 - 2, -s.height / 2, s.width + 4, s.height));
-        CGContextDrawLinearGradient(ctx, rainbow, CGPointMake(0, baseline - font.capHeight), CGPointMake(0, baseline),
-                                    kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
-    });
+    NSMutableArray<UIImageView *> *views = [NSMutableArray array];
+    CGFloat x = 0;
+    for (NSUInteger i = 0; i < kMessage.length; i++) {
+        NSString *ch = [kMessage substringWithRange:NSMakeRange(i, 1)];
+        CGSize s = [ch sizeWithAttributes:plain];
+        CGFloat angle = (x + s.width / 2 - total / 2) / radius;
+        CGPoint c = CGPointMake(width / 2 + radius * sin(angle), top + radius * (1 - cos(angle)));
+        x += s.width;
+        if ([ch isEqualToString:@" "])
+            continue;
+        CGFloat r = hypot(s.width, s.height * stretch) / 2 + size * 0.06;
+        CGRect box = CGRectIntegral(CGRectMake(c.x - r - 4, c.y - r - 4, 2 * r + depth * 0.55 + 22, 2 * r + depth + 24));
+        // Runs body in the letter's upright, stretched frame, centered on its line box.
+        void (^place)(CGSize, void (^)(void)) = ^(CGSize offset, void (^body)(void)) {
+            CGContextRef ctx = UIGraphicsGetCurrentContext();
+            CGContextSaveGState(ctx);
+            CGContextTranslateCTM(ctx, c.x - box.origin.x + offset.width, c.y - box.origin.y + offset.height);
+            CGContextRotateCTM(ctx, angle);
+            CGContextScaleCTM(ctx, 1, stretch);
+            body();
+            CGContextRestoreGState(ctx);
+        };
+        void (^draw)(NSDictionary *, CGSize) = ^(NSDictionary *attributes, CGSize offset) {
+            place(offset, ^{
+                [ch drawAtPoint:CGPointMake(-s.width / 2, -s.height / 2) withAttributes:attributes];
+            });
+        };
+        // The rainbow: a white letter, then the gradient painted only where it is opaque.
+        UIGraphicsBeginImageContextWithOptions(box.size, NO, 0);
+        draw(@{NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor]}, CGSizeZero);
+        CGContextSetBlendMode(UIGraphicsGetCurrentContext(), kCGBlendModeSourceIn);
+        place(CGSizeZero, ^{
+            CGFloat baseline = -s.height / 2 + font.ascender;
+            CGContextDrawLinearGradient(UIGraphicsGetCurrentContext(), rainbow, CGPointMake(0, baseline - font.capHeight),
+                                        CGPointMake(0, baseline),
+                                        kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
+        });
+        UIImage *fill = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+
+        UIGraphicsBeginImageContextWithOptions(box.size, NO, 0);
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        CGContextSetShadowWithColor(ctx, CGSizeMake(4, 7), 6, [UIColor colorWithWhite:0 alpha:0.55].CGColor);
+        CGContextBeginTransparencyLayer(ctx, NULL);
+        for (CGFloat k = depth; k >= 1; k--)
+            draw(@{
+                NSFontAttributeName : font, NSForegroundColorAttributeName : extrusion,
+                NSStrokeColorAttributeName : extrusion, NSStrokeWidthAttributeName : @-9
+            },
+                 CGSizeMake(k * 0.55, k));
+        draw(@{
+            NSFontAttributeName : font, NSForegroundColorAttributeName : navy, NSStrokeColorAttributeName : navy,
+            NSStrokeWidthAttributeName : @-9
+        },
+             CGSizeZero);
+        [fill drawAtPoint:CGPointZero];
+        draw(@{
+            NSFontAttributeName : font, NSStrokeColorAttributeName : [UIColor colorWithWhite:1 alpha:0.75],
+            NSStrokeWidthAttributeName : @1.5
+        },
+             CGSizeZero);
+        CGContextEndTransparencyLayer(ctx);
+        UIImageView *view = [[UIImageView alloc] initWithImage:UIGraphicsGetImageFromCurrentImageContext()];
+        UIGraphicsEndImageContext();
+        view.frame = box;
+        [views addObject:view];
+    }
     CGGradientRelease(rainbow);
     CGColorSpaceRelease(space);
-    UIImage *fill = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-
-    UIGraphicsBeginImageContextWithOptions(canvas, NO, 0);
-    ctx = UIGraphicsGetCurrentContext();
-    CGContextSetShadowWithColor(ctx, CGSizeMake(4, 7), 6, [UIColor colorWithWhite:0 alpha:0.55].CGColor);
-    CGContextBeginTransparencyLayer(ctx, NULL);
-    UIColor *navy = [UIColor colorWithRed:0.1 green:0.08 blue:0.4 alpha:1],
-            *extrusion = [UIColor colorWithRed:0.3 green:0.1 blue:0.45 alpha:1];
-    for (CGFloat k = depth; k >= 1; k--)
-        draw(@{
-            NSFontAttributeName : font, NSForegroundColorAttributeName : extrusion,
-            NSStrokeColorAttributeName : extrusion, NSStrokeWidthAttributeName : @-9
-        },
-             CGSizeMake(k * 0.55, k));
-    draw(@{
-        NSFontAttributeName : font, NSForegroundColorAttributeName : navy, NSStrokeColorAttributeName : navy,
-        NSStrokeWidthAttributeName : @-9
-    },
-         CGSizeZero);
-    [fill drawAtPoint:CGPointZero];
-    draw(@{
-        NSFontAttributeName : font, NSStrokeColorAttributeName : [UIColor colorWithWhite:1 alpha:0.75],
-        NSStrokeWidthAttributeName : @1.5
-    },
-         CGSizeZero);
-    CGContextEndTransparencyLayer(ctx);
-    UIImage *art = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return art;
+    return views;
 }
 // A cartoon star: thick black outline and a shine, straight out of a clip-art CD.
 + (UIImage *)starOfSize:(CGFloat)size color:(UIColor *)color {
@@ -201,10 +204,9 @@ static NSString *const kMessage = @"Congrats Reagan!";
     CGFloat width = MIN(size.width - 40, 840);
     if (self.showing && width != self.artWidth) {
         self.artWidth = width;
-        self.wordArt.image = [CelebrationView wordArtForWidth:width];
+        [self buildWordArt];
     }
-    CGSize art = self.wordArt.image.size;
-    self.wordArt.bounds = (CGRect){CGPointZero, art};
+    CGSize art = self.wordArt.bounds.size;
     self.wordArt.center = CGPointMake(size.width / 2, (size.height - self.bottomInset) * 0.4);
     CGRect frame = CGRectMake(self.wordArt.center.x - art.width / 2, self.wordArt.center.y - art.height / 2,
                               art.width, art.height);
@@ -215,6 +217,17 @@ static NSString *const kMessage = @"Congrats Reagan!";
     self.stats.frame = CGRectMake(20, size.height - self.bottomInset - 84, size.width - 40, 76);
     self.confetti.emitterPosition = CGPointMake(size.width / 2, -20);
     self.confetti.emitterSize = CGSizeMake(size.width, 1);
+}
+- (void)buildWordArt {
+    for (UIView *letter in self.letters)
+        [letter removeFromSuperview];
+    CGSize canvas;
+    self.letters = [CelebrationView wordArtLettersForWidth:self.artWidth canvas:&canvas];
+    self.wordArt.bounds = (CGRect){CGPointZero, canvas};
+    for (UIView *letter in self.letters)
+        [self.wordArt addSubview:letter];
+    if (self.looping)
+        [self loopLetters];
 }
 - (void)showWithTime:(NSString *)time moves:(NSInteger)moves hint:(NSString *)hint {
     UIColor *edge = [UIColor colorWithRed:0.02 green:0.14 blue:0.05 alpha:1];
@@ -250,20 +263,35 @@ static NSString *const kMessage = @"Congrats Reagan!";
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         confetti.birthRate = 1;
     });
-    NSArray<UIView *> *popping = [@[ self.wordArt ] arrayByAddingObjectsFromArray:self.stars];
-    for (UIView *view in popping) {
-        view.transform = CGAffineTransformRotate(CGAffineTransformMakeScale(0.05, 0.05), -0.4);
-        view.alpha = 0;
+    // The letters drop in one by one and land with a bounce; the stars pop in around them.
+    for (NSUInteger i = 0; i < self.letters.count; i++) {
+        UIView *letter = self.letters[i];
+        letter.transform = CGAffineTransformMakeTranslation(0, -self.bounds.size.height * 0.6);
+        letter.alpha = 0;
+        [UIView animateWithDuration:0.8
+                              delay:0.1 + i * 0.06
+             usingSpringWithDamping:0.45
+              initialSpringVelocity:0.4
+                            options:0
+                         animations:^{
+                             letter.transform = CGAffineTransformIdentity;
+                             letter.alpha = 1;
+                         }
+                         completion:nil];
+    }
+    for (UIView *star in self.stars) {
+        star.transform = CGAffineTransformRotate(CGAffineTransformMakeScale(0.05, 0.05), -0.4);
+        star.alpha = 0;
     }
     [UIView animateWithDuration:0.9
-        delay:0.15
+        delay:0.1 + self.letters.count * 0.06
         usingSpringWithDamping:0.5
         initialSpringVelocity:0.6
         options:0
         animations:^{
-            for (UIView *view in popping) {
-                view.transform = CGAffineTransformIdentity;
-                view.alpha = 1;
+            for (UIView *star in self.stars) {
+                star.transform = CGAffineTransformIdentity;
+                star.alpha = 1;
             }
         }
         completion:^(BOOL finished) {
@@ -271,10 +299,47 @@ static NSString *const kMessage = @"Congrats Reagan!";
                 [self startLooping];
         }];
 }
++ (CABasicAnimation *)swing:(NSString *)keyPath by:(CGFloat)amount duration:(CFTimeInterval)duration {
+    CABasicAnimation *swing = [CABasicAnimation animationWithKeyPath:keyPath];
+    swing.fromValue = @(-amount);
+    swing.toValue = @(amount);
+    swing.duration = duration;
+    swing.autoreverses = YES;
+    swing.repeatCount = HUGE_VALF;
+    swing.additive = YES;
+    swing.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    return swing;
+}
+// A wave runs through the letters, each hopping and wiggling a beat after the one before.
+- (void)loopLetters {
+    CFTimeInterval now = CACurrentMediaTime();
+    CGFloat hop = self.wordArt.bounds.size.height * 0.07;
+    for (NSUInteger i = 0; i < self.letters.count; i++) {
+        CABasicAnimation *bounce = [CelebrationView swing:@"transform.translation.y" by:hop duration:0.42];
+        CABasicAnimation *wiggle = [CelebrationView swing:@"transform.rotation.z" by:0.09 duration:0.56];
+        bounce.beginTime = wiggle.beginTime = now + i * 0.07;
+        bounce.fillMode = wiggle.fillMode = kCAFillModeBackwards;
+        [self.letters[i].layer addAnimation:bounce forKey:@"bounce"];
+        [self.letters[i].layer addAnimation:wiggle forKey:@"wiggle"];
+    }
+}
 - (void)startLooping {
+    self.looping = YES;
+    [self loopLetters];
+    // The whole message floats on a slow loop around its spot, rocking and pulsing as it goes.
+    CAKeyframeAnimation *drift = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    CGFloat dx = MIN(40, (self.bounds.size.width - self.wordArt.bounds.size.width) / 2), dy = 14;
+    drift.path = CGPathCreateWithEllipseInRect(CGRectMake(-dx, -dy, 2 * dx, 2 * dy), NULL);
+    CGPathRelease(drift.path);
+    drift.additive = YES;
+    drift.calculationMode = kCAAnimationPaced;
+    drift.duration = 6;
+    drift.repeatCount = HUGE_VALF;
+    [self.wordArt.layer addAnimation:drift forKey:@"drift"];
+    [self.wordArt.layer addAnimation:[CelebrationView swing:@"transform.rotation.z" by:0.04 duration:1.6] forKey:@"rock"];
     CABasicAnimation *pulse = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     pulse.fromValue = @1;
-    pulse.toValue = @1.05;
+    pulse.toValue = @1.06;
     pulse.duration = 0.7;
     pulse.autoreverses = YES;
     pulse.repeatCount = HUGE_VALF;
@@ -299,10 +364,12 @@ static NSString *const kMessage = @"Congrats Reagan!";
     if (!self.showing)
         return;
     self.showing = NO;
+    self.looping = NO;
     self.hidden = YES;
     [self.confetti removeFromSuperlayer];
     self.confetti = nil;
-    for (UIView *view in [@[ self.wordArt ] arrayByAddingObjectsFromArray:self.stars]) {
+    NSArray *views = [[@[ self.wordArt ] arrayByAddingObjectsFromArray:self.stars] arrayByAddingObjectsFromArray:self.letters];
+    for (UIView *view in views) {
         [view.layer removeAllAnimations];
         view.transform = CGAffineTransformIdentity;
         view.alpha = 1;

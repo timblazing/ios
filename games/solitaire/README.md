@@ -4,15 +4,15 @@ Offline Draw-1 Klondike in Objective-C, UIKit, and SpriteKit. Targets ARM64 and 
 
 ## Install this build
 
-Use `packages/com.local.solitaire_2.4.0_iphoneos-arm.deb` on the jailbroken iPad. Copy it to the device and install it with Filza or run as root:
+Use `packages/com.local.solitaire_2.4.1_iphoneos-arm.deb` on the jailbroken iPad. Copy it to the device and install it with Filza or run as root:
 
 ```sh
-dpkg -i com.local.solitaire_2.4.0_iphoneos-arm.deb
+dpkg -i com.local.solitaire_2.4.1_iphoneos-arm.deb
 ```
 
 The package refreshes the icon cache. If the icon is missing, run `uicache` as mobile and return to the Home screen.
 
-`dist/Solitaire-2.4.0.ipa` contains the same app. It is ad-hoc signed for a jailbroken installation environment. An IPA installer must support that signing setup, such as an AppSync-enabled installer. It is not an Apple-provisioned IPA for a stock device. The `.deb` is the intended route for this target.
+`dist/Solitaire-2.4.1.ipa` contains the same app. It is ad-hoc signed for a jailbroken installation environment. An IPA installer must support that signing setup, such as an AppSync-enabled installer. It is not an Apple-provisioned IPA for a stock device. The `.deb` is the intended route for this target.
 
 ## Play
 
@@ -24,7 +24,7 @@ The package refreshes the icon cache. If the icon is missing, run `uicache` as m
 - Undo restores the previous move, including a draw, recycle, or automatic flip. The last 200 actions are available during the current session.
 - The controls bar sits at the bottom: time and moves on the left, then Undo (back arrow), New game (circular arrow), and Settings (gear).
 - Once every tableau card is face up, a gold Auto Win button appears in the controls bar. It plays the rest out to the foundations, drawing through the stock as needed. Any interruption (Undo, New game, Settings, rotation, backgrounding) stops it; tap it again to resume.
-- New game replaces the board after confirmation. A completed game locks board interaction and celebrates: confetti over the whole screen, "Congrats Reagan!" in rainbow WordArt with clip-art stars, the kings and queens dancing in a line, and the time and moves above the bar. Reduce Motion keeps the message and the line of cards but drops the confetti and dancing. Settings → Preview celebration shows it without winning; tap the board to close it.
+- New game replaces the board after confirmation. A completed game locks board interaction and celebrates: confetti over the whole screen, "Congrats Reagan!" in rainbow WordArt (the letters drop in, then wave and wiggle while the whole message floats) with clip-art stars, the kings and queens dancing in a line, and the time and moves above the bar. Reduce Motion keeps the message and the line of cards but drops the confetti and dancing. Settings → Preview celebration shows it without winning; tap the board to close it.
 
 The board, move count, and elapsed time save locally. Undo history does not survive a relaunch. The timer pauses in the background. Settings shows games played, wins, and current win streak. Replacing an unfinished game breaks the streak.
 

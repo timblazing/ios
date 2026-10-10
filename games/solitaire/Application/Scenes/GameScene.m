@@ -395,16 +395,19 @@ static const NSInteger kDancers[] = {12, 50, 38, 24, 25, 37, 51, 11};
         }
         SKAction *enter = [SKAction group:@[ [SKAction moveTo:spot duration:0.5], [SKAction scaleTo:scale duration:0.5] ]];
         enter.timingMode = SKActionTimingEaseInEaseOut;
-        SKAction *up = [SKAction moveByX:0 y:34 duration:0.22], *down = [SKAction moveByX:0 y:-34 duration:0.22];
-        up.timingMode = SKActionTimingEaseOut;
-        down.timingMode = SKActionTimingEaseIn;
-        SKAction *hop = [SKAction sequence:@[ up, down ]];
-        SKAction *step = [SKAction repeatActionForever:[SKAction sequence:@[
-            [SKAction group:@[ hop, [SKAction rotateToAngle:0.24 duration:0.44 shortestUnitArc:YES] ]],
-            [SKAction group:@[ hop, [SKAction rotateToAngle:-0.24 duration:0.44 shortestUnitArc:YES] ]]
-        ]]];
+        // One custom action per beat pair, driven by its own clock: two hops, swaying and tilting left then right.
+        // Positions are computed from the spot each frame, so nothing accumulates or drifts.
+        CGFloat period = 0.88, hop = 34 * scale, sway = 10 * scale;
+        SKAction *step = [SKAction repeatActionForever:[SKAction customActionWithDuration:period
+                                                                              actionBlock:^(SKNode *node, CGFloat t) {
+                                                                                  CGFloat phase = t / period * 2 * M_PI;
+                                                                                  node.position = CGPointMake(
+                                                                                      spot.x + sway * sin(phase),
+                                                                                      spot.y + hop * fabs(sin(phase)));
+                                                                                  node.zRotation = -0.24 * sin(phase);
+                                                                              }]];
         [n runAction:[SKAction sequence:@[ [SKAction waitForDuration:0.3 + i * 0.08], enter,
-                                           [SKAction waitForDuration:(i % 2) * 0.22], step ]]
+                                           [SKAction waitForDuration:0.05 + (i % 2) * period / 4], step ]]
              withKey:@"victory"];
     }
 }
