@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs a game IPA onto the USB-connected iPad with ideviceinstaller.
+# Installs a game IPA onto the iPad with ideviceinstaller, over USB or Wi-Fi.
 # A slimmed-down version of Legacy iOS Kit's App Management -> Install IPA (ideviceinstaller).
 # Requires AppSync Unified on the device for the ad-hoc signed IPAs this repo builds.
 set -uo pipefail
@@ -7,6 +7,7 @@ set -uo pipefail
 root="$(cd "$(dirname "$0")" && pwd)"
 bin="$root/tools/libimobiledevice/macos"
 ipa="" game=""
+conn=() device=""  # conn: -u UDID for the chosen device, plus -n when it's on Wi-Fi
 
 if [[ $(uname -s) != Darwin ]]; then
   echo "install.sh runs on macOS only (it uses the bundled macOS libimobiledevice tools)." >&2
@@ -79,16 +80,70 @@ select_ipa() {
   return 0
 }
 
-device_connected() {
-  "$bin/ideviceinfo" -s -k DeviceName >/dev/null 2>&1
+dev() {  # dev tool args... -> runs a bundled tool against the chosen device
+  local tool="$1"; shift
+  "$bin/$tool" ${conn[@]+"${conn[@]}"} "$@"
+}
+
+# Prints "UDID USB" or "UDID Network" for each device usbmuxd knows, USB first when a device is on both.
+# Wi-Fi devices only appear once they've been paired over USB with Wi-Fi sync turned on (see AGENTS.md).
+list_devices() {
+  python3 - <<'EOF' 2>/dev/null
+import plistlib, socket, struct
+s = socket.socket(socket.AF_UNIX)
+s.connect("/var/run/usbmuxd")
+body = plistlib.dumps({"MessageType": "ListDevices", "ClientVersionString": "install.sh", "ProgName": "install.sh"})
+s.sendall(struct.pack("<IIII", 16 + len(body), 1, 8, 1) + body)
+size = struct.unpack("<IIII", s.recv(16))[0] - 16
+data = b""
+while len(data) < size:
+    data += s.recv(size - len(data))
+found = {}
+for d in plistlib.loads(data)["DeviceList"]:
+    p = d["Properties"]
+    if found.get(p["SerialNumber"]) != "USB":
+        found[p["SerialNumber"]] = p["ConnectionType"]
+for udid, kind in sorted(found.items(), key=lambda x: x[1] != "USB"):
+    print(udid, kind)
+EOF
+}
+
+# Sets conn and device. With several devices, an only iPad is picked; otherwise asks.
+choose_device() {
+  local udids=() kinds=() labels=() ipads=() udid kind args name type i
+  while read -r udid kind; do
+    args=(-u "$udid"); [[ $kind == Network ]] && args+=(-n)
+    name="$("$bin/ideviceinfo" "${args[@]}" -k DeviceName 2>/dev/null)"
+    [[ -z $name ]] && continue
+    type="$("$bin/ideviceinfo" "${args[@]}" -k ProductType 2>/dev/null)"
+    [[ $type == iPad* ]] && ipads+=("${#udids[@]}")
+    udids+=("$udid"); kinds+=("$kind")
+    labels+=("$name, $type, iOS $("$bin/ideviceinfo" "${args[@]}" -k ProductVersion 2>/dev/null), $([[ $kind == USB ]] && echo USB || echo Wi-Fi)")
+  done < <(list_devices)
+  if ((${#udids[@]} == 0)); then
+    # No usbmuxd listing (python3 missing): fall back to the first USB device.
+    "$bin/ideviceinfo" -s -k DeviceName >/dev/null 2>&1 || return 1
+    conn=() device="$("$bin/ideviceinfo" -k DeviceName), $("$bin/ideviceinfo" -k ProductType), iOS $("$bin/ideviceinfo" -k ProductVersion), USB"
+    return 0
+  fi
+  if ((${#udids[@]} == 1)); then i=0
+  elif ((${#ipads[@]} == 1)); then i=${ipads[0]}
+  else
+    menu "Which device?" "${labels[@]}" "Back"
+    [[ $choice == "Back" ]] && return 2
+    i=$choice_index
+  fi
+  conn=(-u "${udids[$i]}"); [[ ${kinds[$i]} == Network ]] && conn+=(-n)
+  device="${labels[$i]}"
 }
 
 pair_device() {
-  "$bin/idevicepair" validate >/dev/null 2>&1 && return 0
-  "$bin/idevicepair" pair >/dev/null 2>&1 && return 0
+  [[ " ${conn[*]} " == *" -n "* ]] && return 0  # reachable over Wi-Fi means it's already paired
+  dev idevicepair validate >/dev/null 2>&1 && return 0
+  dev idevicepair pair >/dev/null 2>&1 && return 0
   warn "Unlock the iPad and tap \"Trust\", then press Return."
   read -r || exit 0
-  "$bin/idevicepair" pair >/dev/null 2>&1 && return 0
+  dev idevicepair pair >/dev/null 2>&1 && return 0
   fail "Couldn't pair with the iPad. If you tapped \"Don't Trust\", unplug and replug it and try again."
   return 1
 }
@@ -98,16 +153,18 @@ confirm() {
   id="$(ipa_info "$ipa" CFBundleIdentifier)"
   version="$(ipa_info "$ipa" CFBundleShortVersionString)"
   name="$(ipa_info "$ipa" CFBundleDisplayName)"
-  while ! device_connected; do
-    menu "No device found. Connect the iPad over USB and unlock it." "Retry" "Back" "Quit"
+  while true; do
+    choose_device
+    case $? in 0) break ;; 2) return 1 ;; esac
+    menu "No device found. Connect the iPad over USB, or wake it on the same Wi-Fi as this Mac." "Retry" "Back" "Quit"
     case "$choice" in Back) return 1 ;; Quit) exit 0 ;; esac
   done
   pair_device || return 1
-  installed="$("$bin/ideviceinstaller" list -b "$id" -a CFBundleShortVersionString 2>/dev/null | sed -n 2p | tr -d '"')"
+  installed="$(dev ideviceinstaller list -b "$id" -a CFBundleShortVersionString 2>/dev/null | sed -n 2p | tr -d '"')"
   printf '\n%sReady to install%s\n\n' "$bold" "$reset"
   printf '  IPA:        %s\n' "$ipa"
   printf '  App:        %s %s (%s)\n' "${name:-?}" "${version:-?}" "${id:-unknown bundle id}"
-  printf '  Device:     %s, %s, iOS %s\n' "$("$bin/ideviceinfo" -k DeviceName)" "$("$bin/ideviceinfo" -k ProductType)" "$("$bin/ideviceinfo" -k ProductVersion)"
+  printf '  Device:     %s\n' "$device"
   printf '  Installed:  %s\n' "${installed:-not installed}"
   menu "Install it?" "Install" "Back" "Quit"
   case "$choice" in Back) return 1 ;; Quit) exit 0 ;; esac
@@ -116,11 +173,12 @@ confirm() {
 install_ipa() {
   say ""
   say "Installing $(basename "$ipa")..."
-  if "$bin/ideviceinstaller" install "$ipa"; then
+  if dev ideviceinstaller install "$ipa"; then
     say ""
     say "${green}Installed.${reset} If the home screen icon looks stale, run uicache as mobile or respring."
   else
     fail "Install failed. Check that the iPad is jailbroken (TNS Sockport active) and AppSync Unified is installed."
+    [[ " ${conn[*]} " == *" -n "* ]] && warn "Over Wi-Fi, keep the iPad awake and unlocked until the install finishes."
     return 1
   fi
 }
