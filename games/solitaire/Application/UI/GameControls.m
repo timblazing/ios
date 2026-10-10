@@ -61,13 +61,23 @@ typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, C
     UIGraphicsEndImageContext();
     return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
++ (UIColor *)gold {
+    return [UIColor colorWithRed:1 green:0.82 blue:0.25 alpha:1];
+}
+// A 36pt pill centered in a 44pt-tall image, so the button looks slim but keeps a 44pt tap target.
++ (UIImage *)pillWithColor:(UIColor *)color {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(37, 44), NO, 0);
+    [color setFill];
+    [[UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 4, 37, 36) cornerRadius:18] fill];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return [image resizableImageWithCapInsets:UIEdgeInsetsMake(0, 18, 0, 18)];
+}
 - (UIButton *)buttonWithIcon:(ControlIcon)icon label:(NSString *)label {
     UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
-    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:1 alpha:0.78]]
-       forState:UIControlStateNormal];
-    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithRed:0.937 green:0.788 blue:0.396 alpha:1]]
-       forState:UIControlStateHighlighted];
-    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:1 alpha:0.2]]
+    [b setImage:[GameControls imageForIcon:icon color:[UIColor whiteColor]] forState:UIControlStateNormal];
+    [b setImage:[GameControls imageForIcon:icon color:[GameControls gold]] forState:UIControlStateHighlighted];
+    [b setImage:[GameControls imageForIcon:icon color:[UIColor colorWithWhite:1 alpha:0.3]]
        forState:UIControlStateDisabled];
     b.accessibilityLabel = label;
     [self addSubview:b];
@@ -75,15 +85,28 @@ typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, C
 }
 - (instancetype)initWithFrame:(CGRect)frame {
     if ((self = [super initWithFrame:frame])) {
-        self.backgroundColor = [UIColor colorWithRed:0.039 green:0.035 blue:0.055 alpha:0.82];
+        self.backgroundColor = [UIColor colorWithRed:0.02 green:0.13 blue:0.06 alpha:0.9];
         _rule = [UIView new];
-        _rule.backgroundColor = [UIColor colorWithWhite:1 alpha:0.08];
+        _rule.backgroundColor = [UIColor colorWithWhite:1 alpha:0.2];
         [self addSubview:_rule];
         _undoButton = [self buttonWithIcon:ControlIconUndo label:@"Undo"];
         _restartButton = [self buttonWithIcon:ControlIconNewGame label:@"New game"];
         _settingsButton = [self buttonWithIcon:ControlIconSettings label:@"Settings"];
+        // A gold pill, so the one-tap finish is hard to miss when it appears.
+        _autoWinButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_autoWinButton setTitle:@"Auto Win" forState:UIControlStateNormal];
+        _autoWinButton.titleLabel.font = [UIFont fontWithName:@"AvenirNext-Bold" size:16];
+        [_autoWinButton setTitleColor:[UIColor colorWithRed:0.06 green:0.2 blue:0.09 alpha:1]
+                             forState:UIControlStateNormal];
+        [_autoWinButton setBackgroundImage:[GameControls pillWithColor:[GameControls gold]]
+                                  forState:UIControlStateNormal];
+        [_autoWinButton setBackgroundImage:[GameControls pillWithColor:[UIColor colorWithRed:0.85 green:0.66 blue:0.12 alpha:1]]
+                                  forState:UIControlStateHighlighted];
+        _autoWinButton.accessibilityLabel = @"Auto win";
+        _autoWinButton.hidden = YES;
+        [self addSubview:_autoWinButton];
         _status = [UILabel new];
-        _status.textColor = [UIColor colorWithWhite:1 alpha:0.55];
+        _status.textColor = [UIColor colorWithWhite:1 alpha:0.9];
         _status.font = [UIFont monospacedDigitSystemFontOfSize:14 weight:UIFontWeightRegular];
         [self addSubview:_status];
     }
@@ -93,7 +116,9 @@ typedef NS_ENUM(NSInteger, ControlIcon) { ControlIconUndo, ControlIconNewGame, C
     [super layoutSubviews];
     CGFloat w = self.bounds.size.width, h = self.bounds.size.height, button = 56;
     self.rule.frame = CGRectMake(0, 0, w, 1 / [UIScreen mainScreen].scale);
-    self.status.frame = CGRectMake(24, 0, MAX(0, w - 24 - 3 * button - 24), h);
+    CGFloat pill = 112, pillX = w - 3 * button - 12 - pill - 8;
+    self.autoWinButton.frame = CGRectMake(pillX, (h - 44) / 2, pill, 44);
+    self.status.frame = CGRectMake(24, 0, MAX(0, pillX - 24 - 12), h);
     self.undoButton.frame = CGRectMake(w - 3 * button - 12, 0, button, h);
     self.restartButton.frame = CGRectMake(w - 2 * button - 12, 0, button, h);
     self.settingsButton.frame = CGRectMake(w - button - 12, 0, button, h);

@@ -8,7 +8,7 @@ Built on 2026-10-02 on macOS with Theos, current Xcode, and the iPhoneOS 16.5 SD
 - Rules tests pass on macOS:
 
 ```text
-PASS: 136144 assertions; deal, stock/recycle, moves, flips, undo, persistence, stats, victory, 2400 random steps.
+PASS: 153993 assertions; deal, stock/recycle, moves, flips, undo, persistence, stats, victory, auto-win, 2400 random steps.
 ```
 
 - `scripts/make-icons.sh` was run against a test master; it wrote all seven sizes (29–167 px) and keeps the existing icons when the master is missing.

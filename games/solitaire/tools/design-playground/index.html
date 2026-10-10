@@ -332,11 +332,11 @@ function prepareCanvas(canvas, w, h) {
 
 function drawSlot(ctx, cx, cy, card, label) {
   ctx.beginPath(); ctx.roundRect(cx - card.w / 2 + 2, cy - card.h / 2 + 2, card.w - 4, card.h - 4, 7);
-  ctx.fillStyle = "rgba(255,255,255,.035)"; ctx.fill();
-  ctx.strokeStyle = "rgba(255,255,255,.14)"; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.4)"; ctx.lineWidth = 1.5; ctx.stroke();
   if (label) {
     const arrow = label === "↻";
-    ctx.fillStyle = `rgba(255,255,255,${arrow ? .32 : .1})`;
+    ctx.fillStyle = `rgba(255,255,255,${arrow ? .6 : .28})`;
     ctx.font = arrow ? '300 26px "Helvetica Neue", sans-serif' : `600 ${card.w * 0.36}px "Avenir Next Condensed", sans-serif`;
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(label, cx, cy); ctx.textAlign = "start";
   }
@@ -373,24 +373,23 @@ function deal() {
   return piles;
 }
 
-// GameScene's background: a radial gradient from the top-left corner, matching the app icon.
-// GameScene backgroundTextureForSize: near-black with a faint violet glow from the top edge.
+// GameScene backgroundTextureForSize: green felt, lighter from the top edge.
 function drawBackground(ctx, w, h) {
   const g = ctx.createRadialGradient(w / 2, -h * 0.1, 0, w / 2, -h * 0.1, Math.hypot(w, h) * 0.85);
-  g.addColorStop(0, "rgb(30,21,53)"); g.addColorStop(0.55, "rgb(15,12,23)"); g.addColorStop(1, "rgb(10,9,14)");
+  g.addColorStop(0, "rgb(51,143,74)"); g.addColorStop(0.55, "rgb(26,102,48)"); g.addColorStop(1, "rgb(9,56,23)");
   ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
 }
 
 function drawControlsBar(ctx, w, y) {
-  ctx.fillStyle = "rgba(10,9,14,.82)"; ctx.fillRect(0, y, w, BAR);
-  ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fillRect(0, y, w, 0.5);
-  ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "14px -apple-system, sans-serif"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "rgba(5,33,15,.9)"; ctx.fillRect(0, y, w, BAR);
+  ctx.fillStyle = "rgba(255,255,255,.2)"; ctx.fillRect(0, y, w, 0.5);
+  ctx.fillStyle = "rgba(255,255,255,.9)"; ctx.font = "14px -apple-system, sans-serif"; ctx.textBaseline = "middle";
   ctx.fillText("0:28   •   0 moves", 24, y + BAR / 2);
   // Icon placeholders at the same frames as GameControls.m: three 56pt buttons, 12pt from the right edge.
   const icons = [drawUndoIcon, drawNewGameIcon, drawGearIcon];
   icons.forEach((draw, i) => {
     const bx = w - (3 - i) * 56 - 12;
-    ctx.save(); ctx.translate(bx + 16, y + 14); draw(ctx, i === 0 ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.78)"); ctx.restore();
+    ctx.save(); ctx.translate(bx + 16, y + 14); draw(ctx, i === 0 ? "rgba(255,255,255,.3)" : "#fff"); ctx.restore();
   });
 }
 function drawUndoIcon(ctx, color) {

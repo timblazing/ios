@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="250" height="350" viewBox="0 0 250 350">
-<rect width="250" height="350" fill="#ffffff"/>
-<g id="center"><path transform="translate(73 123) scale(4.33333)" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" fill="#7445e6"/></g>
-<g id="index"><text x="14" y="53" font-family="'Avenir Next Condensed', 'Helvetica Neue', sans-serif" font-weight="600" font-size="54" letter-spacing="0" fill="#7445e6">A</text><path transform="translate(44.3281 18) scale(1.41667)" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" fill="#7445e6"/></g>
-<g id="index-flipped" transform="rotate(180 125 175)"><text x="14" y="53" font-family="'Avenir Next Condensed', 'Helvetica Neue', sans-serif" font-weight="600" font-size="54" letter-spacing="0" fill="#7445e6">A</text><path transform="translate(44.3281 18) scale(1.41667)" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" fill="#7445e6"/></g>
-</svg>

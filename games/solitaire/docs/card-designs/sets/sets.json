@@ -14,5 +14,9 @@
  {
   "id": "minimal",
   "label": "Minimal courts"
+ },
+ {
+  "id": "traditional",
+  "label": "Traditional"
  }
 ]

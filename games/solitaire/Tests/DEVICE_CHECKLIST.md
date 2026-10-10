@@ -20,7 +20,9 @@ Run on the iPad mini 2 with iOS 10.3.3.
 - Each icon is easy to hit (44pt or larger). Undo is dimmed until the first move and after undoing everything.
 - With VoiceOver on, the buttons read "Undo", "New game", and "Settings".
 - New game still asks for confirmation. Cancel leaves the board unchanged; accepting resets moves and Undo and increments games played.
-- Win a game and confirm the victory text sits above the bar, not over it.
+- Win a game. Confetti falls over the whole screen, including the bar; "Congrats Reagan!" pops in as rainbow WordArt with spinning stars; the kings and queens line up and dance; time and moves sit above the bar. The New game button still works through the confetti.
+- Rotate during the celebration. The message and dancers re-center and keep going.
+- Auto Win appears only once every tableau card is face up (stock and waste may still hold cards) and plays the game out without a hitch. Undo during it stops it.
 
 ## Card art
 
@@ -39,8 +41,8 @@ Run on the iPad mini 2 with iOS 10.3.3.
 - Drag one card and a multi-card stack to legal and illegal destinations. Invalid drops return without incrementing moves.
 - Tap a waste card, a tableau top card, and a card partway down a face-up run. Each moves to its foundation if it can, otherwise onto a tableau card, otherwise a king to an empty column. A card with no move shakes and the move count doesn't change. A lone king at the bottom of a column doesn't hop to another empty column. Covered waste and foundation cards cannot be moved.
 - While dragging, the outline sits on the card a stack would land on, not over the top of the column.
-- The top row reads foundations left, waste and stock right, with space above it. Empty foundations are plain outlines. The purple gradient fills the screen, including behind the controls bar, in both orientations.
+- The top row reads foundations left, waste and stock right, with space above it. Empty foundations are plain outlines. The green felt fills the screen, including behind the controls bar, in both orientations.
 - Move a tableau stack that exposes a face-down card. Confirm it flips, then undo and confirm it becomes face-down again.
 - Background the app for a minute. The game timer does not advance, and relaunching restores the board.
-- Enable Reduce Motion. Move and victory animations are suppressed.
+- Enable Reduce Motion. Move animations, confetti, and dancing are suppressed; the win message and the line of cards still show.
 - Play for at least ten minutes in both orientations. Check responsiveness, memory stability, and whether drag motion holds 60 FPS on the A7.

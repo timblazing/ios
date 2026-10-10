@@ -227,6 +227,42 @@ static void TestWinAndStats(void) {
     bad[@"piles"] = piles;
     CHECK(![loaded restore:bad]);
 }
+static void TestAutoWin(void) {
+    // K♠ Q♥ in one column, K♥ alone in another, a face-up 5♣ on the waste, the rest face down in the stock.
+    SolitaireGame *g = Fixture(@{
+        @1 : @[ @[ @30, @YES ] ],
+        @6 : @[ @[ @51, @YES ], @[ @11, @YES ] ],
+        @7 : @[ @[ @12, @YES ] ]
+    });
+    CHECK(g.canAutoWin);
+    NSInteger steps = 0;
+    while ([g autoWinStep])
+        CHECK(++steps < 5000);
+    CHECK(g.won);
+    CHECK(!g.canAutoWin);
+    CHECK(![g autoWinStep]);
+    Conserved(g);
+    SolitaireGame *hidden = Fixture(@{@6 : @[ @[ @51, @NO ], @[ @11, @YES ] ]});
+    CHECK(!hidden.canAutoWin);
+    CHECK(![hidden autoWinStep]);
+    for (NSInteger round = 0; round < 50; round++) {
+        SolitaireGame *r = [SolitaireGame new];
+        [r newGame];
+        for (NSInteger p = 6; p < 13; p++)
+            while (r.piles[p].count > 1) {
+                [r.piles[1] addObject:r.piles[p].firstObject];
+                [r.piles[p] removeObjectAtIndex:0];
+            }
+        for (Card *c in r.piles[1])
+            c.faceUp = YES;
+        CHECK(r.canAutoWin);
+        steps = 0;
+        while ([r autoWinStep])
+            CHECK(++steps < 5000);
+        CHECK(r.won);
+        Conserved(r);
+    }
+}
 static void TestTimer(void) {
     SolitaireGame *g = [SolitaireGame new];
     [g newGame];
@@ -278,9 +314,10 @@ int main(void) {
         TestFoundations();
         TestBestDestination();
         TestWinAndStats();
+        TestAutoWin();
         TestTimer();
         TestRandomPlay();
-        printf("PASS: %lu assertions; deal, stock/recycle, moves, flips, undo, persistence, stats, victory, "
+        printf("PASS: %lu assertions; deal, stock/recycle, moves, flips, undo, persistence, stats, victory, auto-win, "
                "2400 random steps.\n",
                (unsigned long)assertions);
     }

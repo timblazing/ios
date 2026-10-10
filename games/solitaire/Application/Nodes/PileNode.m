@@ -13,7 +13,7 @@
         SKLabelNode *text = [SKLabelNode labelNodeWithFontNamed:arrow ? @"HelveticaNeue-Light" : @"AvenirNextCondensed-DemiBold"];
         text.text = label;
         text.fontSize = arrow ? 26 : size.width * 0.36;
-        text.fontColor = [SKColor colorWithWhite:1 alpha:arrow ? 0.32 : 0.1];
+        text.fontColor = [SKColor colorWithWhite:1 alpha:arrow ? 0.6 : 0.28];
         text.verticalAlignmentMode = SKLabelVerticalAlignmentModeCenter;
         [self addChild:text];
     }
@@ -21,13 +21,13 @@
 }
 - (void)setHighlighted:(BOOL)highlighted {
     self.zPosition = highlighted ? 800 : 0;
-    self.fillColor = highlighted ? [SKColor clearColor] : [SKColor colorWithWhite:1 alpha:0.035];
+    self.fillColor = highlighted ? [SKColor clearColor] : [SKColor colorWithWhite:0 alpha:0.12];
     for (SKNode *child in self.children)
         child.hidden = highlighted;
-    // Legal drops glow in the card back's gold.
-    self.strokeColor = highlighted ? [SKColor colorWithRed:0.937 green:0.788 blue:0.396 alpha:1]
-                                   : [SKColor colorWithWhite:1 alpha:0.14];
+    // Legal drops glow gold against the felt.
+    self.strokeColor = highlighted ? [SKColor colorWithRed:1 green:0.82 blue:0.25 alpha:1]
+                                   : [SKColor colorWithWhite:1 alpha:0.4];
     self.glowWidth = highlighted ? 2 : 0;
-    self.lineWidth = highlighted ? 2.5 : 1;
+    self.lineWidth = highlighted ? 3 : 1.5;
 }
 @end

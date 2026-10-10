@@ -26,6 +26,15 @@
 - (BOOL)canUndo {
     return self.history.count > 0 && !self.won;
 }
+- (BOOL)canAutoWin {
+    if (self.won)
+        return NO;
+    for (NSInteger p = 6; p < 13; p++)
+        for (Card *c in self.piles[p])
+            if (!c.faceUp)
+                return NO;
+    return YES;
+}
 - (NSTimeInterval)elapsed {
     return self.frozenTime >= 0 ? self.frozenTime : -[self.started timeIntervalSinceNow];
 }
@@ -195,6 +204,24 @@
     self.started = [NSDate dateWithTimeIntervalSinceNow:-elapsed];
     [self save];
     return YES;
+}
+- (BOOL)autoWinStep {
+    if (!self.canAutoWin)
+        return NO;
+    // With every card face up, the lowest remaining card is always uncovered or in the stock, so playing
+    // the lowest available card, and drawing when none is, always finishes.
+    NSInteger source = NSNotFound, rank = 14;
+    for (NSInteger s = 1; s < 13; s++) {
+        Card *top = s == 1 || s >= 6 ? self.piles[s].lastObject : nil;
+        if (top && top.rank < rank && [self foundationFor:s index:self.piles[s].count - 1] != NSNotFound) {
+            source = s;
+            rank = top.rank;
+        }
+    }
+    if (source != NSNotFound)
+        return [self moveFrom:source index:self.piles[source].count - 1
+                           to:[self foundationFor:source index:self.piles[source].count - 1]];
+    return [self draw];
 }
 - (NSInteger)foundationFor:(NSInteger)s index:(NSInteger)i {
     for (NSInteger d = 2; d < 6; d++)

@@ -13,11 +13,13 @@
 @property(nonatomic, strong) NSArray<NSValue *> *origins;
 @property(nonatomic, strong) UITouch *activeTouch;
 @property(nonatomic, strong) SKSpriteNode *background;
+@property(nonatomic) BOOL autoPlaying;
+@property(nonatomic) BOOL celebrating;
 @end
 @implementation GameScene
 - (instancetype)initWithSize:(CGSize)size {
     if ((self = [super initWithSize:size])) {
-        self.backgroundColor = [SKColor colorWithRed:0.039 green:0.035 blue:0.055 alpha:1];
+        self.backgroundColor = [SKColor colorWithRed:0.035 green:0.22 blue:0.09 alpha:1];
         self.scaleMode = SKSceneScaleModeResizeFill;
         _cards = [NSMutableDictionary dictionary];
         _slots = [NSMutableArray array];
@@ -80,11 +82,11 @@
         [NSValue valueWithCGSize:[GameScene cardSizeForWidth:shortSide]]
     ]];
 }
-// Near-black with a faint violet glow from the top edge, like the icon's backdrop.
+// Card-table felt: a lighter pool of green from the top edge, darkening toward the corners, like the icon.
 + (SKTexture *)backgroundTextureForSize:(CGSize)size {
     UIGraphicsBeginImageContextWithOptions(size, YES, 1);
     CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
-    CGFloat components[] = {0.118, 0.082, 0.208, 1, 0.059, 0.047, 0.09, 1, 0.039, 0.035, 0.055, 1},
+    CGFloat components[] = {0.2, 0.56, 0.29, 1, 0.1, 0.4, 0.19, 1, 0.035, 0.22, 0.09, 1},
             locations[] = {0, 0.55, 1};
     CGGradientRef gradient = CGGradientCreateWithColorComponents(space, components, locations, 3);
     CGPoint top = CGPointMake(size.width / 2, -size.height * 0.1);
@@ -136,11 +138,13 @@
             node.zPosition = 10 + p * 52 + i;
             node.colorBlendFactor = 0;
             node.alpha = 1;
-            node.hidden = p < 6 && i < (NSInteger)self.game.piles[p].count - 1;
+            // The card under the top stays visible, so a pile never looks empty while a card flies onto it.
+            node.hidden = p < 6 && i < (NSInteger)self.game.piles[p].count - 2;
             [node refreshWithSize:self.cardSize animated:motion];
             [node removeActionForKey:@"move"];
             [node removeActionForKey:@"victory"];
-            node.yScale = 1;
+            [node setScale:1];
+            node.zRotation = 0;
             CGPoint target = [self positionForPile:p index:i];
             if (motion) {
                 SKAction *move = [SKAction moveTo:target duration:0.18];
@@ -150,6 +154,9 @@
                 node.position = target;
         }
     [self showSelection];
+    self.celebrating = self.celebrating && self.game.won;
+    if (self.celebrating)
+        [self danceAnimated:!UIAccessibilityIsReduceMotionEnabled()];
 }
 - (CardNode *)cardAt:(CGPoint)point {
     CardNode *best = nil;
@@ -181,12 +188,14 @@
                                                           : [self originForPile:p];
     }
     for (CardNode *node in self.cards.allValues) {
-        node.color = [SKColor colorWithRed:0.455 green:0.271 blue:0.902 alpha:1];
+        node.color = [SKColor colorWithRed:1 green:0.75 blue:0.1 alpha:1];
         node.colorBlendFactor =
-            (node.pile == self.selectedPile && node.index >= self.selectedIndex) ? 0.16 : 0;
+            (node.pile == self.selectedPile && node.index >= self.selectedIndex) ? 0.22 : 0;
     }
 }
 - (void)cancelInteraction {
+    [self removeActionForKey:@"autoWin"];
+    self.autoPlaying = NO;
     self.activeTouch = nil;
     self.dragging = NO;
     self.lifted = nil;
@@ -201,7 +210,7 @@
         self.gameChanged();
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    if (self.game.won || self.activeTouch)
+    if (self.game.won || self.activeTouch || self.autoPlaying)
         return;
     UITouch *touch = touches.anyObject;
     self.activeTouch = touch;
@@ -291,16 +300,70 @@
     [self cancelInteraction];
     [self refreshAnimated:NO];
 }
-- (void)celebrate {
-    if (UIAccessibilityIsReduceMotionEnabled())
+- (void)autoWin {
+    if (self.autoPlaying || !self.game.canAutoWin)
         return;
-    for (NSInteger p = 2; p < 6; p++) {
-        Card *c = self.game.piles[p].lastObject;
-        CardNode *n = self.cards[@(c.identifier)];
-        [n runAction:[SKAction sequence:@[
-               [SKAction waitForDuration:0.2 + (p - 2) * 0.09], [SKAction moveByX:0 y:14 duration:0.18],
-               [SKAction moveByX:0 y:-14 duration:0.25]
-           ]]
+    [self cancelInteraction];
+    self.autoPlaying = YES;
+    [self autoWinNext];
+}
+- (void)autoWinNext {
+    BOOL moved = [self.game autoWinStep];
+    self.autoPlaying = moved && !self.game.won;
+    [self refreshAnimated:YES];
+    if (self.gameChanged)
+        self.gameChanged();
+    if (!self.autoPlaying)
+        return;
+    __weak typeof(self) weakSelf = self;
+    [self runAction:[SKAction sequence:@[
+              [SKAction waitForDuration:0.07], [SKAction runBlock:^{
+                  [weakSelf autoWinNext];
+              }]
+          ]]
+            withKey:@"autoWin"];
+}
+- (void)celebrate {
+    self.celebrating = YES;
+    [self danceAnimated:!UIAccessibilityIsReduceMotionEnabled()];
+}
+// The kings and queens step off the foundations into a chorus line across the lower board and dance,
+// alternating red and black, each a beat behind its neighbor.
+- (void)danceAnimated:(BOOL)motion {
+    NSArray<NSArray<NSNumber *> *> *order =
+        @[ @[ @2, @12 ], @[ @5, @11 ], @[ @4, @12 ], @[ @3, @11 ], @[ @3, @12 ], @[ @4, @11 ], @[ @5, @12 ], @[ @2, @11 ] ];
+    CGFloat available = self.size.width - 2 * self.margin, spacing = MIN(self.cardSize.width * 1.2, available / order.count),
+            scale = MIN(1.1, spacing / (self.cardSize.width * 1.12)),
+            y = self.bottomInset + (self.size.height - self.bottomInset) * 0.3;
+    for (NSUInteger i = 0; i < order.count; i++) {
+        NSArray *pile = self.game.piles[order[i][0].integerValue];
+        CardNode *n = self.cards[@(((Card *)pile[order[i][1].integerValue]).identifier)];
+        CGPoint spot = CGPointMake(self.size.width / 2 + (i - (order.count - 1) / 2.0) * spacing, y);
+        [n removeActionForKey:@"move"];
+        [n removeActionForKey:@"victory"];
+        n.hidden = NO;
+        n.zPosition = 900 + i;
+        // The jacks stay behind, so the foundations still look complete.
+        CardNode *jack = self.cards[@(((Card *)pile[10]).identifier)];
+        jack.hidden = NO;
+        if (!motion) {
+            n.position = spot;
+            [n setScale:scale];
+            n.zRotation = 0;
+            continue;
+        }
+        SKAction *enter = [SKAction group:@[ [SKAction moveTo:spot duration:0.5], [SKAction scaleTo:scale duration:0.5] ]];
+        enter.timingMode = SKActionTimingEaseInEaseOut;
+        SKAction *up = [SKAction moveByX:0 y:34 duration:0.22], *down = [SKAction moveByX:0 y:-34 duration:0.22];
+        up.timingMode = SKActionTimingEaseOut;
+        down.timingMode = SKActionTimingEaseIn;
+        SKAction *hop = [SKAction sequence:@[ up, down ]];
+        SKAction *step = [SKAction repeatActionForever:[SKAction sequence:@[
+            [SKAction group:@[ hop, [SKAction rotateToAngle:0.24 duration:0.44 shortestUnitArc:YES] ]],
+            [SKAction group:@[ hop, [SKAction rotateToAngle:-0.24 duration:0.44 shortestUnitArc:YES] ]]
+        ]]];
+        [n runAction:[SKAction sequence:@[ [SKAction waitForDuration:0.3 + i * 0.08], enter,
+                                           [SKAction waitForDuration:(i % 2) * 0.22], step ]]
              withKey:@"victory"];
     }
 }

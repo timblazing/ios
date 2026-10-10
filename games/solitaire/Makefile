@@ -6,7 +6,7 @@ INSTALL_TARGET_PROCESSES = Solitaire
 include $(THEOS)/makefiles/common.mk
 APPLICATION_NAME = Solitaire
 Solitaire_FILES = $(wildcard Application/*.m Application/Game/*.m Application/Scenes/*.m Application/Nodes/*.m Application/UI/*.m)
-Solitaire_FRAMEWORKS = UIKit Foundation SpriteKit CoreGraphics
+Solitaire_FRAMEWORKS = UIKit Foundation SpriteKit CoreGraphics QuartzCore
 Solitaire_CFLAGS = -fobjc-arc -fno-exceptions -fno-objc-exceptions -Wall -Wextra -Wno-unused-parameter
 Solitaire_RESOURCE_DIRS = Resources
 Solitaire_INFOPLIST = Resources/Info.plist

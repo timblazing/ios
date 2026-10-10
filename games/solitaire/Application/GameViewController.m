@@ -1,5 +1,6 @@
 #import "GameViewController.h"
 #import "Scenes/GameScene.h"
+#import "UI/CelebrationView.h"
 #import "UI/GameControls.h"
 #import "UI/SettingsViewController.h"
 #import <SpriteKit/SpriteKit.h>
@@ -7,7 +8,7 @@
 @property(nonatomic, strong) SKView *board;
 @property(nonatomic, strong) GameScene *scene;
 @property(nonatomic, strong) GameControls *controls;
-@property(nonatomic, strong) UILabel *victory;
+@property(nonatomic, strong) CelebrationView *celebration;
 @property(nonatomic, strong) NSTimer *timer;
 @property(nonatomic) BOOL showingVictory;
 @end
@@ -15,7 +16,7 @@ static const CGFloat kBarHeight = 52;
 @implementation GameViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithRed:0.039 green:0.035 blue:0.055 alpha:1];
+    self.view.backgroundColor = [UIColor colorWithRed:0.035 green:0.22 blue:0.09 alpha:1];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults registerDefaults:@{@"soundEnabled" : @NO}];
     // v1 settings that no longer exist.
@@ -47,15 +48,12 @@ static const CGFloat kBarHeight = 52;
     [self.controls.settingsButton addTarget:self
                                      action:@selector(settings)
                            forControlEvents:UIControlEventTouchUpInside];
-    self.victory = [UILabel new];
-    self.victory.textColor = [UIColor whiteColor];
-    self.victory.textAlignment = NSTextAlignmentCenter;
-    self.victory.font = [UIFont fontWithName:@"AvenirNext-Medium" size:20];
-    self.victory.shadowColor = [UIColor colorWithWhite:0 alpha:0.8];
-    self.victory.shadowOffset = CGSizeMake(0, 1);
-    self.victory.numberOfLines = 0;
-    self.victory.hidden = YES;
-    [self.view addSubview:self.victory];
+    [self.controls.autoWinButton addTarget:self
+                                    action:@selector(autoWin)
+                          forControlEvents:UIControlEventTouchUpInside];
+    self.celebration = [[CelebrationView alloc] initWithFrame:self.view.bounds];
+    self.celebration.bottomInset = kBarHeight;
+    [self.view addSubview:self.celebration];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(background)
                                                  name:UIApplicationDidEnterBackgroundNotification
@@ -76,7 +74,7 @@ static const CGFloat kBarHeight = 52;
     self.board.frame = self.view.bounds;
     self.controls.frame = CGRectMake(0, boardHeight, size.width, bar);
     self.scene.size = self.board.bounds.size;
-    self.victory.frame = CGRectMake(24, boardHeight * 0.48, size.width - 48, 150);
+    self.celebration.frame = self.view.bounds;
 }
 - (BOOL)prefersStatusBarHidden {
     return YES;
@@ -112,32 +110,20 @@ static const CGFloat kBarHeight = 52;
     self.controls.status.text =
         [NSString stringWithFormat:@"%@   •   %ld moves", time, (long)self.scene.game.moves];
     self.controls.undoButton.enabled = self.scene.game.canUndo;
+    self.controls.autoWinButton.hidden = !self.scene.game.canAutoWin || self.scene.autoPlaying;
     if (self.scene.game.won) {
-        self.victory.hidden = NO;
-        NSMutableAttributedString *text = [[NSMutableAttributedString alloc]
-            initWithString:@"Nicely played.\n"
-                attributes:@{NSFontAttributeName : [UIFont fontWithName:@"AvenirNextCondensed-DemiBold" size:44]}];
-        [text appendAttributedString:[[NSAttributedString alloc]
-                                         initWithString:[NSString stringWithFormat:@"%@   ·   %ld moves\n", time,
-                                                                                   (long)self.scene.game.moves]
-                                             attributes:@{
-                                                 NSForegroundColorAttributeName :
-                                                     [UIColor colorWithRed:0.937 green:0.788 blue:0.396 alpha:1]
-                                             }]];
-        [text appendAttributedString:[[NSAttributedString alloc]
-                                         initWithString:@"Tap the new game button to play again"
-                                             attributes:@{
-                                                 NSForegroundColorAttributeName : [UIColor colorWithWhite:1 alpha:0.5],
-                                                 NSFontAttributeName : [UIFont fontWithName:@"AvenirNext-Regular" size:15]
-                                             }]];
-        self.victory.attributedText = text;
+        [self.celebration showWithTime:time moves:self.scene.game.moves];
         if (!self.showingVictory)
             [self.scene celebrate];
         self.showingVictory = YES;
     } else {
-        self.victory.hidden = YES;
+        [self.celebration hide];
         self.showingVictory = NO;
     }
+}
+- (void)autoWin {
+    [self.scene autoWin];
+    [self updateStatus];
 }
 - (void)undo {
     [self.scene cancelInteraction];

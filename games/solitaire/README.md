@@ -4,15 +4,15 @@ Offline Draw-1 Klondike in Objective-C, UIKit, and SpriteKit. Targets ARM64 and 
 
 ## Install this build
 
-Use `packages/com.local.solitaire_2.2.0_iphoneos-arm.deb` on the jailbroken iPad. Copy it to the device and install it with Filza or run as root:
+Use `packages/com.local.solitaire_2.3.0_iphoneos-arm.deb` on the jailbroken iPad. Copy it to the device and install it with Filza or run as root:
 
 ```sh
-dpkg -i com.local.solitaire_2.2.0_iphoneos-arm.deb
+dpkg -i com.local.solitaire_2.3.0_iphoneos-arm.deb
 ```
 
 The package refreshes the icon cache. If the icon is missing, run `uicache` as mobile and return to the Home screen.
 
-`dist/Solitaire-2.2.0.ipa` contains the same app. It is ad-hoc signed for a jailbroken installation environment. An IPA installer must support that signing setup, such as an AppSync-enabled installer. It is not an Apple-provisioned IPA for a stock device. The `.deb` is the intended route for this target.
+`dist/Solitaire-2.3.0.ipa` contains the same app. It is ad-hoc signed for a jailbroken installation environment. An IPA installer must support that signing setup, such as an AppSync-enabled installer. It is not an Apple-provisioned IPA for a stock device. The `.deb` is the intended route for this target.
 
 ## Play
 
@@ -23,7 +23,8 @@ The package refreshes the icon cache. If the icon is missing, run `uicache` as m
 - Exposed face-down tableau cards flip automatically.
 - Undo restores the previous move, including a draw, recycle, or automatic flip. The last 200 actions are available during the current session.
 - The controls bar sits at the bottom: time and moves on the left, then Undo (back arrow), New game (circular arrow), and Settings (gear).
-- New game replaces the board after confirmation. A completed game shows time and moves and locks board interaction.
+- Once every tableau card is face up, a gold Auto Win button appears in the controls bar. It plays the rest out to the foundations, drawing through the stock as needed. Any interruption (Undo, New game, Settings, rotation, backgrounding) stops it; tap it again to resume.
+- New game replaces the board after confirmation. A completed game locks board interaction and celebrates: confetti over the whole screen, "Congrats Reagan!" in rainbow WordArt with clip-art stars, the kings and queens dancing in a line, and the time and moves above the bar. Reduce Motion keeps the message and the line of cards but drops the confetti and dancing.
 
 The board, move count, and elapsed time save locally. Undo history does not survive a relaunch. The timer pauses in the background. Settings shows games played, wins, and current win streak. Replacing an unfinished game breaks the streak.
 
@@ -33,7 +34,7 @@ The app uses one card design from `Resources/Cards/`: `back.png` plus 52 faces n
 
 Any missing or unreadable card falls back to the built-in drawn card (rank text and suit symbol, or the slate lattice back). An empty folder gives the v1 look, so a partial set works while you design. Missing filenames are logged once at launch. All textures are rendered on a background queue at launch for both orientations, so the first flip doesn't hitch.
 
-Candidate designs are in `docs/card-designs/sets/<set>/`: one SVG and one 250×350 PNG per card, with the same names. `scripts/make-card-svgs.py` builds them (it overwrites that folder, so copy a set elsewhere before reworking it by hand); each set is a palette plus a court style, with suit shapes matching the app icon and court figures from CC0 art in `docs/card-designs/courts/`. To compare sets on a simulated board, serve the game folder (`python3 -m http.server 8765`) and open `http://127.0.0.1:8765/tools/design-playground/`. The app ships the `violet-gold` set. To switch, copy another set's card PNGs into `Resources/Cards/` and its `icon-1024.png` into `Resources/Icon/`.
+Candidate designs are in `docs/card-designs/sets/<set>/`: one SVG and one 250×350 PNG per card, with the same names. `scripts/make-card-svgs.py` builds them (it overwrites that folder, so copy a set elsewhere before reworking it by hand); each set is a palette plus a court style, with suit shapes matching the app icon and court figures from CC0 art in `docs/card-designs/courts/`. To compare sets on a simulated board, serve the game folder (`python3 -m http.server 8765`) and open `http://127.0.0.1:8765/tools/design-playground/`. The app ships the `traditional` set: red and black faces, a red back, and a green-felt icon to match the board. To switch, copy another set's card PNGs into `Resources/Cards/` and its `icon-1024.png` into `Resources/Icon/`.
 
 Only the top ~24% of a face-up card shows in a landscape tableau column (32% in portrait), and as little as ~14% when a long column compresses. The generated sets keep the rank and suit side by side in the top 62 px and start pips and court art below that, so a compressed column reads cleanly.
 
@@ -72,7 +73,7 @@ The build disables C++ and Objective-C exception handling; the app doesn't use e
 - `Application/Scenes/GameScene` handles layout, picking, dragging, selection, and motion.
 - `Application/Nodes/` renders cards and pile outlines.
 - `Application/UI/` contains settings and the bottom controls bar, whose icons are drawn in code.
-- `GameViewController` owns the scene, timer display, lifecycle handling, and victory text.
+- `GameViewController` owns the scene, timer display, lifecycle handling, and the win celebration (`UI/CelebrationView`).
 
 No networking, accounts, ads, analytics, achievements, or multiplayer. Audio, haptics, Draw 3, and Vegas scoring are out of scope. Sound preference is initialized to off for future use; there are no sound effects or sound controls yet.
 
@@ -84,6 +85,6 @@ On macOS with command-line developer tools:
 scripts/test-rules.sh
 ```
 
-On Linux, the same script needs GNUstep Base built against libobjc2 with the modern Objective-C runtime and ARC. A distribution's legacy GNUstep runtime is insufficient. Tests compile the actual app model without SpriteKit or UIKit. They cover rule boundaries, recycling order, undo, persistence, statistics, victory, and 2,400 randomized play steps with board invariants.
+On Linux, the same script needs GNUstep Base built against libobjc2 with the modern Objective-C runtime and ARC. A distribution's legacy GNUstep runtime is insufficient. Tests compile the actual app model without SpriteKit or UIKit. They cover rule boundaries, recycling order, undo, persistence, statistics, victory, auto-win, and 2,400 randomized play steps with board invariants.
 
 See `Tests/DEVICE_CHECKLIST.md` for the remaining iPad checks. Install, rotation, and A7 frame rate still need checking on the iPad.

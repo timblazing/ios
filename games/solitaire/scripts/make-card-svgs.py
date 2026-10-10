@@ -50,6 +50,10 @@ SETS = {
                     field="#1b1236", glow="#4b2f9a", glowSuit="#ef5a6e"),
     "minimal": dict(label="Minimal courts", red="#7445e6", blue="#2c1a52", yellow="#ddd2ff", courts="letters",
                     field="#1a0f31", glow="#5b33b8", glowSuit="#a88bff"),
+    # True red and black faces, a red back with a white lattice, and the icon on the board's green felt.
+    "traditional": dict(label="Traditional", red="#d0101e", blue="#1f3c8f", yellow="#f3c22c", courts="figures",
+                        ink="#111111", field="#b3101c", line="#ffffff", glow="#e8434d", glowSuit="#ffffff",
+                        felt=("#3a9d55", "#1a6a33", "#0a3a1a")),
 }
 SOURCE = {"red": (0xff, 0x55, 0x55), "blue": (0x55, 0x55, 0xaa), "yellow": (0xff, 0xff, 0x55),
           "black": (0, 0, 0), "white": (0xff, 0xff, 0xff)}
@@ -105,7 +109,7 @@ LAYOUTS = {
 def recolor(svg, palette):
     """Maps every color in the court art to the nearest of its five source colors, then to the set."""
     target = {"red": palette["red"], "blue": palette["blue"], "yellow": palette["yellow"],
-              "black": INK, "white": "#ffffff"}
+              "black": palette.get("ink", INK), "white": "#ffffff"}
 
     def swap(m):
         rgb = tuple(int(m.group(1)[i:i + 2], 16) for i in (0, 2, 4))
@@ -149,7 +153,7 @@ def center(rank, letter, color, palette):
 
 
 def face(rank, letter, palette):
-    color = palette["red"] if letter in RED else INK
+    color = palette["red"] if letter in RED else palette.get("ink", INK)
     corner = index(rank, letter, color)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
             f'<rect width="{W}" height="{H}" fill="#ffffff"/>\n'
@@ -174,7 +178,7 @@ def diamond(cx, cy, w, h, pinch=.14):
 def back(palette):
     """Bordered like the faces: a white margin around a dark field with a fine lattice, a double rule,
     and a concave-diamond medallion holding the four suits. Symmetric under a half turn."""
-    field, line, light = palette["field"], palette["yellow"], palette["glow"]
+    field, line, light = palette["field"], palette.get("line", palette["yellow"]), palette["glow"]
     fx, fy, fw, fh = 11, 11, W - 22, H - 22
     cx, cy = W / 2, H / 2
     lattice = (f'<pattern id="lattice" width="18" height="18" patternUnits="userSpaceOnUse" '
@@ -190,7 +194,8 @@ def back(palette):
         f'stroke-width="{width}"/>')
     corners = "".join(f'<path d="{diamond(x, y, 12, 16)}" fill="{line}"/>'
                       for x in (fx + 9, fx + fw - 9) for y in (fy + 9, fy + fh - 9))
-    suit_color = {"S": "#f6f2ff", "C": "#f6f2ff", "H": palette["glowSuit"], "D": palette["glowSuit"]}
+    pale = "#ffffff" if "line" in palette else "#f6f2ff"
+    suit_color = {"S": pale, "C": pale, "H": palette["glowSuit"], "D": palette["glowSuit"]}
     suits = "".join(pip(k, cx + dx, cy + dy, 26, suit_color[k], flip=flip)
                     for k, dx, dy, flip in (("S", 0, -34, False), ("H", 30, 0, False),
                                             ("C", 0, 34, True), ("D", -30, 0, False)))
@@ -210,7 +215,7 @@ def back(palette):
 
 
 def icon(name, palette):
-    """1024px app icon: the set's back and ace of spades fanned on the board's near-black."""
+    """1024px app icon: the set's back and ace of spades fanned on the board color (near-black, or felt)."""
     out = OUT / name
     cards = []
     for card in ("back", "AS"):
@@ -218,6 +223,7 @@ def icon(name, palette):
                              check=True, capture_output=True).stdout
         cards.append("data:image/png;base64," + base64.b64encode(png).decode())
     cw, ch = 476, 666
+    felt = palette.get("felt")
 
     def card(href, x, y, angle):
         return (f'<g transform="rotate({angle} {x + cw / 2:g} {y + ch / 2:g})">'
@@ -227,15 +233,17 @@ def icon(name, palette):
                 f'<image href="{href}" x="{x}" y="{y}" width="{cw}" height="{ch}" clip-path="url(#c{angle})"/></g>')
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">'
            f'<defs><radialGradient id="bg" cx="512" cy="300" r="820" gradientUnits="userSpaceOnUse">'
-           f'<stop offset="0" stop-color="{palette["glow"]}" stop-opacity=".55"/>'
-           f'<stop offset=".55" stop-color="#140d24"/><stop offset="1" stop-color="#07060a"/></radialGradient>'
-           f'<filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">'
+           + (f'<stop offset="0" stop-color="{felt[0]}"/><stop offset=".55" stop-color="{felt[1]}"/>'
+              f'<stop offset="1" stop-color="{felt[2]}"/></radialGradient>' if felt else
+              f'<stop offset="0" stop-color="{palette["glow"]}" stop-opacity=".55"/>'
+              f'<stop offset=".55" stop-color="#140d24"/><stop offset="1" stop-color="#07060a"/></radialGradient>')
+           + f'<filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">'
            f'<feGaussianBlur stdDeviation="22"/></filter></defs>'
            f'<rect width="1024" height="1024" fill="url(#bg)"/>'
            + card(cards[0], 138, 176, -12) + card(cards[1], 408, 168, 8) + '</svg>')
     (out / "icon-1024.svg").write_text(svg)
-    subprocess.run(["rsvg-convert", "-w", "1024", "-h", "1024", "-b", "#07060a", "-o", str(out / "icon-1024.png"),
-                    str(out / "icon-1024.svg")], check=True)
+    subprocess.run(["rsvg-convert", "-w", "1024", "-h", "1024", "-b", felt[2] if felt else "#07060a", "-o",
+                    str(out / "icon-1024.png"), str(out / "icon-1024.svg")], check=True)
 
 
 def build(name, palette):
