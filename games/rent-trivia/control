@@ -1,0 +1,9 @@
+Package: com.local.renttrivia
+Name: Rent Trivia
+Version: 1.1.1
+Architecture: iphoneos-arm
+Description: Trivia game for Rent (2005), for personal use
+Maintainer: Rent Trivia
+Author: Rent Trivia
+Section: Games
+Depends: firmware (>= 10.0)
