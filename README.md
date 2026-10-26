@@ -13,6 +13,7 @@ Every game uses the same stack: Objective-C, UIKit, and SpriteKit, built with Th
 ## Layout
 
 - `games/<name>/` holds one self-contained Theos project: its own `Makefile`, `control`, `Resources/`, `scripts/`, tests, and build output. Build and package from inside that folder.
+- `apps/<name>/` holds non-game apps for the same iPad. See [apps/README.md](apps/README.md).
 - `docs/` holds notes shared across games.
 - `.clang-format` applies to all games.
 
