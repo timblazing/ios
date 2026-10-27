@@ -1,104 +1,81 @@
-# T3 Mini
+# T3 Chat
 
-Read-only T3 Code companion for a jailbroken iPad mini 2 on iOS 10.3.3.
-Version **0.1.0** is a connection and rendering prototype, not the full T3 mobile app.
+A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.2.1** adds everyday chat to the device-tested T3 Mini reader.
 
-- Pair with a reachable T3 environment using a one-time pairing link.
-- List up to 300 active threads and read the latest user/assistant messages,
-  including inherited messages exposed in the server's bounded projection.
-- Tap **Refresh** for new replies; this version does not stream or poll automatically.
-- Credentials stay in the iPad's Keychain. Only the last environment address is
-  saved in preferences. Pairing requests ask for `orchestration:read` only.
+- Browse/search conversations by project; create conversations in an existing project workspace.
+- Choose a host provider/model, send or queue follow-ups, watch live replies, and stop turns.
+- Respond to resumable approvals and questions, including choices and custom answers.
+- Read Markdown, fenced code, and expandable tool activity in a bounded conversation view.
+- Keep drafts, recover after wake, and explicitly retry unconfirmed commands with their original IDs.
 
-Sending prompts, approvals, tools, attachments, archived threads, rich Markdown,
-terminal access, and older-history pagination are not implemented. Responses are
-bounded to an 8 MB payload, the final 100 turn items, and 30,000 characters per message.
+[IPA](dist/T3Chat-0.2.1.ipa) · [Debian package](packages/com.local.t3mini_0.2.1_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
 
-**Release:** [T3Mini-0.1.0.ipa](dist/T3Mini-0.1.0.ipa), Debian package in `packages/`, and [checksums](dist/SHA256SUMS).
+## Connect and upgrade
 
-## Connect
-
-Keep T3 running on your Mac or Linux host and make it reachable from the iPad's
-network. On the host, create a fresh link with:
+Keep the T3 host running. For a desktop host listening on loopback, run the included adapter on this Mac's private LAN IPv4 address:
 
 ```sh
-t3 pair --scope orchestration:read
+python3 tools/t3-mini/lan-gateway.py --listen <Mac-LAN-IP> --port 3774 --allow-chat
 ```
 
-Paste the complete direct or hosted pairing link into **Pairing link or one-time
-credential**, or enter the base environment address and fragment credential
-separately. After pairing, leave that field blank to reuse the saved session.
-**Forget saved session** removes the current origin's local Keychain entry; it
-does not revoke the host session. Use the host's access settings to revoke it.
+This changes the adapter's exposed operations; it does not restart or reconfigure the desktop server. The default without `--allow-chat` remains read-only. Keep the adapter running while using the app. HTTP is only for a trusted LAN: prompts and bearer credentials are unencrypted in transit. HTTPS connections retain normal system certificate verification; certificate checks are never disabled. The adapter itself accepts a loopback HTTP upstream only.
 
-Pairing links are secrets. Do not put them in screenshots, logs, or Git. Direct
-bearer sessions currently last 30 days; an expired session requires a new pairing
-link. The app checks protocol 2 and the saved environment identity before sending
-saved credentials. It refuses redirects, and HTTPS uses the system's normal
-certificate checks. Plain HTTP is permitted for trusted LAN use; its traffic is
-not encrypted. T3 Connect account sign-in is not implemented in this prototype.
-
-The host setup is separate. A host bound only to `127.0.0.1` cannot be reached by
-the iPad. This app does not enable network access or modify the host's settings.
-
-## Temporary LAN adapter for a loopback desktop host
-
-The repository includes a narrow adapter for this prototype, so testing does not
-require restarting or changing the desktop server. On the host Mac:
+Create a fresh pairing link with the app's chat permissions:
 
 ```sh
-python3 tools/t3-mini/lan-gateway.py --listen <Mac-LAN-IP> --port 3774
+t3 auth pairing create --scope orchestration:read --scope orchestration:operate \
+  --label 'T3 Chat iPad' --base-url http://<Mac-LAN-IP>:3774
 ```
 
-Keep that process running while using the iPad. It forwards only public discovery,
-read-only pairing exchange, thread listing, and bounded conversation reads to
-`127.0.0.1:3773`. Write endpoints are denied. Use this only on a trusted LAN;
-it serves HTTP. Stop with Ctrl-C after testing. Create a pairing link for the
-same environment with `t3 auth pairing create --scope orchestration:read
---base-url http://<Mac-LAN-IP>:3774`; paste the link into the app. No private
-addresses or pairing credentials are bundled in public releases.
+Open **Connection** and **Scan pairing code**, or enter the address and paste the code/link, then Connect. New pairing always requests conversation read and operate access; there is no read-only switch. IP addresses can be entered without `http://`. For a saved session, leave the code blank. The camera permission is requested only when you open the scanner. A code grants access once; the session then stays in Keychain. Direct host reading remains supported, but chat operations in this release require this adapter even if the host is already reachable directly.
 
-## Build
+**Upgrading keeps `com.local.t3mini`, the executable name, Keychain service/account, and preferences.** Install over the existing app; do not uninstall it. Existing reader sessions remain saved until replaced by a fresh chat pairing. The app never silently expands an old session's authority. A failed credential save preserves the previous Keychain entry. Session expiry requires pairing again. Forget removes the current origin's local Keychain entry; revoke host sessions in the host's access settings.
+
+Pairing links are secrets. Never put them in screenshots, logs, Git, or public packages. No host addresses or credentials are bundled in release artifacts.
+
+## Use
+
+Choose a project filter or search a title in the sidebar. Project/provider/model selectors use in-app dark menus. Connection settings remain open until Done or a successful connection; background refresh does not close them or overwrite edited fields. **New** creates a conversation in the project's existing workspace, with approval required and the selected model; it does not create a worktree. Existing conversation runtime/interaction modes stay on the host. Provider/model changes apply to the next prompt. Providers that require a new conversation for model changes are blocked accordingly.
+
+Enter adds a line; **⌘/Ctrl + Enter** sends. During a running turn, follow-ups queue. **Stop** requests a host thread stop, including delegated work as the host normally does. Pending permission/question cards offer only resumable responses; unavailable requests direct you to the host. Secret-entry requests, attachments, terminal access, full file/diff previews, archived/older-history pagination, and T3 Connect account login are not implemented.
+
+Live updates use foreground bounded snapshot polling: about two seconds while active, eight seconds while idle, with errors backing off to thirty seconds. Network work pauses in the background; wake rechecks environment identity before authenticated reads/writes. The UI preserves a reader's scroll position and offers **Latest reply** when appropriate.
+
+A prompt is saved locally before dispatch. On a timeout or lost connection, **Refresh and inspect the conversation**, then use **Retry same command** if needed. It reuses the exact command/message IDs; it never auto-resends. **Dismiss after checking** discards only the local pending record. Sending remains blocked for that thread until its pending operation is resolved. Drafts (up to fifty threads) and up to eight pending commands are local app data, including prompt text, scoped by environment origin; credentials remain in Keychain. Treat the device as containing private conversations. Local drafts are not an encrypted vault.
+
+## Architecture and limits
+
+Objective-C/UIKit hosts a bundled ES5 HTML/CSS/JavaScript interface in WKWebView. Native NSURLSession owns all networking, redirect refusal, environment identity checks, and Keychain access. The page cannot navigate to remote pages or make its own network requests. Markdown escapes remote content; HTML and remote images are not interpreted, and links are displayed as text.
+
+The native transport cancels responses beyond **8 MB while receiving**, rather than checking only after buffering. The page receives at most the newest **80 turn items**, plus older pending questions, **24,000 characters per message**, **4,000 per tool text field**, and a **350,000-character shared text budget**. Pending runtime requests are capped at twenty, threads/projects at three hundred. Earlier history is visibly omitted. Tool details have no syntax highlighter, embedded browser, image decoding, or per-frame animation. Real A7 memory/scroll behavior still requires physical testing.
+
+The adapter forwards discovery, OAuth exchange, shell/bounded reads, and project reads. Its chat bridge opens one bounded authenticated WebSocket RPC per operation:
+
+- `GET /t3-chat/config`: filtered provider/model catalog from `server.getConfig`.
+- `POST /t3-chat/command`: `orchestration.dispatchCommand`, allowing only `thread.create`, `message.dispatch`, `thread.stop`, `runtime-request.respond`, and `thread.model-selection.set`.
+
+It stores no credentials, logs no access URLs or bodies, never retries writes, and rejects other endpoints/command fields. The host still authorizes the bearer scopes. The native command payload limit is 64 KB; the adapter's request limit is 128 KB. Protocol and design evidence are in [PROTOCOL.md](docs/PROTOCOL.md).
+
+## Build and test
 
 ```sh
+cd apps/t3code
 export THEOS=~/theos
 make package FINALPACKAGE=1 -j4
 scripts/package-ipa.sh
+scripts/check-release.py
+node --test Tests/test-ui.js Tests/test-picker.js
+Tests/browser-smoke.sh                 # agent-browser + Python 3 + curl
+cd ../..
+python3 -m unittest discover -s tools/t3-mini/Tests -v
 ```
 
-Build uses Objective-C/UIKit/WebKit/Security, Theos, and the configured iPhoneOS
-16.5 SDK with an iOS 10.0 deployment target. Icon generation uses only Python's
-standard library. Install the `dist/T3Mini-0.1.0.ipa` with the repo installer or
-the bundled `ideviceinstaller`; AppSync Unified and an active jailbreak are required.
+The configured iPhoneOS 16.5 SDK resolves locally to 16.4; the deployment target stays **10.0**. The internal app/executable remains T3Mini intentionally; the display and release IPA names are T3 Chat. Version both `control` and `Resources/Info.plist`, and regenerate checksums when packaging. Public `.deb`/`.ipa` artifacts are committed deliberately.
 
-`Application/main.m` contains the native network and Keychain bridge.
-`Resources/index.html` contains the bundled legacy JavaScript UI. The web view
-cannot navigate to remote pages or make its own network requests; it renders
-remote text with `textContent`. Only the native bridge handles authentication.
+Normal device setup uses QR/code pairing. Older supervised tests used separate private IPAs with a one-use `Pairing.local.plist` (`url`, `token`) injected into temporary staging outside the repo. The release script excludes it, and `check-release.py` checks both formats. The 0.2.1 installed test uses the public IPA and normal pairing. No pairing credentials are included in release artifacts.
 
-## Private provisioning for a supervised device test
+## Remote access on this iPad
 
-A private install bundle can contain `Pairing.local.plist` with string fields
-`url` (base environment URL) and `token` (a one-use pairing credential). The app
-reads it natively on page load and automatically pairs only if that origin has
-no saved Keychain session. No credential is passed to the web UI. Inject this
-file into a separate temporary install staging directory, never into public
-source/artifacts. The package script strips it from the public IPA stage and
-the source location is gitignored. A public release must also verify that the
-`.deb` has no provisioning file. Do not commit or publish private install IPAs.
+Direct pairing works anywhere the iPad can reach the host's address. The official Tailscale iOS client requires iOS 15+, so this iOS 10 iPad cannot join a tailnet using that client. A home subnet router alone does not enroll a remote device; the iPad would need a compatible VPN path or a local gateway/travel router running Tailscale. No VPN, router, Tailscale Serve/Funnel, or public network exposure is configured by this app.
 
-## Compatibility and validation
-
-The prototype implements these protocol-2 endpoints:
-
-- `GET /.well-known/t3/environment`
-- `POST /oauth/token` using a native bearer token exchange
-- `GET /api/orchestration/shell`
-- `GET /api/orchestration/threads/:id/bounded`
-
-Orchestration requests carry `x-t3-orchestration-protocol: 2`. Endpoint/schema
-research was pinned to upstream commit `0b0417a56b2091c87760470833b337eaa0b9a304`.
-The server API can change, so compatibility must be rechecked after host updates.
-See [the device checklist](Tests/DEVICE_CHECKLIST.md) and
-[the original feasibility note](docs/FEASIBILITY.md). Build/package checks do not
-prove real iOS 10 networking, Keychain access, touch behavior, or rendering.
+T3 Connect's official managed-relay flow uses account authentication and DPoP-bound access credentials. Backporting that flow to native iOS 10 requires separate authentication, cryptography, renewal, and real relay testing; it is not available in this release. Home LAN pairing remains the working path while that compatibility is investigated. See [official remote access](https://github.com/pingdotgg/t3code/blob/9bc0c334383a43af5390283e9b10f999acc021b8/docs/user/remote-access.md) and [Tailscale iOS requirements](https://tailscale.com/docs/install/ios).

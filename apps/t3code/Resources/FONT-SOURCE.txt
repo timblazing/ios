@@ -1,0 +1,5 @@
+DM Sans static fonts from @expo-google-fonts/dm-sans 0.4.2
+https://registry.npmjs.org/@expo-google-fonts/dm-sans/-/dm-sans-0.4.2.tgz
+Original design: Colophon Foundry, Google; SIL Open Font License 1.1.
+Bundled regular, medium, bold weights match the official T3 Code mobile app.
+See DMSans-OFL.txt for the complete font license.

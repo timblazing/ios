@@ -1,6 +1,9 @@
 # Feasibility: T3 Code on iOS 10
 
-Research date: 2026-10-26. This is a proposal, not device-tested compatibility.
+Original research date: 2026-10-26. This proposal is retained as historical context.
+T3 Mini 0.1.0 reading was subsequently user-verified on the device; T3 Chat 0.2.0
+implements the chat milestone. See [PROTOCOL.md](PROTOCOL.md) and the current
+[build report](../Tests/BUILD_REPORT.md) for evidence and remaining device checks.
 
 ## Upstream findings
 

@@ -1,0 +1,32 @@
+name: T3 Chat checks
+on:
+  pull_request:
+    paths:
+      - 'apps/t3code/**'
+      - 'tools/t3-mini/**'
+      - '.github/workflows/t3-chat.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/t3code/**'
+      - 'tools/t3-mini/**'
+      - '.github/workflows/t3-chat.yml'
+permissions:
+  contents: read
+jobs:
+  protocol-ui-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gateway protocol and authorization tests
+        run: python3 -m unittest discover -s tools/t3-mini/Tests -v
+      - name: UI and menu logic tests
+        run: node --test apps/t3code/Tests/test-ui.js apps/t3code/Tests/test-picker.js
+      - name: Public release contents and checksums
+        run: python3 apps/t3code/scripts/check-release.py
