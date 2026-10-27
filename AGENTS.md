@@ -4,7 +4,7 @@ Notes for agents working in this repo. Read this before changing code or the bui
 
 ## What this is
 
-Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; the T3 Code companion app connects to a T3 Code host. No ads or analytics. Never commit credentials or private server configuration.
+Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; the T3 Code companion app connects to a T3 Code host; TV plays live channels from a user-configured Dispatcharr server. No ads or analytics. Never commit credentials or private server configuration.
 
 ```
 games/<name>/      one self-contained Theos project per game (Makefile, control, Resources/, scripts/, Tests/, docs/)
@@ -132,3 +132,10 @@ A T3 Code companion: UIKit shell, bundled HTML/CSS/JS UI in WKWebView, native ne
 - The UI copies the official app's dark theme from `pingdotgg/t3code` `apps/mobile` (see README "Design"). Check new UI against that source rather than inventing styles.
 - The desktop host listens on loopback, so the iPad goes through `tools/t3-mini/lan-gateway.py --allow-chat` on the Mac's LAN IP. Pair with `tools/t3-mini/pair-ipad.sh`, which prints an address and code to type on the iPad.
 - Never commit pairing codes, sessions or `Pairing.local.plist`. Revoke test sessions with `t3 auth session revoke`.
+
+### TV (`apps/iptv/`)
+
+A live TV player for a Dispatcharr server, v0.2.0 prototype. Read `README.md` first.
+
+- AVPlayer can't play raw MPEG-TS, so `Application/Stream/` repackages the channel's TS into HLS in memory and serves it on 127.0.0.1. No transcoding: only H.264 video plays; other codecs (4K HEVC) are detected and reported.
+- The server URL is entered on the device. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.

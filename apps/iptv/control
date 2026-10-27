@@ -1,0 +1,9 @@
+Package: com.local.iptv
+Name: TV
+Version: 0.2.0
+Architecture: iphoneos-arm
+Description: A live TV player for a Dispatcharr server on the home network
+Maintainer: TV
+Author: TV
+Section: Multimedia
+Depends: firmware (>= 10.0)

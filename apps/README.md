@@ -5,6 +5,7 @@ Non-game apps live in `apps/<name>/`, alongside `games/<name>/`. Each app is a s
 | App | Status |
 |---|---|
 | [Paint](paint/) | v2.0.0; source, IPA, and Debian packages |
+| [TV](iptv/) | v0.2.0 live TV prototype for a Dispatcharr server |
 | [T3 Mini](t3code/) | v0.1.0 read-only T3 Code connection prototype |
 
 The root `install.sh` discovers both games and apps. Networking, build instructions, and device-test status are documented in each app's README.

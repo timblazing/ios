@@ -16,8 +16,9 @@ Native games and apps for a jailbroken **iPad mini 2 running iOS 10.3.3** (A7, T
 |---|---|---|
 | [Paint](apps/paint/) | 2.0.0 | [IPA](apps/paint/dist/Paint-2.0.0.ipa) · [checksums](apps/paint/dist/SHA256SUMS) |
 | [T3 Code](apps/t3code/) | 0.3.1 | [IPA](apps/t3code/dist/T3Code-0.3.1.ipa) · [checksums](apps/t3code/dist/SHA256SUMS) |
+| [TV](apps/iptv/) | 0.2.0 | [IPA](apps/iptv/dist/IPTV-0.2.0.ipa) · [checksums](apps/iptv/dist/SHA256SUMS) |
 
-Solitaire and Paint are offline. Wordle fetches and caches daily answers from the NYT. Rent Trivia can optionally stream a movie from a user-configured Jellyfin server; public packages contain no server credentials. The T3 Code companion connects to a T3 Code host on another computer.
+Solitaire and Paint are offline. Wordle fetches and caches daily answers from the NYT. Rent Trivia can optionally stream a movie from a user-configured Jellyfin server; public packages contain no server credentials. The T3 Code companion connects to a T3 Code host on another computer. TV plays live channels from a user-configured Dispatcharr server on the home network.
 
 ## Stack and layout
 

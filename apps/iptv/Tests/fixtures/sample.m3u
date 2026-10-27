@@ -1,0 +1,9 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="100" tvg-name="Example One" tvg-logo="http://192.0.2.10:9191/api/channels/logos/1/cache/" tvg-chno="100" group-title="Sports, Live",Example One
+http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000001
+#EXTINF:-1 tvg-id="101" tvg-name="Example Two" tvg-chno="101" group-title="News",Example Two
+http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000002
+#EXTINF:-1 tvg-name="No Group",No Group
+/proxy/ts/stream/00000000-0000-0000-0000-000000000003
+#EXTINF:-1 tvg-chno="103" group-title="Sports, Live",Example Three
+http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000004
