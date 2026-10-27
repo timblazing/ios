@@ -1,5 +1,6 @@
 // Rich, realistic state for screenshots: shelves, statuses, grouped tool activity, Markdown, an approval card.
 (function(){var now=Date.now(),iso=function(min){return new Date(now-min*60000).toISOString();};
+document.getElementById('project-filter').value='';document.getElementById('search').value='';try{localStorage.removeItem('t3code.settledOpen');}catch(e){}
 window.sent=[];window.webkit={messageHandlers:{client:{postMessage:function(m){window.sent.push(m)}}}};
 receive({type:'connecting'});receive({type:'paired',canWrite:true});receive({type:'environment',label:'mac'});
 receive({type:'catalog',providers:[{instanceId:'claude',title:'Claude',enabled:true,installed:true,supportedRuntimeModes:['approval-required'],models:[{id:'opus',label:'Claude Opus 5.5'}]},{instanceId:'codex',title:'Codex',enabled:true,installed:true,supportedRuntimeModes:['approval-required'],models:[{id:'gpt-6-luna',label:'GPT-6 Luna'}]}]});
