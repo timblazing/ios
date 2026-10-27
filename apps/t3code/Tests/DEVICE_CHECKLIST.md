@@ -29,3 +29,4 @@ Further checks:
 Remote access is a separate network/authentication check. This iPad cannot use the current Tailscale iOS client. No remote route, T3 Connect account sign-in, or TLS compatibility for a new remote endpoint is claimed.
 - [ ] 0.3.0: the home screen shows "T3 Code" with the official black T3 icon (run `uicache` or respring if stale), and the app reconnects without re-pairing.
 - [ ] 0.3.0: the All projects arrow is vertically centered; status labels, tool groups, the composer and the Working capsule render as in the official app.
+- [ ] 0.3.1: only unsettled threads appear on top; Settled (n) is collapsed at the bottom and expands on tap; the old usage-limit threads are under Settled.

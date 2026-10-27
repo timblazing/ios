@@ -1,6 +1,6 @@
 Package: com.local.t3mini
 Name: T3 Code
-Version: 0.3.0
+Version: 0.3.1
 Architecture: iphoneos-arm
 Description: T3 Code chat companion for iPad mini 2
 Maintainer: timblazing

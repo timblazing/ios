@@ -54,8 +54,12 @@ h1,h2,p{margin:0}
 .filters{padding:4px 14px 2px}
 #threads{padding:2px 8px 0}
 .list-empty{color:#a3a3a3;font-size:14px;line-height:19px;padding:20px 10px}
-.shelf{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;margin:14px 0 5px;padding:0 9.5px;font-weight:500;font-size:13px;line-height:17px;color:#818181}
-.shelf:after{content:'';-webkit-flex:1;flex:1;height:1px;background:#191919;margin-left:9px}
+.shelf{display:block;width:100%;min-height:44px;margin:10px 0 0;padding:0 9.5px;background:transparent;border-radius:10px;text-align:left;font-weight:500;font-size:13px;line-height:17px;color:#818181}
+.shelf:active{background:#131313}
+.shelf-label{-webkit-flex-shrink:0;flex-shrink:0}
+.shelf-line{-webkit-flex:1;flex:1;height:1px;background:#191919;margin:0 9px}
+.shelf .row-chevron{margin:0;width:12px;height:12px}.shelf .row-chevron .icon{width:11px;height:11px;margin:0.5px}
+.shelf.open .row-chevron{-webkit-transform:rotate(180deg);transform:rotate(180deg)}
 .thread{display:block;width:100%;text-align:left;background:#000;border-radius:12px;padding:10px 12px;margin-bottom:2px;font-weight:400;font-size:16px;line-height:23px;color:#f1f3f7}
 .thread:active{background:#131313}
 .thread.selected{background:#1a1b1b}

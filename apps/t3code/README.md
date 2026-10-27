@@ -1,14 +1,14 @@
 # T3 Code
 
-A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.3.0** looks like the official T3 Code iOS app's dark theme, uses its app icon, and adds everyday chat to the device-tested T3 Mini reader.
+A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.3.1** looks like the official T3 Code iOS app's dark theme, uses its app icon, and adds everyday chat to the device-tested T3 Mini reader.
 
-- Browse/search threads with Working/Settled shelves and status labels; create threads in an existing project workspace.
+- Browse/search threads: active threads with status labels (Working, Approval, Input, Limited, Failed) on top, and a collapsible Settled shelf below, matching the host's settled/archived/subagent state as the official app does; create threads in an existing project workspace.
 - Choose a host provider/model, send or queue follow-ups, watch live replies, and stop turns.
 - Respond to resumable approvals and questions, including choices and custom answers.
 - Read Markdown, fenced code, and grouped, expandable tool activity ("Ran 2 commands, read 3 files") in a bounded view.
 - Keep drafts, recover after wake, and explicitly retry unconfirmed commands with their original IDs.
 
-[IPA](dist/T3Code-0.3.0.ipa) · [Debian package](packages/com.local.t3mini_0.3.0_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
+[IPA](dist/T3Code-0.3.1.ipa) · [Debian package](packages/com.local.t3mini_0.3.1_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
 
 ## Connect and upgrade
 

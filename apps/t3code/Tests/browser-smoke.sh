@@ -23,6 +23,7 @@ agent-browser --session "$qa_session" eval --stdin < Tests/fixtures/pickers.js
 agent-browser --session "$qa_session" eval 'document.getElementById("draft").value="Hello from iPad";document.getElementById("draft").dispatchEvent(new Event("input"));document.getElementById("send").click();document.getElementById("send").click();if(sent.filter(function(m){return m.operation==="command"}).length!==1)throw Error("Duplicate send");'
 agent-browser --session "$qa_session" eval --stdin < Tests/fixtures/flows.js
 agent-browser --session "$qa_session" eval 'if(!Array.from(document.querySelectorAll("#requests button")).every(function(n){return n.disabled}))throw Error("Background response enabled");'
+agent-browser --session "$qa_session" eval --stdin < Tests/fixtures/showcase.js
 for qa_size in '1440 900' '1024 768' '768 1024' '393 852'; do
   read -r qa_width qa_height <<< "$qa_size"
   agent-browser --session "$qa_session" set viewport "$qa_width" "$qa_height"

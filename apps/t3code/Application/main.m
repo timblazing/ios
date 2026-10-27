@@ -277,7 +277,10 @@ static NSString *const Service = @"com.local.t3mini.session";
         NSArray *sorted = [shell[@"threads"] sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"updatedAt" ascending:NO]]];
         for (NSDictionary *thread in sorted) {
             if (![thread isKindOfClass:[NSDictionary class]] || ![thread[@"id"] isKindOfClass:[NSString class]]) continue;
-            [threads addObject:[self pick:thread keys:@[@"id", @"projectId", @"title", @"modelSelection", @"status", @"activeRunId", @"updatedAt", @"pendingRuntimeRequest"]]];
+            // Like the official list: archived, deleted and subagent threads never appear in the sidebar.
+            NSDictionary *lineage = [thread[@"lineage"] isKindOfClass:[NSDictionary class]] ? thread[@"lineage"] : nil;
+            if ([thread[@"archivedAt"] isKindOfClass:[NSString class]] || [thread[@"deletedAt"] isKindOfClass:[NSString class]] || [lineage[@"relationshipToParent"] isEqual:@"subagent"]) continue;
+            [threads addObject:[self pick:thread keys:@[@"id", @"projectId", @"title", @"modelSelection", @"status", @"activeRunId", @"updatedAt", @"pendingRuntimeRequest", @"settledOverride", @"settledAt", @"snoozedUntil", @"lastErrorClass", @"latestUserMessageAt"]]];
             if (threads.count == 300) break;
         }
         for (NSDictionary *project in shell[@"projects"]) {
