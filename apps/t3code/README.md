@@ -1,6 +1,6 @@
 # T3 Chat
 
-A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.2.1** adds everyday chat to the device-tested T3 Mini reader.
+A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.2.2** adds everyday chat to the device-tested T3 Mini reader and makes pairing a typed code from the Mac.
 
 - Browse/search conversations by project; create conversations in an existing project workspace.
 - Choose a host provider/model, send or queue follow-ups, watch live replies, and stop turns.
@@ -8,7 +8,7 @@ A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.
 - Read Markdown, fenced code, and expandable tool activity in a bounded conversation view.
 - Keep drafts, recover after wake, and explicitly retry unconfirmed commands with their original IDs.
 
-[IPA](dist/T3Chat-0.2.1.ipa) · [Debian package](packages/com.local.t3mini_0.2.1_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
+[IPA](dist/T3Chat-0.2.2.ipa) · [Debian package](packages/com.local.t3mini_0.2.2_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
 
 ## Connect and upgrade
 
@@ -20,14 +20,13 @@ python3 tools/t3-mini/lan-gateway.py --listen <Mac-LAN-IP> --port 3774 --allow-c
 
 This changes the adapter's exposed operations; it does not restart or reconfigure the desktop server. The default without `--allow-chat` remains read-only. Keep the adapter running while using the app. HTTP is only for a trusted LAN: prompts and bearer credentials are unencrypted in transit. HTTPS connections retain normal system certificate verification; certificate checks are never disabled. The adapter itself accepts a loopback HTTP upstream only.
 
-Create a fresh pairing link with the app's chat permissions:
+Pairing goes one way: the Mac issues a code and the iPad enters it. The iPad never shows a code, and the iPhone T3 Code app can't add it. Mint a one-time code with the app's chat permissions:
 
 ```sh
-t3 auth pairing create --scope orchestration:read --scope orchestration:operate \
-  --label 'T3 Chat iPad' --base-url http://<Mac-LAN-IP>:3774
+tools/t3-mini/pair-ipad.sh   # prints the address and a 12-character code, valid once for 10 minutes
 ```
 
-Open **Connection** and **Scan pairing code**, or enter the address and paste the code/link, then Connect. New pairing always requests conversation read and operate access; there is no read-only switch. IP addresses can be entered without `http://`. For a saved session, leave the code blank. The camera permission is requested only when you open the scanner. A code grants access once; the session then stays in Keychain. Direct host reading remains supported, but chat operations in this release require this adapter even if the host is already reachable directly.
+Open **Connection**, type the address and code, then Connect. Lowercase input is accepted. **Scan QR on Mac** still accepts a pairing link QR (`http://<Mac-LAN-IP>:3774/pair#token=<code>`, e.g. from `t3 auth pairing create --base-url ...`) shown on the Mac's screen. New pairing always requests conversation read and operate access; there is no read-only switch. IP addresses can be entered without `http://`. For a saved session, leave the code blank. The camera permission is requested only when you open the scanner. A code grants access once; the session then stays in Keychain. Direct host reading remains supported, but chat operations in this release require this adapter even if the host is already reachable directly.
 
 **Upgrading keeps `com.local.t3mini`, the executable name, Keychain service/account, and preferences.** Install over the existing app; do not uninstall it. Existing reader sessions remain saved until replaced by a fresh chat pairing. The app never silently expands an old session's authority. A failed credential save preserves the previous Keychain entry. Session expiry requires pairing again. Forget removes the current origin's local Keychain entry; revoke host sessions in the host's access settings.
 
@@ -72,7 +71,7 @@ python3 -m unittest discover -s tools/t3-mini/Tests -v
 
 The configured iPhoneOS 16.5 SDK resolves locally to 16.4; the deployment target stays **10.0**. The internal app/executable remains T3Mini intentionally; the display and release IPA names are T3 Chat. Version both `control` and `Resources/Info.plist`, and regenerate checksums when packaging. Public `.deb`/`.ipa` artifacts are committed deliberately.
 
-Normal device setup uses QR/code pairing. Older supervised tests used separate private IPAs with a one-use `Pairing.local.plist` (`url`, `token`) injected into temporary staging outside the repo. The release script excludes it, and `check-release.py` checks both formats. The 0.2.1 installed test uses the public IPA and normal pairing. No pairing credentials are included in release artifacts.
+Normal device setup uses QR/code pairing. Older supervised tests used separate private IPAs with a one-use `Pairing.local.plist` (`url`, `token`) injected into temporary staging outside the repo. The release script excludes it, and `check-release.py` checks both formats. The 0.2.x installed tests uses the public IPA and normal pairing. No pairing credentials are included in release artifacts.
 
 ## Remote access on this iPad
 

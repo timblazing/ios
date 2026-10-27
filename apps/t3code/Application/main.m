@@ -191,7 +191,7 @@ static NSString *const Service = @"com.local.t3mini.session";
             address = pairing.string ?: @"";
         }
         if (!code.length) { [self fail:@"The pairing link must contain a token fragment. Create a fresh link on the host."]; return; }
-    }
+    } else if (code.length <= 16) code = code.uppercaseString;  // Typed one-time codes are uppercase; the keyboard may not be.
     address = [address stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (![address containsString:@"://"] && address.length) {
         NSURLComponents *probe = [NSURLComponents componentsWithString:[@"http://" stringByAppendingString:address]];

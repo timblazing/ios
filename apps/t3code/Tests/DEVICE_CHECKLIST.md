@@ -8,7 +8,7 @@ First checks after force-closing and reopening the upgraded app:
 
 - [ ] Open Connection, edit Address, wait at least 15 seconds. Confirm the sheet remains open and input is retained.
 - [ ] Open All projects. Confirm a dark in-app menu appears instead of the native iOS selector; choose a project.
-- [ ] Tap Scan pairing code, allow the camera, scan a fresh code shown on the Mac. Confirm chat controls become available and no access/count banner clutters the conversation.
+- [ ] Run `tools/t3-mini/pair-ipad.sh` on the Mac, type the address and code into Connection (try lowercase), and Connect. Confirm chat controls become available and no access/count banner clutters the conversation.
 - [ ] Alternatively, pair using address + code or a full pairing link; confirm bare LAN IP addresses work.
 - [ ] Send one short prompt in the validation conversation. Confirm exactly one copy appears and the reply updates automatically.
 - [ ] Lock/unlock or background/reopen. Confirm the saved session reconnects without another pairing code and a draft survives.
