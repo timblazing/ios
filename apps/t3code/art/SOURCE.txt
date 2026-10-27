@@ -1,0 +1,6 @@
+icon-1024.png: the official T3 Code production iOS icon (pingdotgg/t3code assets/prod/black-ios-1024.png,
+commit becf853d), with its transparent rounded-corner preview rim replaced by a full-bleed black square so
+iOS 10 can apply its own mask. MIT License, Copyright (c) 2026 T3 Tools Inc.
+
+UI icons in Resources/index.html: Tabler Icons 3.49.0 (@tabler/icons), MIT License, Copyright (c) 2020-2024 Paweł Kuna.
+T3 wordmark path: pingdotgg/t3code apps/mobile/src/components/T3Wordmark.tsx (MIT).

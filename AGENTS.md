@@ -4,7 +4,7 @@ Notes for agents working in this repo. Read this before changing code or the bui
 
 ## What this is
 
-Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; T3 Mini connects to a T3 Code host. No ads or analytics. Never commit credentials or private server configuration.
+Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; the T3 Code companion app connects to a T3 Code host. No ads or analytics. Never commit credentials or private server configuration.
 
 ```
 games/<name>/      one self-contained Theos project per game (Makefile, control, Resources/, scripts/, Tests/, docs/)
@@ -73,6 +73,7 @@ When the iPad is plugged in you can read from it with the bundled tools, e.g. `t
 - Keep UIKit for chrome (menus, settings, alerts, control bars) and SpriteKit for the board.
 - Respect Reduce Motion (`UIAccessibilityIsReduceMotionEnabled`), set `accessibilityLabel` on icon buttons, and keep tap targets at least 44×44pt.
 - Cancel any in-progress touch interaction on rotation, backgrounding, and modal presentation.
+- Web UIs in WKWebView (T3 Code) run iOS 10 WebKit: `<button>` ignores flex layout (put the flex row on an inner `<span>`), and there's no flex `gap` or `inset`. Desktop browsers don't catch these, so check layout on the device.
 - Match the surrounding style: compact Objective-C, sparse comments that explain why, `.clang-format` at the root.
 
 ## Performance on the A7
@@ -120,3 +121,14 @@ NYT-style Wordle, v1.0.0, UIKit only. Read `README.md` first.
 
 - Ships no word list by design: answers are fetched from `nytimes.com/svc/wordle/v2/<date>.json` and cached; guesses are checked with `UITextChecker`.
 - Mimics the NYT look (colors, tile animations, toasts, stats modal). Keep it that way.
+
+## App notes
+
+### T3 Code (`apps/t3code/`)
+
+A T3 Code companion: UIKit shell, bundled HTML/CSS/JS UI in WKWebView, native networking and Keychain. Read `README.md` first.
+
+- Keep the bundle ID `com.local.t3mini`, the `T3Mini` executable and the Keychain service: renaming them would lose the iPad's pairing. Only the display name and release file names say T3 Code.
+- The UI copies the official app's dark theme from `pingdotgg/t3code` `apps/mobile` (see README "Design"). Check new UI against that source rather than inventing styles.
+- The desktop host listens on loopback, so the iPad goes through `tools/t3-mini/lan-gateway.py --allow-chat` on the Mac's LAN IP. Pair with `tools/t3-mini/pair-ipad.sh`, which prints an address and code to type on the iPad.
+- Never commit pairing codes, sessions or `Pairing.local.plist`. Revoke test sessions with `t3 auth session revoke`.

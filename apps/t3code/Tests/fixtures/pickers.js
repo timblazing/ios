@@ -1,0 +1,26 @@
+(function () {
+    var select = document.getElementById('project-filter');
+    if (getComputedStyle(select).display !== 'none') throw Error('Native project select is visible');
+    document.getElementById('project-filter-picker').click();
+    var menu = document.getElementById('t3-picker-menu');
+    if (!menu || menu.children.length !== 2) throw Error('Custom project menu did not open');
+    menu.querySelector('[data-value="p1"]').click();
+    if (select.value !== 'p1' || document.getElementById('t3-picker-menu')) throw Error('Project menu selection failed');
+    document.getElementById('model-picker').click();
+    menu = document.getElementById('t3-picker-menu');
+    if (!menu || menu.getBoundingClientRect().bottom > innerHeight) throw Error('Composer menu clipped');
+    var before = menu;
+    var projects = [{id:'p1',title:'My project'}];
+    receive({type:'threads',canWrite:true,projects:projects,threads:[{id:'t1',projectId:'p1',title:'Build a useful iPad app',modelSelection:{instanceId:'codex',model:'gpt-6-luna'}},{id:'t2',projectId:'p1',title:'Weekend notes',modelSelection:{instanceId:'codex',model:'gpt-6-luna'}}]});
+    if (document.getElementById('t3-picker-menu') !== before) throw Error('Refresh replaced open menu');
+    document.body.dispatchEvent(new MouseEvent('mousedown', {bubbles:true}));
+    if (document.getElementById('t3-picker-menu')) throw Error('Outside tap failed');
+    document.getElementById('connection-toggle').click();
+    document.getElementById('scan-pairing').click();
+    if (sent[sent.length-1].operation !== 'scanPairing') throw Error('Scanner bridge not invoked');
+    receive({type:'scanCancelled'});
+    document.getElementById('connection-close').click();
+    if (document.getElementById('status').className !== 'hidden') throw Error('Persistent status banner remains');
+    if (/read.only|299 conversations/i.test(document.body.innerText)) throw Error('Unnecessary access banner remains');
+    return 'Custom project/model menus, refresh stability, outside tap, scanner and quiet chat passed';
+})();

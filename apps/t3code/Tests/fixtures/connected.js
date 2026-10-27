@@ -1,0 +1,8 @@
+window.sent=[];window.webkit={messageHandlers:{client:{postMessage:function(m){window.sent.push(m)}}}};
+window.receive({type:'connecting'});
+window.receive({type:'paired',canWrite:true});
+window.receive({type:'catalog',providers:[{instanceId:'codex',title:'Codex',enabled:true,installed:true,supportedRuntimeModes:['approval-required'],models:[{id:'gpt-6-luna',label:'GPT-6 Luna'}]}]});
+window.receive({type:'threads',address:'http://test.local:3774/',canWrite:true,projects:[{id:'p1',title:'My project',defaultModelSelection:{instanceId:'codex',model:'gpt-6-luna'}}],threads:[{id:'t1',projectId:'p1',title:'Build a useful iPad app',status:'idle',modelSelection:{instanceId:'codex',model:'gpt-6-luna'}},{id:'t2',projectId:'p1',title:'Weekend notes',status:'idle',modelSelection:{instanceId:'codex',model:'gpt-6-luna'}}]});
+document.querySelector('[data-thread-id="t1"]').click();
+window.receive({type:'messages',id:'t1',thread:{id:'t1',title:'Build a useful iPad app',modelSelection:{instanceId:'codex',model:'gpt-6-luna'}},items:[{id:'u1',type:'user_message',text:'Can you show a small Markdown example?'},{id:'a1',type:'assistant_message',text:'# Ready to chat\n\nYour agents keep running on the host.\n\n- Project navigation\n- Live replies\n- **Readable Markdown**\n\n```objc\nNSLog(@"Hello, iPad");\n```'},{id:'tool1',type:'command_execution',title:'Check build',input:'make package FINALPACKAGE=1',output:'Build succeeded',status:'completed'}],requests:[]});
+JSON.stringify({overflow:document.documentElement.scrollWidth>window.innerWidth,fonts:document.fonts.status,controls:document.getElementById('new').disabled,messages:document.querySelectorAll('.message').length});
