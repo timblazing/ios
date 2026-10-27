@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Renders art/source into Resources/: stills, cast headshots, logo, and the app icon."""
 import os
-from PIL import Image, ImageDraw, ImageFilter
 
 root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 src = os.path.join(root, "art", "source")
@@ -9,6 +8,8 @@ media = os.path.join(root, "Resources", "Media")
 if not os.path.isdir(os.path.join(src, "stills")):
     print("make-art: art/source/ not found (film art isn't in the repo); skipping.")
     raise SystemExit(0)
+from PIL import Image, ImageDraw, ImageFilter
+
 os.makedirs(media, exist_ok=True)
 
 def newer(out, *ins):

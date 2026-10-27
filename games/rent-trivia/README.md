@@ -3,9 +3,11 @@
 A personal trivia game for *Rent* (2005) on the iPad mini 2 (iOS 10.3.3). Objective-C + UIKit.
 
 The local build uses official film artwork (logo, stills, cast photos from TMDB) for personal use. That art is
-not in the repo: `art/source/`, `Resources/Media/`, the generated icons, and the built `.deb`/`.ipa` are gitignored.
+excluded from the source tree: `art/source/`, `Resources/Media/`, and generated icons are gitignored. Packaged `.deb`/`.ipa` releases include the artwork but exclude private Jellyfin configuration.
 To build it yourself, put your own images in `art/source/` (`logo.png`, `stills/<name>.jpg`, `cast/<character>.jpg`,
 names as referenced in `Questions.json`). Without them the game still builds and runs, just without pictures.
+
+**Release:** [RentTrivia-1.1.1.ipa](dist/RentTrivia-1.1.1.ipa), Debian package in `packages/`, and [checksums](dist/SHA256SUMS).
 
 The movie stream needs `Resources/Jellyfin.plist` (gitignored, holds the API key). Copy `Jellyfin.example.plist` and fill it in.
 

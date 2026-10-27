@@ -1,0 +1,9 @@
+Package: com.local.wordle
+Name: Wordle
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Wordle for iPad, with the daily puzzle and practice puzzles from the NYT archive
+Maintainer: Wordle
+Author: Wordle
+Section: Games
+Depends: firmware (>= 10.0)

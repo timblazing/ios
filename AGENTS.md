@@ -4,17 +4,18 @@ Notes for agents working in this repo. Read this before changing code or the bui
 
 ## What this is
 
-Small native games for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Everything is offline: no networking, accounts, ads, or analytics.
+Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; T3 Mini connects to a T3 Code host. No ads or analytics. Never commit credentials or private server configuration.
 
 ```
 games/<name>/      one self-contained Theos project per game (Makefile, control, Resources/, scripts/, Tests/, docs/)
+apps/<name>/       one self-contained Theos project per non-game app
 docs/              shared notes, including the original stack research
 install.sh         interactive IPA installer for the USB-connected iPad (macOS)
 tools/             shared tooling: bundled libimobiledevice binaries for install.sh
 .clang-format      applies to all games
 ```
 
-Build, test, and package from inside `games/<name>/`. Each game's README is the source of truth for that game. Specs live in `games/<name>/docs/`.
+Build, test, and package from inside `games/<name>/` or `apps/<name>/`. Each game's README is the source of truth for that game. Specs live in `games/<name>/docs/`.
 
 ## Stack
 
@@ -57,7 +58,7 @@ vtool -show-build .theos/_/Applications/<App>.app/<App>   # expect LC_VERSION_MI
 
 ## Installing on the iPad
 
-Run `./install.sh` from the repo root with the iPad on USB or on the same Wi-Fi as the Mac, TNS Sockport active, and AppSync Unified installed. It's an interactive menu: pick a game (from `games/`) or "Select IPA file..." for a Finder picker, pick a build from that game's `dist/`, then confirm. The confirm screen shows the app, the device, and the installed version. It's a slimmed-down version of Legacy iOS Kit's App Management → Install IPA (ideviceinstaller), using the same macOS binaries, copied to `tools/libimobiledevice/macos/` (see `NOTICE.md` there). The `.deb` also works (`dpkg -i`, or Filza). If the home screen icon is stale, run `uicache` as mobile or respring.
+Run `./install.sh` from the repo root with the iPad on USB or on the same Wi-Fi as the Mac, TNS Sockport active, and AppSync Unified installed. It's an interactive menu: pick a game or app (from `games/` or `apps/`) or "Select IPA file..." for a Finder picker, pick a build from that game's `dist/`, then confirm. The confirm screen shows the app, the device, and the installed version. It's a slimmed-down version of Legacy iOS Kit's App Management → Install IPA (ideviceinstaller), using the same macOS binaries, copied to `tools/libimobiledevice/macos/` (see `NOTICE.md` there). The `.deb` also works (`dpkg -i`, or Filza). If the home screen icon is stale, run `uicache` as mobile or respring.
 
 Wi-Fi works through usbmuxd's network devices (`-n` on the bundled tools), which needs Wi-Fi sync turned on for this Mac: done once over USB in Finder (select the iPad, check "Show this iPad when on Wi-Fi"). It's already on for the user's iPad (`iPad-Mini.local`). The script lists devices from usbmuxd, prefers USB, picks the only iPad when other devices (like the user's iPhone) are also on Wi-Fi, and shows the connection on the confirm screen. Keep the iPad awake and unlocked during a Wi-Fi install. To target it by hand: `ideviceinfo -n -u <UDID> -k ProductVersion`.
 

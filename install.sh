@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Installs a game IPA onto the iPad with ideviceinstaller, over USB or Wi-Fi.
+# Installs a game or app IPA onto the iPad with ideviceinstaller, over USB or Wi-Fi.
 # A slimmed-down version of Legacy iOS Kit's App Management -> Install IPA (ideviceinstaller).
 # Requires AppSync Unified on the device for the ad-hoc signed IPAs this repo builds.
 set -uo pipefail
 
 root="$(cd "$(dirname "$0")" && pwd)"
 bin="$root/tools/libimobiledevice/macos"
-ipa="" game=""
+ipa="" project=""
 conn=() device=""  # conn: -u UDID for the chosen device, plus -n when it's on Wi-Fi
 
 if [[ $(uname -s) != Darwin ]]; then
@@ -46,35 +46,37 @@ pick_file() {
   osascript -e 'POSIX path of (choose file with prompt "Select an IPA to install" of type {"ipa", "com.apple.itunes.ipa"})' 2>/dev/null
 }
 
-select_game() {
-  local games=() dir
-  for dir in "$root"/games/*/; do
-    [[ -d $dir ]] && games+=("$(basename "$dir")")
+select_project() {
+  local projects=() category dir
+  for category in games apps; do
+    for dir in "$root/$category"/*/; do
+      [[ -f "$dir/Makefile" ]] && projects+=("$category/$(basename "$dir")")
+    done
   done
-  menu "Which game do you want to install?" "${games[@]}" "Select IPA file..." "Quit"
+  menu "Which game or app do you want to install?" "${projects[@]}" "Select IPA file..." "Quit"
   case "$choice" in
     "Quit") exit 0 ;;
     "Select IPA file...")
-      game=""
+      project=""
       ipa="$(pick_file)"
       [[ -z $ipa ]] && { warn "No file selected."; return 1; }
       [[ -f $ipa ]] || { fail "Not a file: $ipa"; return 1; } ;;
-    *) game="$choice" ;;
+    *) project="$choice" ;;
   esac
 }
 
 select_ipa() {
   local files=() labels=() f i
   # Newest first.
-  while IFS= read -r f; do files+=("$f"); done < <(ls -t "$root/games/$game/dist/"*.ipa 2>/dev/null)
+  while IFS= read -r f; do files+=("$f"); done < <(ls -t "$root/$project/dist/"*.ipa 2>/dev/null)
   if ((${#files[@]} == 0)); then
-    warn "No IPAs in games/$game/dist. Build one first: cd games/$game && make package FINALPACKAGE=1 && scripts/package-ipa.sh"
+    warn "No IPAs in $project/dist. Build one first: cd $project && make package FINALPACKAGE=1 && scripts/package-ipa.sh"
     return 1
   fi
   for i in "${!files[@]}"; do
     labels+=("$(basename "${files[$i]}")  ${dim}$(du -h "${files[$i]}" | cut -f1 | tr -d ' '), $(date -r "${files[$i]}" '+%b %d %H:%M')$([[ $i == 0 ]] && echo ", newest")${reset}")
   done
-  menu "Which $game build?" "${labels[@]}" "Back"
+  menu "Which $project build?" "${labels[@]}" "Back"
   [[ $choice == "Back" ]] && return 1
   ipa="${files[$choice_index]}"
   return 0
@@ -183,11 +185,11 @@ install_ipa() {
   fi
 }
 
-# Screens: game -> ipa (skipped for a picked file) -> confirm. Back returns to the previous screen.
+# Screens: project -> ipa (skipped for a picked file) -> confirm. Back returns to the previous screen.
 screen=game
 while true; do
   case "$screen" in
-    game) select_game && screen=$([[ -n $game ]] && echo ipa || echo confirm) ;;
+    game) select_project && screen=$([[ -n $project ]] && echo ipa || echo confirm) ;;
     ipa) if select_ipa; then screen=confirm; else screen=game; fi ;;
     confirm)
       if confirm; then
@@ -196,7 +198,7 @@ while true; do
         [[ $choice == "Quit" ]] && exit 0
         screen=game
       else
-        screen=$([[ -n $game ]] && echo ipa || echo game)
+        screen=$([[ -n $project ]] && echo ipa || echo game)
       fi ;;
   esac
 done

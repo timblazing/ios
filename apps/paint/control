@@ -1,0 +1,9 @@
+Package: com.local.paint
+Name: Paint
+Version: 2.0.0
+Architecture: iphoneos-arm
+Description: A nostalgic offline painting app for iPad
+Maintainer: Paint
+Author: Paint
+Section: Games
+Depends: firmware (>= 10.0)

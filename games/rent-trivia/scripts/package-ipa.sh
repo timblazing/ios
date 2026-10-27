@@ -12,3 +12,5 @@ output="$PWD/dist/RentTrivia-$version.ipa"
 rm -f "$output"
 (cd "$stage" && zip -qr "$output" Payload)
 echo "$output"
+# Keep checksums usable with `cd dist && shasum -a 256 -c SHA256SUMS`.
+(cd dist && shasum -a 256 ./*.ipa ../packages/*.deb > SHA256SUMS)
