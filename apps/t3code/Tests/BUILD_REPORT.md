@@ -19,8 +19,10 @@ Date: 2026-10-26.
 - A separate private IPA with a one-use pairing credential was installed over
   Wi-Fi on the iPad4,5 running iOS 10.3.3. Installer reported Complete;
   querying installed `com.local.t3mini` returned version 0.1.0.
-- Actual launch, pairing, Keychain persistence, scrolling, rotation, and wake
-  behavior remain user checks in DEVICE_CHECKLIST.md.
+- User then confirmed that threads and conversations work on the iPad. This
+  verifies launch, pairing, thread listing, and conversation reading on iOS 10.
+  Relaunch persistence, scrolling performance, rotation, and wake behavior remain
+  user checks in DEVICE_CHECKLIST.md.
 
 The Mac's temporary HTTP adapter must remain running on the trusted LAN during
 this test. Public artifacts contain no configured host or pairing credential.
