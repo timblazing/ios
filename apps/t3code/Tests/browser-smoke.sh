@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-qa_session="t3-chat-smoke-$$"
+qa_session="t3-code-smoke-$$"
 qa_port=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
 qa_log=$(mktemp)
 python3 -m http.server "$qa_port" --bind 127.0.0.1 --directory Resources > "$qa_log" 2>&1 &

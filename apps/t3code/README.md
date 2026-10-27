@@ -1,14 +1,14 @@
-# T3 Chat
+# T3 Code
 
-A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.2.3** adds everyday chat to the device-tested T3 Mini reader and makes pairing a typed code from the Mac.
+A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.3.0** looks like the official T3 Code iOS app's dark theme, uses its app icon, and adds everyday chat to the device-tested T3 Mini reader.
 
-- Browse/search conversations by project; create conversations in an existing project workspace.
+- Browse/search threads with Working/Settled shelves and status labels; create threads in an existing project workspace.
 - Choose a host provider/model, send or queue follow-ups, watch live replies, and stop turns.
 - Respond to resumable approvals and questions, including choices and custom answers.
-- Read Markdown, fenced code, and expandable tool activity in a bounded conversation view.
+- Read Markdown, fenced code, and grouped, expandable tool activity ("Ran 2 commands, read 3 files") in a bounded view.
 - Keep drafts, recover after wake, and explicitly retry unconfirmed commands with their original IDs.
 
-[IPA](dist/T3Chat-0.2.3.ipa) · [Debian package](packages/com.local.t3mini_0.2.3_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
+[IPA](dist/T3Code-0.3.0.ipa) · [Debian package](packages/com.local.t3mini_0.3.0_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
 
 ## Connect and upgrade
 
@@ -34,13 +34,17 @@ Pairing links are secrets. Never put them in screenshots, logs, Git, or public p
 
 ## Use
 
-Choose a project filter or search a title in the sidebar. Project/provider/model selectors use in-app dark menus. Connection settings remain open until Done or a successful connection; background refresh does not close them or overwrite edited fields. **New** creates a conversation in the project's existing workspace, with approval required and the selected model; it does not create a worktree. Existing conversation runtime/interaction modes stay on the host. Provider/model changes apply to the next prompt. Providers that require a new conversation for model changes are blocked accordingly.
+Choose a project with the **All projects** pill or search a title in the sidebar. The gear opens the environment sheet; the compose button starts a new thread. Project/provider/model selectors use in-app dark menus. Connection settings remain open until Done or a successful connection; background refresh does not close them or overwrite edited fields. **New** creates a conversation in the project's existing workspace, with approval required and the selected model; it does not create a worktree. Existing conversation runtime/interaction modes stay on the host. Provider/model changes apply to the next prompt. Providers that require a new conversation for model changes are blocked accordingly.
 
 Enter adds a line; **⌘/Ctrl + Enter** sends. During a running turn, follow-ups queue. **Stop** requests a host thread stop, including delegated work as the host normally does. Pending permission/question cards offer only resumable responses; unavailable requests direct you to the host. Secret-entry requests, attachments, terminal access, full file/diff previews, archived/older-history pagination, and T3 Connect account login are not implemented.
 
-Live updates use foreground bounded snapshot polling: about two seconds while active, eight seconds while idle, with errors backing off to thirty seconds. Network work pauses in the background; wake rechecks environment identity before authenticated reads/writes. The UI preserves a reader's scroll position and offers **Latest reply** when appropriate.
+Live updates use foreground bounded snapshot polling: about two seconds while active, eight seconds while idle, with errors backing off to thirty seconds. Network work pauses in the background; wake rechecks environment identity before authenticated reads/writes. The UI preserves a reader's scroll position and offers a scroll-to-latest button when appropriate. A floating **Working** capsule shows elapsed time during a turn.
 
 A prompt is saved locally before dispatch. On a timeout or lost connection, **Refresh and inspect the conversation**, then use **Retry same command** if needed. It reuses the exact command/message IDs; it never auto-resends. **Dismiss after checking** discards only the local pending record. Sending remains blocked for that thread until its pending operation is resolved. Drafts (up to fifty threads) and up to eight pending commands are local app data, including prompt text, scoped by environment origin; credentials remain in Keychain. Treat the device as containing private conversations. Local drafts are not an encrypted vault.
+
+## Design
+
+The interface follows the official app's source ([pingdotgg/t3code](https://github.com/pingdotgg/t3code) `apps/mobile`, MIT): dark tokens (`#0a0a0a` canvas, `#000` sidebar, `#111` surfaces, `#346bf1` accent), DM Sans, the T3 wordmark with its stage badge, round header buttons, filter pills, status labels, the `#161616` user bubble, plain assistant Markdown, the work-log rows, the pill composer with a 30pt send disc, approval/input cards and the inset-grouped Add environment sheet. The split view uses the official sidebar width (32%, 280–380pt) and 960pt feed width. iOS 26 Liquid Glass and SF Symbols aren't available on iOS 10, so the app uses the official non-glass fallback colours and [Tabler](https://tabler.io/icons) icons (MIT; the official Android/web set), built into an inline sprite by `scripts/make-icons.py`. The app icon is the official production icon (`assets/prod/black-ios-1024.png`) on a full-bleed black square, resized by `scripts/make-art.py`. Tap targets stay at least 44pt, so tool rows are taller than the official 28pt.
 
 ## Architecture and limits
 
@@ -50,8 +54,8 @@ The native transport cancels responses beyond **8 MB while receiving**, rather t
 
 The adapter forwards discovery, OAuth exchange, shell/bounded reads, and project reads. Its chat bridge opens one bounded authenticated WebSocket RPC per operation:
 
-- `GET /t3-chat/config`: filtered provider/model catalog from `server.getConfig`.
-- `POST /t3-chat/command`: `orchestration.dispatchCommand`, allowing only `thread.create`, `message.dispatch`, `thread.stop`, `runtime-request.respond`, and `thread.model-selection.set`.
+- `GET /t3-code/config`: filtered provider/model catalog from `server.getConfig`.
+- `POST /t3-code/command`: `orchestration.dispatchCommand`, allowing only `thread.create`, `message.dispatch`, `thread.stop`, `runtime-request.respond`, and `thread.model-selection.set`.
 
 It stores no credentials, logs no access URLs or bodies, never retries writes, and rejects other endpoints/command fields. The host still authorizes the bearer scopes. The native command payload limit is 64 KB; the adapter's request limit is 128 KB. Protocol and design evidence are in [PROTOCOL.md](docs/PROTOCOL.md).
 
@@ -69,9 +73,9 @@ cd ../..
 python3 -m unittest discover -s tools/t3-mini/Tests -v
 ```
 
-The configured iPhoneOS 16.5 SDK resolves locally to 16.4; the deployment target stays **10.0**. The internal app/executable remains T3Mini intentionally; the display and release IPA names are T3 Chat. Version both `control` and `Resources/Info.plist`, and regenerate checksums when packaging. Public `.deb`/`.ipa` artifacts are committed deliberately.
+The configured iPhoneOS 16.5 SDK resolves locally to 16.4; the deployment target stays **10.0**. The internal app/executable remains T3Mini intentionally; the display and release IPA names are T3 Code. Version both `control` and `Resources/Info.plist`, and regenerate checksums when packaging. Public `.deb`/`.ipa` artifacts are committed deliberately.
 
-Normal device setup uses QR/code pairing. Older supervised tests used separate private IPAs with a one-use `Pairing.local.plist` (`url`, `token`) injected into temporary staging outside the repo. The release script excludes it, and `check-release.py` checks both formats. The 0.2.x installed tests uses the public IPA and normal pairing. No pairing credentials are included in release artifacts.
+Normal device setup uses a typed code from `tools/t3-mini/pair-ipad.sh` (QR scanning is optional). Older supervised tests used separate private IPAs with a one-use `Pairing.local.plist` (`url`, `token`) injected into temporary staging outside the repo. The release script excludes it, and `check-release.py` checks both formats. Installed tests since 0.2.1 use the public IPA and normal pairing. No pairing credentials are included in release artifacts.
 
 ## Remote access on this iPad
 

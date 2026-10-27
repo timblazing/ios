@@ -26,7 +26,7 @@ Thread reads replace bounded snapshots, so reconnect does not depend on replay c
 
 ## Official mobile appearance
 
-This is the official **T3 Code** dark palette, despite the companion's display name “T3 Chat.” Upstream has a separate purple T3 Chat palette; that was not selected.
+This is the official **T3 Code** dark palette, despite the companion's display name “T3 Code.” Upstream has a separate purple T3 Code palette; that was not selected.
 
 | Element | Adaptation from official mobile source |
 |---|---|

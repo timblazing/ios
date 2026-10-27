@@ -9,7 +9,7 @@ mkdir -p "$stage/Payload" dist
 cp -R "$app" "$stage/Payload/"
 rm -f "$stage/Payload/T3Mini.app/Pairing.local.plist"
 version=$(awk '/^Version:/ {print $2}' control)
-output="$PWD/dist/T3Chat-$version.ipa"
+output="$PWD/dist/T3Code-$version.ipa"
 rm -f "$output"
 (cd "$stage" && zip -qr "$output" Payload)
 (cd dist && shasum -a 256 ./*.ipa ../packages/*.deb > SHA256SUMS)

@@ -1,4 +1,4 @@
-# T3 Chat 0.2.1 physical device checks
+# T3 Code 0.2.1 physical device checks
 
 Target: iPad mini 2 / iPad4,5 on iOS 10.3.3. Automated and real-host protocol results are in [BUILD_REPORT.md](BUILD_REPORT.md). Check boxes below require the user's physical verification.
 
@@ -27,3 +27,5 @@ Further checks:
 - [ ] Invalid/expired/consumed pairing codes give recoverable errors without exposing credentials.
 
 Remote access is a separate network/authentication check. This iPad cannot use the current Tailscale iOS client. No remote route, T3 Connect account sign-in, or TLS compatibility for a new remote endpoint is claimed.
+- [ ] 0.3.0: the home screen shows "T3 Code" with the official black T3 icon (run `uicache` or respring if stale), and the app reconnects without re-pairing.
+- [ ] 0.3.0: the All projects arrow is vertically centered; status labels, tool groups, the composer and the Working capsule render as in the official app.

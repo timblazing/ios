@@ -193,7 +193,10 @@
             label.className = 'picker-label';
             chevron.className = 'picker-chevron';
             chevron.setAttribute('aria-hidden', 'true');
-            trigger.appendChild(label); trigger.appendChild(chevron);
+            // iOS 10 WebKit ignores flex layout on <button>, so the flex row lives on an inner span.
+            var inner = doc.createElement('span');
+            inner.className = 'picker-inner';
+            inner.appendChild(label); inner.appendChild(chevron); trigger.appendChild(inner);
             select.parentNode.insertBefore(trigger, select.nextSibling);
             var entry = {select: select, trigger: trigger, label: label, options: []};
             entries.push(entry);

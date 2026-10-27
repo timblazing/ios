@@ -91,11 +91,11 @@ static void T3StopCaptureSession(AVCaptureSession *session) {
                 T3PairingScanner *scanner = weakSelf;
                 if (!scanner || scanner.finished) return;
                 if (granted) [scanner startCamera];
-                else [scanner showUnavailable:@"Camera access is off. Enable it for T3 Chat in Settings, or use a pairing link."];
+                else [scanner showUnavailable:@"Camera access is off. Enable it for T3 Code in Settings, or use a pairing link."];
             });
         }];
     } else {
-        [self showUnavailable:@"Camera access is off. Enable it for T3 Chat in Settings, or use a pairing link."];
+        [self showUnavailable:@"Camera access is off. Enable it for T3 Code in Settings, or use a pairing link."];
     }
 }
 - (void)viewDidDisappear:(BOOL)animated {

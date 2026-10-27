@@ -219,7 +219,7 @@ static NSString *const Service = @"com.local.t3mini.session";
     [self request:@"/.well-known/t3/environment" body:nil form:NO authenticated:NO completion:^(NSDictionary *descriptor, NSString *failure, BOOL uncertain) {
         (void)uncertain; if (failure) { [self fail:failure]; return; }
         if (![descriptor[@"environmentId"] isKindOfClass:[NSString class]] || (![descriptor[@"orchestrationProtocolVersion"] isKindOfClass:[NSNumber class]] || [descriptor[@"orchestrationProtocolVersion"] integerValue] != 2)) {
-            [self fail:@"T3 Chat requires a T3 server advertising orchestration protocol 2."]; return;
+            [self fail:@"T3 Code requires a T3 server advertising orchestration protocol 2."]; return;
         }
         self.environmentID = descriptor[@"environmentId"];
         if (self.credential && ![self.credential[@"environmentId"] isEqual:self.environmentID]) {
@@ -228,7 +228,7 @@ static NSString *const Service = @"com.local.t3mini.session";
         [self emit:@{@"type": @"environment", @"address": self.origin.absoluteString, @"label": [descriptor[@"label"] isKindOfClass:[NSString class]] ? descriptor[@"label"] : @"T3 environment"}];
         if (!code.length) { self.connected = YES; [self emit:@{@"type": @"paired", @"canWrite": @(self.canWrite)}]; [self loadThreads]; [self loadCatalog]; return; }
         [self request:@"/oauth/token" body:@{@"grant_type": @"urn:ietf:params:oauth:grant-type:token-exchange", @"subject_token": code,
-            @"subject_token_type": @"urn:t3:params:oauth:token-type:environment-bootstrap", @"requested_token_type": @"urn:ietf:params:oauth:token-type:access_token", @"scope": @"orchestration:read orchestration:operate", @"client_label": @"T3 Chat", @"client_device_type": @"tablet", @"client_os": @"iOS"} form:YES authenticated:NO completion:^(NSDictionary *token, NSString *failure, BOOL uncertain) {
+            @"subject_token_type": @"urn:t3:params:oauth:token-type:environment-bootstrap", @"requested_token_type": @"urn:ietf:params:oauth:token-type:access_token", @"scope": @"orchestration:read orchestration:operate", @"client_label": @"T3 Code", @"client_device_type": @"tablet", @"client_os": @"iOS"} form:YES authenticated:NO completion:^(NSDictionary *token, NSString *failure, BOOL uncertain) {
             (void)uncertain; if (failure) { [self fail:failure]; return; }
             if (![token[@"access_token"] isKindOfClass:[NSString class]] || ![token[@"token_type"] isEqual:@"Bearer"] || ![token[@"expires_in"] isKindOfClass:[NSNumber class]] || [token[@"expires_in"] doubleValue] <= 0) {
                 [self fail:@"The host did not issue a supported bearer session."]; return;
@@ -251,7 +251,7 @@ static NSString *const Service = @"com.local.t3mini.session";
 - (void)loadCatalog {
     if ([self.reads containsObject:@"catalog"]) return;
     [self.reads addObject:@"catalog"];
-    [self request:@"/t3-chat/config" body:nil form:NO authenticated:YES completion:^(NSDictionary *catalog, NSString *failure, BOOL uncertain) {
+    [self request:@"/t3-code/config" body:nil form:NO authenticated:YES completion:^(NSDictionary *catalog, NSString *failure, BOOL uncertain) {
         (void)uncertain; [self.reads removeObject:@"catalog"];
         if (failure) { if (self.canWrite) [self fail:@"Chat requires the LAN adapter with --allow-chat. Existing reading still works."]; return; }
         if ([catalog[@"providers"] isKindOfClass:[NSArray class]]) [self emit:@{@"type": @"catalog", @"providers": catalog[@"providers"]}];
@@ -323,7 +323,7 @@ static NSString *const Service = @"com.local.t3mini.session";
             NSDictionary *item = wrapper[@"item"];
             if (![item isKindOfClass:[NSDictionary class]]) continue;
             if ((NSUInteger)index < start && ![pendingIDs containsObject:item[@"requestId"] ?: @""]) continue;
-            NSMutableDictionary *copy = [[self pick:item keys:@[@"type", @"id", @"messageId", @"title", @"status", @"text", @"input", @"output", @"requestId", @"questions", @"options", @"prompt", @"reason", @"streaming", @"fileName", @"message", @"exitCode", @"markdown", @"diffStr", @"toolName", @"appName", @"requestKind"]] mutableCopy];
+            NSMutableDictionary *copy = [[self pick:item keys:@[@"type", @"id", @"messageId", @"title", @"status", @"text", @"input", @"output", @"requestId", @"questions", @"options", @"prompt", @"reason", @"streaming", @"fileName", @"message", @"exitCode", @"markdown", @"diffStr", @"toolName", @"appName", @"requestKind", @"updatedAt", @"startedAt", @"completedAt", @"additions", @"deletions"]] mutableCopy];
             for (NSString *key in @[@"text", @"input", @"output", @"prompt", @"reason", @"message", @"markdown", @"diffStr", @"title", @"toolName", @"appName"]) {
                 NSString *value = copy[key];
                 if (![value isKindOfClass:[NSString class]]) { [copy removeObjectForKey:key]; continue; }
@@ -347,7 +347,7 @@ static NSString *const Service = @"com.local.t3mini.session";
     NSData *encoded = [NSJSONSerialization dataWithJSONObject:command options:0 error:NULL];
     if (!encoded || encoded.length > 65536) { [self emit:@{@"type": @"commandError", @"commandId": commandID, @"message": @"This operation exceeds the 64 KB limit.", @"uncertain": @NO}]; return; }
     [self.commands addObject:commandID];
-    [self request:@"/t3-chat/command" body:command form:NO authenticated:YES completion:^(NSDictionary *result, NSString *failure, BOOL uncertain) {
+    [self request:@"/t3-code/command" body:command form:NO authenticated:YES completion:^(NSDictionary *result, NSString *failure, BOOL uncertain) {
         [self.commands removeObject:commandID];
         if (failure) [self emit:@{@"type": @"commandError", @"commandId": commandID, @"message": failure, @"uncertain": @(uncertain)}];
         else [self emit:@{@"type": @"commandResult", @"commandId": commandID, @"result": result[@"result"] ?: @{}}];

@@ -137,12 +137,12 @@ class Bridge(unittest.TestCase):
 
     def test_chat_opt_in_and_command_allowlist(self):
         encoded = json.dumps(self.command()).encode()
-        self.assertFalse(gateway.allowed('POST', '/t3-chat/command', encoded))
-        self.assertTrue(gateway.allowed('POST', '/t3-chat/command', encoded, True))
-        self.assertFalse(gateway.allowed('POST', '/t3-chat/command', b'[]', True))
+        self.assertFalse(gateway.allowed('POST', '/t3-code/command', encoded))
+        self.assertTrue(gateway.allowed('POST', '/t3-code/command', encoded, True))
+        self.assertFalse(gateway.allowed('POST', '/t3-code/command', b'[]', True))
         for kind in ['thread.delete', 'thread.archive', 'project.mutate', 'terminal.write']:
             command = dict(self.command(), type=kind)
-            self.assertFalse(gateway.allowed('POST', '/t3-chat/command', json.dumps(command).encode(), True))
+            self.assertFalse(gateway.allowed('POST', '/t3-code/command', json.dumps(command).encode(), True))
         self.assertFalse(gateway.valid_command(dict(self.command(), unexpected='value')))
         self.assertFalse(gateway.valid_command(dict(self.command(), threadId='../secret')))
 
@@ -199,19 +199,19 @@ class Bridge(unittest.TestCase):
             with serving(gateway.Gateway, upstream=upstream, allow_chat=True) as proxy:
                 headers = {'Authorization': 'Bearer test-session', 'x-t3-orchestration-protocol': '2',
                            'Content-Type': 'application/json'}
-                status, data = self.request(proxy, 'GET', '/t3-chat/config', headers=headers)
+                status, data = self.request(proxy, 'GET', '/t3-code/config', headers=headers)
                 self.assertEqual(status, 200)
                 catalog = json.loads(data)
                 self.assertEqual(catalog['providers'][0]['models'][0]['id'], 'model-a')
                 for private in ['secret', 'private/path', 'private@example.com']:
                     self.assertNotIn(private, data.decode())
                 self.assertEqual(self.request(proxy, 'GET', '/api/projects')[0], 200)
-                self.assertEqual(self.request(proxy, 'GET', '/t3-chat/config')[0], 401)
-                self.assertEqual(self.request(proxy, 'GET', '/t3-chat/config', headers={'Authorization': 'Bearer test-session'})[0], 426)
-                self.assertEqual(self.request(proxy, 'POST', '/t3-chat/command', json.dumps(self.command()), dict(headers, **{'Content-Type': 'text/plain'}))[0], 415)
-                self.assertEqual(self.request(proxy, 'POST', '/t3-chat/command', json.dumps(self.command()), headers)[0], 200)
+                self.assertEqual(self.request(proxy, 'GET', '/t3-code/config')[0], 401)
+                self.assertEqual(self.request(proxy, 'GET', '/t3-code/config', headers={'Authorization': 'Bearer test-session'})[0], 426)
+                self.assertEqual(self.request(proxy, 'POST', '/t3-code/command', json.dumps(self.command()), dict(headers, **{'Content-Type': 'text/plain'}))[0], 415)
+                self.assertEqual(self.request(proxy, 'POST', '/t3-code/command', json.dumps(self.command()), headers)[0], 200)
                 self.assertEqual(self.request(proxy, 'GET', '/api/projects?token=secret')[0], 403)
-                self.assertEqual(self.request(proxy, 'POST', '/t3-chat/command', b'x' * (gateway.MAX_REQUEST + 1), headers)[0], 413)
+                self.assertEqual(self.request(proxy, 'POST', '/t3-code/command', b'x' * (gateway.MAX_REQUEST + 1), headers)[0], 413)
                 self.assertEqual(len(host.messages), 2)
 
 

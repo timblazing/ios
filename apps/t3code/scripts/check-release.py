@@ -10,7 +10,7 @@ import zipfile
 
 root = Path(__file__).resolve().parents[1]
 version = next(x.split(':', 1)[1].strip() for x in (root / 'control').read_text().splitlines() if x.startswith('Version:'))
-ipa = root / 'dist' / ('T3Chat-' + version + '.ipa')
+ipa = root / 'dist' / ('T3Code-' + version + '.ipa')
 deb = root / 'packages' / ('com.local.t3mini_' + version + '_iphoneos-arm.deb')
 for archive in [ipa, deb]:
     assert archive.exists(), str(archive)
@@ -19,7 +19,7 @@ with zipfile.ZipFile(ipa) as z:
     assert not any('Pairing.local' in n or '.local.' in n for n in names), 'Private provisioning in IPA'
     info = plistlib.loads(z.read('Payload/T3Mini.app/Info.plist'))
     assert info['CFBundleIdentifier'] == 'com.local.t3mini'
-    assert info['CFBundleDisplayName'] == 'T3 Chat'
+    assert info['CFBundleDisplayName'] == 'T3 Code'
     assert info['CFBundleVersion'] == info['CFBundleShortVersionString'] == version
     assert info['MinimumOSVersion'] == '10.0'
     for resource in ['index.html', 'chat.js', 'chat.css', 'picker.js', 'picker.css', 'DMSans-Regular.ttf', 'DMSans-Medium.ttf', 'DMSans-Bold.ttf', 'DMSans-OFL.txt']:

@@ -1,16 +1,16 @@
-name: T3 Chat checks
+name: T3 Code checks
 on:
   pull_request:
     paths:
       - 'apps/t3code/**'
       - 'tools/t3-mini/**'
-      - '.github/workflows/t3-chat.yml'
+      - '.github/workflows/t3-code.yml'
   push:
     branches: [main]
     paths:
       - 'apps/t3code/**'
       - 'tools/t3-mini/**'
-      - '.github/workflows/t3-chat.yml'
+      - '.github/workflows/t3-code.yml'
 permissions:
   contents: read
 jobs:

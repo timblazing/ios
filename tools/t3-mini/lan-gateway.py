@@ -40,11 +40,11 @@ def valid_command(command):
 def allowed(method, path, body=b'', allow_chat=False):
     if method == 'GET':
         return (path in ('/.well-known/t3/environment', '/api/orchestration/shell')
-                or (allow_chat and path in ('/api/projects', '/t3-chat/config'))
+                or (allow_chat and path in ('/api/projects', '/t3-code/config'))
                 or bool(re.fullmatch(r'/api/orchestration/threads/[A-Za-z0-9_-]+/bounded', path)))
     if method != 'POST':
         return False
-    if path == '/t3-chat/command' and allow_chat:
+    if path == '/t3-code/command' and allow_chat:
         try:
             return valid_command(json.loads(body))
         except (ValueError, UnicodeDecodeError, TypeError):
@@ -256,7 +256,7 @@ class Gateway(BaseHTTPRequestHandler):
         chat = getattr(self.server, 'allow_chat', False)
         if not allowed(self.command, self.path, body, chat):
             return self.reply(403, b'{"error":"endpoint or operation is not allowed"}')
-        if self.path.startswith('/t3-chat/'):
+        if self.path.startswith('/t3-code/'):
             authorization = self.headers.get('Authorization', '')
             if (not authorization.startswith('Bearer ') or len(authorization) > 8192
                     or re.search(r'[^\x20-\x7e]', authorization)):
@@ -264,7 +264,7 @@ class Gateway(BaseHTTPRequestHandler):
             if self.headers.get('x-t3-orchestration-protocol') != '2':
                 return self.reply(426, b'{"error":"orchestration protocol 2 required"}')
             try:
-                if self.path == '/t3-chat/config':
+                if self.path == '/t3-code/config':
                     result = provider_catalog(websocket_rpc(self.server.upstream, authorization, 'server.getConfig', {}))
                 else:
                     if self.headers.get_content_type() != 'application/json':

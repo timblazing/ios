@@ -4,7 +4,7 @@ Notes for agents working in this repo. Read this before changing code or the bui
 
 ## What this is
 
-Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; T3 Chat connects to a T3 Code host. No ads or analytics. Never commit credentials or private server configuration.
+Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; T3 Code connects to a T3 Code host. No ads or analytics. Never commit credentials or private server configuration.
 
 ```
 games/<name>/      one self-contained Theos project per game (Makefile, control, Resources/, scripts/, Tests/, docs/)
