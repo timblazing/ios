@@ -113,3 +113,10 @@ Draw-1 Klondike, v2.0.0. Read `README.md` and `docs/V2_SPEC.md` before changing 
 - One card design from `Resources/Cards/` (`back.png`, `<rank><suit>.png`, 250×350 PNG). Missing cards fall back to drawn ones, per card. There are no theme or card-back options by design.
 - The app icon comes from `Resources/Icon/icon-1024.png` via `scripts/make-icons.sh`, which `make` runs automatically.
 - No Draw 3, Vegas scoring, audio, or haptics (out of scope).
+
+### Wordle (`games/wordle/`)
+
+NYT-style Wordle, v1.0.0, UIKit only. Read `README.md` first.
+
+- Ships no word list by design: answers are fetched from `nytimes.com/svc/wordle/v2/<date>.json` and cached; guesses are checked with `UITextChecker`.
+- Mimics the NYT look (colors, tile animations, toasts, stats modal). Keep it that way.
