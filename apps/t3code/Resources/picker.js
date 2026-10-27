@@ -193,7 +193,6 @@
             label.className = 'picker-label';
             chevron.className = 'picker-chevron';
             chevron.setAttribute('aria-hidden', 'true');
-            chevron.textContent = '⌄';
             trigger.appendChild(label); trigger.appendChild(chevron);
             select.parentNode.insertBefore(trigger, select.nextSibling);
             var entry = {select: select, trigger: trigger, label: label, options: []};

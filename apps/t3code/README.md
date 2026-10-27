@@ -1,6 +1,6 @@
 # T3 Chat
 
-A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.2.2** adds everyday chat to the device-tested T3 Mini reader and makes pairing a typed code from the Mac.
+A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.2.3** adds everyday chat to the device-tested T3 Mini reader and makes pairing a typed code from the Mac.
 
 - Browse/search conversations by project; create conversations in an existing project workspace.
 - Choose a host provider/model, send or queue follow-ups, watch live replies, and stop turns.
@@ -8,7 +8,7 @@ A T3 Code companion for a jailbroken **iPad mini 2 on iOS 10.3.3**. Version **0.
 - Read Markdown, fenced code, and expandable tool activity in a bounded conversation view.
 - Keep drafts, recover after wake, and explicitly retry unconfirmed commands with their original IDs.
 
-[IPA](dist/T3Chat-0.2.2.ipa) · [Debian package](packages/com.local.t3mini_0.2.2_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
+[IPA](dist/T3Chat-0.2.3.ipa) · [Debian package](packages/com.local.t3mini_0.2.3_iphoneos-arm.deb) · [checksums](dist/SHA256SUMS) · [validation](Tests/BUILD_REPORT.md) · [physical checks](Tests/DEVICE_CHECKLIST.md).
 
 ## Connect and upgrade
 

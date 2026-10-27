@@ -1,4 +1,4 @@
-# T3 Chat 0.2.2 validation
+# T3 Chat 0.2.3 validation
 
 Date: 2026-10-26 (local). Target: iPad4,5, iOS 10.3.3.
 
@@ -32,6 +32,7 @@ Permission response buttons were tested against synthetic resumable approval dat
 - 0.2.0: Wi-Fi installer completed; installed metadata reported T3 Chat 0.2.0. User said threads/conversations were a good starting point and reported no other noticeable device issues, but disliked the persistent read-only/count messages and native selectors. The connection fields closed during polling. Chat pairing on that installation remained read-only; no send/wake acceptance is claimed.
 - 0.2.1: the public IPA was installed over Wi-Fi; installer completed and the device reported T3 Chat 0.2.1 under the original bundle ID. Normal QR/code pairing, camera permission/recognition, actual send, new menus, connection persistence and wake/keyboard/rotation/scroll behavior remain focused device checks until the user confirms them.
 - 0.2.1 feedback: the user tried scanning the iPad's pairing sheet with the iPhone T3 Code app. That sheet showed a decorative QR glyph, not a code, and the iPad is the client, so it could never work; the sheet also gave no code to type.
-- 0.2.2: replaced the glyph with Mac-side steps, made the 12-character code field visible and case-insensitive, added `tools/t3-mini/pair-ipad.sh`, and kept QR scanning as a secondary button. Automated: clean Theos build (iOS 10.0 minimum), `check-release.py`, JS and gateway tests, browser smoke. Installed over Wi-Fi; device reports 0.2.2. Typed-code pairing awaits the user's device check.
+- 0.2.2: replaced the glyph with Mac-side steps, made the 12-character code field visible and case-insensitive, added `tools/t3-mini/pair-ipad.sh`, and kept QR scanning as a secondary button. Automated: clean Theos build (iOS 10.0 minimum), `check-release.py`, JS and gateway tests, browser smoke. Installed over Wi-Fi; device reports 0.2.2. User-verified on the iPad: typed-code pairing connected, and a message sent from T3 Chat reached the host conversation. The user believes Connection stayed open (not confirmed precisely) and confirmed All projects uses the dark menu, but its arrow sat low and far from the label.
+- 0.2.3: the picker chevron is drawn in CSS and vertically centered; All projects is a pill with the arrow beside the label, as in the official mobile app. Automated checks above rerun and pass; installed over Wi-Fi, device reports 0.2.3. Arrow alignment awaits the user's look.
 
 The Mac's trusted-LAN adapter stays running for the installed client. Public artifacts contain no host configuration, pairing credential, or account session. Private one-use pairing material stays outside the checkout. Managed T3 Connect sign-in and remote network reachability are not verified or implemented in this release.
