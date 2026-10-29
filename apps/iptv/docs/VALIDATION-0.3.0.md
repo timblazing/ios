@@ -33,11 +33,11 @@ The checked-in guide images contain only public game/network metadata. Player ev
 
 ## Physical acceptance
 
-No physical iPad install or test. All human checks remain unchecked in `Tests/DEVICE_CHECKLIST.md`, including iOS 10 HLS, smooth 720p60/1080p60, audio/routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
+The owner-approved USB install completed on the physical iPad mini 2 / iOS 10.3.3; a subsequent installed-app query reports TV 0.3.0. Physical functional acceptance has not started. All human checks remain unchecked in `Tests/DEVICE_CHECKLIST.md`, including iOS 10 HLS, smooth 720p60/1080p60, audio/routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
 
 Read-only acceptance preflight on 2026-10-29 found zero USB/Wi-Fi devices through usbmuxd; T3 Device panel discovery exposed simulators only. No install or physical test followed. See the device checklist acceptance log for the next step.
 
-The owner then reported that the iPad battery was depleted and requested stopping device work until it is charged and rejailbroken. No physical playback results were collected. The owner subsequently resumed: read-only USB/Wi-Fi queries confirmed iPad4,5 / iOS 10.3.3, with TV 0.2.0 installed. Installation approval for 0.3.0 is pending.
+The owner then reported that the iPad battery was depleted and requested stopping device work until it is charged and rejailbroken. No physical playback results were collected. The owner subsequently resumed: read-only USB/Wi-Fi queries confirmed iPad4,5 / iOS 10.3.3, with TV 0.2.0 installed. The owner then approved installing 0.3.0 over USB. The release IPA SHA256 matched `dist/SHA256SUMS`, installation reported `Install: Complete`, and `ideviceinstaller list` returned `CFBundleShortVersionString` **0.3.0** for `com.local.iptv`. First-launch and playback observations are pending; no video stream was opened for physical acceptance.
 
 ## Network-logo follow-up — 2026-10-29
 

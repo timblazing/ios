@@ -40,6 +40,6 @@ In T3 Code, follow the [Device panel workflow](../../AGENTS.md#verifying-without
 - `Application/Stream/`: retained legacy relay and model.
 - [Gateway API](gateway/README.md), [implementation plan](docs/NEXT.md), [design mock](docs/design/browser-mock.html).
 - [0.3.0 validation](docs/VALIDATION-0.3.0.md) records simulator evidence and its limits.
-- [Device checklist](Tests/DEVICE_CHECKLIST.md) remains unchecked for this release. No iPad install was performed.
+- [Device checklist](Tests/DEVICE_CHECKLIST.md) remains unchecked for this release. The owner-approved USB install completed and the installed version is verified as 0.3.0; physical functional acceptance remains pending.
 
 Dispatcharr authentication and provider credentials are not handled by this app. Keep the gateway and Dispatcharr on a trusted private network.

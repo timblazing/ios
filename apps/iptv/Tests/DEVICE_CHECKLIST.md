@@ -5,8 +5,10 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 ## Acceptance log — 2026-10-29
 
 - **Pending:** read-only usbmuxd discovery returned zero USB/Wi-Fi connections. T3 `device_list` listed simulators only; no physical iPad was exposed.
-- No installation or physical playback test was performed. All acceptance items below remain pending; retain the legacy relay.
-- The owner initially paused acceptance to charge and rejailbreak the iPad, then resumed. Read-only discovery now confirms iPad mini 2 (`iPad4,5`), iOS 10.3.3, reachable over USB and Wi-Fi; installed TV is **0.2.0**. Installation approval for 0.3.0 is pending. No 0.3.0 physical playback checks have run.
+- Initial preflight performed no installation or physical playback test. All functional acceptance items below remain pending; retain the legacy relay.
+- The owner initially paused acceptance to charge and rejailbreak the iPad, then resumed. Read-only discovery now confirms iPad mini 2 (`iPad4,5`), iOS 10.3.3, reachable over USB and Wi-Fi; TV **0.2.0** was installed at discovery. The owner approved installing 0.3.0 over USB.
+- **Pass — installation:** verified the release IPA SHA256, installed over USB (`Install: Complete`), then queried `com.local.iptv`: `CFBundleShortVersionString` is **0.3.0**. No physical playback checks have run.
+- **Pending — first launch:** owner to open TV and report whether the guide populates, settings/empty guide appears, or an error/crash occurs. No channel has been requested for this acceptance run.
 - Run one interaction at a time and record pass/fail/pending plus actual observations: HLS picture/audio and tap-to-picture time first, then controls, 2+ minute background recovery, rotation and sustained 720p60. Test one stream at a time. Record remaining checks without treating simulator results as physical passes.
 
 ## Guide and interaction
