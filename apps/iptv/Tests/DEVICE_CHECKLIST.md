@@ -1,21 +1,35 @@
-# TV device checklist
+# TV 0.3.0 device checklist
 
-Run on the iPad mini 2 with the Dispatcharr server reachable on the same network.
+Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. These checks require a person; simulator evidence is in `docs/VALIDATION-0.3.0.md`. No 0.3.0 device checks have been marked complete. Historical 0.1.0 relay playback passed on 720p channels; that is not direct-HLS acceptance.
 
-- [x] 720p H.264 channels play with decent quality (0.1.0: 1400, 1401, 1403).
-- [ ] A 1080p60 channel plays without dropped frames or stutter over several minutes.
-- [ ] A 4K HEVC channel shows "This channel uses HEVC (H.265) video…" within a few seconds, and OK returns to the list.
-- [ ] Time from tap to picture is under about 10 s.
-- [ ] Delay versus the same channel on another device is under about 15 s.
-- [ ] Closing the player and opening another channel works repeatedly (ten switches).
-- [ ] Rotating during playback keeps playing.
-- [ ] Going to the home screen stops playback; reopening the channel works.
-- [ ] 30 minutes of playback without the app being killed (memory) or drifting further behind live.
-- [ ] Changing the server URL reloads the channel list; a wrong URL shows an error.
+## Guide and interaction
 
-## Dispatcharr HLS (no relay)
+- [ ] Enter gateway and Dispatcharr URLs; relaunch and verify settings persist.
+- [ ] NFL / NBA / NCAAF tabs, refresh and server controls are comfortable to tap.
+- [ ] Three columns in landscape and two in portrait; rotate while scrolling without clipped cards or stuck touches.
+- [ ] Team/network logos remain smooth while scrolling; missing logos show abbreviations.
+- [ ] Scores, status and EPG update over several polling cycles without flicker or scroll jumps.
+- [ ] Disconnect/reconnect Wi-Fi: last good guide remains, errors clear when the gateway recovers.
+- [ ] A wrong gateway URL shows an error; correcting it reloads the guide.
+- [ ] Tapping a pre-game card shows local start time without opening video.
+- [ ] VoiceOver reads card/team/status details and labels all controls; Reduce Motion removes control fades.
 
-- [ ] A channel's `…?output_format=hls` URL plays in AVPlayer on the iPad (open it in Safari as a quick check)
-- [ ] Startup is under 3 s on a 24/7 channel (e.g. NFL NETWORK)
-- [ ] After 2+ minutes in the background, returning re-requests the stream and plays
-- [ ] 720p60 (NFL NETWORK) plays smoothly without dropped frames
+## Direct Dispatcharr HLS (no relay)
+
+- [ ] A channel's original `?output_format=hls` endpoint plays in the app on iOS 10.3.3. This gates retiring the legacy relay.
+- [ ] Startup on a 24/7 channel is acceptable (aim under 3 s; record actual tap-to-picture time).
+- [ ] 720p60 plays smoothly, with audible synchronized audio and no dropped frames.
+- [ ] A 1080p60 H.264 channel plays smoothly for several minutes.
+- [ ] HEVC-only feeds fail clearly or use a configured server-side H.264 profile; no indefinite spinner.
+- [ ] Tap toggles controls; controls hide after 3 s; back chevron reliably closes playback.
+- [ ] Pause, resume and GO LIVE return to the live edge.
+- [ ] System volume slider and AirPlay work on this device.
+- [ ] Swipe left/right changes games and shows the correct toast; pre-game targets show start time without streaming.
+- [ ] A failed primary feed switches to a backup; all failed feeds show an inline error with a usable Back control.
+- [ ] Closing and reopening channels works ten times without overlapping provider streams.
+- [ ] Rotation during playback preserves video, controls and touch handling.
+- [ ] Home/lock stops video; after 2+ minutes returning re-requests the original endpoint and resumes.
+- [ ] Silent switch/audio interruptions and route changes behave sensibly.
+- [ ] 30 minutes without memory termination, stutter or increasing live delay.
+
+Test one stream at a time; the provider allows only two connections. Ask before installing on the physical iPad.

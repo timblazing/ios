@@ -1,0 +1,1483 @@
+{
+  "updated": "2026-10-29T16:16:41Z",
+  "leagues": [
+    {
+      "id": "nfl",
+      "title": "NFL",
+      "games": [
+        {
+          "id": "401873023",
+          "start": "2026-10-30T00:15Z",
+          "state": "pre",
+          "detail": "10/29 - 8:15 PM EDT",
+          "away": {
+            "abbr": "CAR",
+            "name": "Carolina Panthers",
+            "nick": "Panthers",
+            "color": "0085ca",
+            "alt": "000000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-3",
+            "score": ""
+          },
+          "home": {
+            "abbr": "GB",
+            "name": "Green Bay Packers",
+            "nick": "Packers",
+            "color": "204e32",
+            "alt": "ffb612",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-3",
+            "score": ""
+          },
+          "tv": "Prime Video",
+          "channels": [
+            {
+              "id": "1402",
+              "number": "1402",
+              "name": "Panthers at Packers",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Panthers at Packers",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Panthers at Packers",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T22:14:35Z"
+                }
+              ]
+            },
+            {
+              "id": "1403",
+              "number": "1403",
+              "name": "Panthers at Packers",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Panthers at Packers",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Panthers at Packers",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T22:14:35Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873026",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "BAL",
+            "name": "Baltimore Ravens",
+            "nick": "Ravens",
+            "color": "29126f",
+            "alt": "000000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-3",
+            "score": ""
+          },
+          "home": {
+            "abbr": "BUF",
+            "name": "Buffalo Bills",
+            "nick": "Bills",
+            "color": "00338d",
+            "alt": "d50a0a",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-1",
+            "score": ""
+          },
+          "tv": "CBS",
+          "channels": [
+            {
+              "id": "1404",
+              "number": "1404",
+              "name": "NFL  | 02 - 1pm Ravens at Bills",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873031",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "TEN",
+            "name": "Tennessee Titans",
+            "nick": "Titans",
+            "color": "4495d2",
+            "alt": "001532",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "1-6",
+            "score": ""
+          },
+          "home": {
+            "abbr": "CIN",
+            "name": "Cincinnati Bengals",
+            "nick": "Bengals",
+            "color": "fb4f14",
+            "alt": "000000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-2",
+            "score": ""
+          },
+          "tv": "CBS",
+          "channels": [
+            {
+              "id": "1405",
+              "number": "1405",
+              "name": "NFL  | 03 - 1pm Titans at Bengals",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873024",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "ARI",
+            "name": "Arizona Cardinals",
+            "nick": "Cardinals",
+            "color": "a40227",
+            "alt": "ffffff",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "2-5",
+            "score": ""
+          },
+          "home": {
+            "abbr": "DAL",
+            "name": "Dallas Cowboys",
+            "nick": "Cowboys",
+            "color": "002a5c",
+            "alt": "b0b7bc",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-4",
+            "score": ""
+          },
+          "tv": "Fox",
+          "channels": [
+            {
+              "id": "1406",
+              "number": "1406",
+              "name": "NFL  | 04 - 1pm Cardinals at Cowboys",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873030",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "MIN",
+            "name": "Minnesota Vikings",
+            "nick": "Vikings",
+            "color": "4f2683",
+            "alt": "ffc62f",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "6-0",
+            "score": ""
+          },
+          "home": {
+            "abbr": "DET",
+            "name": "Detroit Lions",
+            "nick": "Lions",
+            "color": "0076b6",
+            "alt": "bbbbbb",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-2",
+            "score": ""
+          },
+          "tv": "Fox",
+          "channels": [
+            {
+              "id": "1407",
+              "number": "1407",
+              "name": "NFL  | 05 - 1pm Vikings at Lions",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873029",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "LV",
+            "name": "Las Vegas Raiders",
+            "nick": "Raiders",
+            "color": "000000",
+            "alt": "a5acaf",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-4",
+            "score": ""
+          },
+          "home": {
+            "abbr": "NYJ",
+            "name": "New York Jets",
+            "nick": "Jets",
+            "color": "115740",
+            "alt": "ffffff",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "2-5",
+            "score": ""
+          },
+          "tv": "Fox",
+          "channels": [
+            {
+              "id": "1408",
+              "number": "1408",
+              "name": "NFL  | 06 - 1pm Raiders at Jets",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873027",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "CLE",
+            "name": "Cleveland Browns",
+            "nick": "Browns",
+            "color": "472a08",
+            "alt": "ff3c00",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-2",
+            "score": ""
+          },
+          "home": {
+            "abbr": "PIT",
+            "name": "Pittsburgh Steelers",
+            "nick": "Steelers",
+            "color": "000000",
+            "alt": "ffb612",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-2",
+            "score": ""
+          },
+          "tv": "CBS",
+          "channels": [
+            {
+              "id": "1409",
+              "number": "1409",
+              "name": "NFL  | 07 - 1pm Browns at Steelers",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873025",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "ATL",
+            "name": "Atlanta Falcons",
+            "nick": "Falcons",
+            "color": "a71930",
+            "alt": "000000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-4",
+            "score": ""
+          },
+          "home": {
+            "abbr": "TB",
+            "name": "Tampa Bay Buccaneers",
+            "nick": "Buccaneers",
+            "color": "bd1c36",
+            "alt": "3e3a35",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "2-5",
+            "score": ""
+          },
+          "tv": "Fox",
+          "channels": [
+            {
+              "id": "1410",
+              "number": "1410",
+              "name": "NFL  | 08 - 1pm Falcons at Buccaneers",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873028",
+          "start": "2026-11-01T18:00Z",
+          "state": "pre",
+          "detail": "11/1 - 1:00 PM EST",
+          "away": {
+            "abbr": "IND",
+            "name": "Indianapolis Colts",
+            "nick": "Colts",
+            "color": "003b75",
+            "alt": "ffffff",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "2-5",
+            "score": ""
+          },
+          "home": {
+            "abbr": "JAX",
+            "name": "Jacksonville Jaguars",
+            "nick": "Jaguars",
+            "color": "007487",
+            "alt": "d7a22a",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-2",
+            "score": ""
+          },
+          "tv": "CBS",
+          "channels": [
+            {
+              "id": "1411",
+              "number": "1411",
+              "name": "NFL  | 09 - 1pm Colts at Jaguars",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NFL",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873032",
+          "start": "2026-11-01T21:05Z",
+          "state": "pre",
+          "detail": "11/1 - 4:05 PM EST",
+          "away": {
+            "abbr": "LAC",
+            "name": "Los Angeles Chargers",
+            "nick": "Chargers",
+            "color": "0080c6",
+            "alt": "ffc20e",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "0-6",
+            "score": ""
+          },
+          "home": {
+            "abbr": "LAR",
+            "name": "Los Angeles Rams",
+            "nick": "Rams",
+            "color": "003594",
+            "alt": "ffd100",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-4",
+            "score": ""
+          },
+          "tv": "Fox",
+          "channels": [
+            {
+              "id": "1412",
+              "number": "1412",
+              "name": "Chargers at Rams",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Chargers at Rams",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Chargers at Rams",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T20:05:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873033",
+          "start": "2026-11-01T21:25Z",
+          "state": "pre",
+          "detail": "11/1 - 4:25 PM EST",
+          "away": {
+            "abbr": "KC",
+            "name": "Kansas City Chiefs",
+            "nick": "Chiefs",
+            "color": "e31837",
+            "alt": "ffb612",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-1",
+            "score": ""
+          },
+          "home": {
+            "abbr": "DEN",
+            "name": "Denver Broncos",
+            "nick": "Broncos",
+            "color": "0a2343",
+            "alt": "fc4c02",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-2",
+            "score": ""
+          },
+          "tv": "CBS",
+          "channels": [
+            {
+              "id": "1413",
+              "number": "1413",
+              "name": "Chiefs at Broncos",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Chiefs at Broncos",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Chiefs at Broncos",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T20:25:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873034",
+          "start": "2026-11-01T21:25Z",
+          "state": "pre",
+          "detail": "11/1 - 4:25 PM EST",
+          "away": {
+            "abbr": "NE",
+            "name": "New England Patriots",
+            "nick": "Patriots",
+            "color": "002a5c",
+            "alt": "c60c30",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-3",
+            "score": ""
+          },
+          "home": {
+            "abbr": "MIA",
+            "name": "Miami Dolphins",
+            "nick": "Dolphins",
+            "color": "008e97",
+            "alt": "fc4c02",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "1-5",
+            "score": ""
+          },
+          "tv": "CBS",
+          "channels": [
+            {
+              "id": "1414",
+              "number": "1414",
+              "name": "Patriots at Dolphins",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Patriots at Dolphins",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Patriots at Dolphins",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T20:25:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873035",
+          "start": "2026-11-02T01:20Z",
+          "state": "pre",
+          "detail": "11/1 - 8:20 PM EST",
+          "away": {
+            "abbr": "PHI",
+            "name": "Philadelphia Eagles",
+            "nick": "Eagles",
+            "color": "06424d",
+            "alt": "000000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "2-5",
+            "score": ""
+          },
+          "home": {
+            "abbr": "WSH",
+            "name": "Washington Commanders",
+            "nick": "Commanders",
+            "color": "5a1414",
+            "alt": "ffb612",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "1-4-1",
+            "score": ""
+          },
+          "tv": "NBC",
+          "channels": [
+            {
+              "id": "1415",
+              "number": "1415",
+              "name": "Eagles at Commanders",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Eagles at Commanders",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Eagles at Commanders",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T22:14:35Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401873036",
+          "start": "2026-11-03T01:15Z",
+          "state": "pre",
+          "detail": "11/2 - 8:15 PM EST",
+          "away": {
+            "abbr": "CHI",
+            "name": "Chicago Bears",
+            "nick": "Bears",
+            "color": "0b1c3a",
+            "alt": "e64100",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-2",
+            "score": ""
+          },
+          "home": {
+            "abbr": "SEA",
+            "name": "Seattle Seahawks",
+            "nick": "Seahawks",
+            "color": "002a5c",
+            "alt": "69be28",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-3",
+            "score": ""
+          },
+          "tv": "ESPN",
+          "channels": [
+            {
+              "id": "1416",
+              "number": "1416",
+              "name": "Bears at Seahawks",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "Bears at Seahawks",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "Bears at Seahawks",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T22:14:35Z"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "channels": [
+        {
+          "id": "1400",
+          "number": "1400",
+          "name": "NFL NETWORK",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NFL",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NFL",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1401",
+          "number": "1401",
+          "name": "NFL REDZONE",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NFL",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NFL",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nba",
+      "title": "NBA",
+      "games": [
+        {
+          "id": "401909893",
+          "start": "2026-10-30T00:00Z",
+          "state": "pre",
+          "detail": "10/29 - 8:00 PM EDT",
+          "away": {
+            "abbr": "CLE",
+            "name": "Cleveland Cavaliers",
+            "nick": "Cavaliers",
+            "color": "860038",
+            "alt": "bc945c",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-1",
+            "score": ""
+          },
+          "home": {
+            "abbr": "ATL",
+            "name": "Atlanta Hawks",
+            "nick": "Hawks",
+            "color": "c8102e",
+            "alt": "fdb927",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "2-3",
+            "score": ""
+          },
+          "tv": "NBA TV",
+          "channels": [
+            {
+              "id": "1201",
+              "number": "1201",
+              "name": "HAWKS vs CAVALIERS",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "HAWKS vs CAVALIERS",
+                  "start": "2026-10-29T16:30:00Z",
+                  "end": "2026-10-29T19:30:00Z"
+                },
+                {
+                  "title": "HAWKS vs CAVALIERS",
+                  "start": "2026-10-29T19:30:00Z",
+                  "end": "2026-10-29T22:30:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401909894",
+          "start": "2026-10-30T00:00Z",
+          "state": "pre",
+          "detail": "10/29 - 8:00 PM EDT",
+          "away": {
+            "abbr": "SAC",
+            "name": "Sacramento Kings",
+            "nick": "Kings",
+            "color": "5a2d81",
+            "alt": "6a7a82",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "0-4",
+            "score": ""
+          },
+          "home": {
+            "abbr": "NO",
+            "name": "New Orleans Pelicans",
+            "nick": "Pelicans",
+            "color": "0a2240",
+            "alt": "b4975a",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "0-4",
+            "score": ""
+          },
+          "tv": "NBA League Pass",
+          "channels": [
+            {
+              "id": "1200",
+              "number": "1200",
+              "name": "PELICANS vs KINGS",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "PELICANS vs KINGS",
+                  "start": "2026-10-29T16:30:00Z",
+                  "end": "2026-10-29T19:30:00Z"
+                },
+                {
+                  "title": "PELICANS vs KINGS",
+                  "start": "2026-10-29T19:30:00Z",
+                  "end": "2026-10-29T22:30:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401909895",
+          "start": "2026-10-30T02:00Z",
+          "state": "pre",
+          "detail": "10/29 - 10:00 PM EDT",
+          "away": {
+            "abbr": "MEM",
+            "name": "Memphis Grizzlies",
+            "nick": "Grizzlies",
+            "color": "5d76a9",
+            "alt": "12173f",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-0",
+            "score": ""
+          },
+          "home": {
+            "abbr": "POR",
+            "name": "Portland Trail Blazers",
+            "nick": "Trail Blazers",
+            "color": "e03a3e",
+            "alt": "000000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-0",
+            "score": ""
+          },
+          "tv": "NBA League Pass",
+          "channels": [
+            {
+              "id": "1202",
+              "number": "1202",
+              "name": "TRAIL BLAZERS vs GRIZZLIES",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "TRAIL BLAZERS vs GRIZZLIES",
+                  "start": "2026-10-29T16:30:00Z",
+                  "end": "2026-10-29T19:30:00Z"
+                },
+                {
+                  "title": "TRAIL BLAZERS vs GRIZZLIES",
+                  "start": "2026-10-29T19:30:00Z",
+                  "end": "2026-10-29T22:30:00Z"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "channels": []
+    },
+    {
+      "id": "ncaaf",
+      "title": "NCAAF",
+      "games": [
+        {
+          "id": "401862812",
+          "start": "2026-10-29T23:30Z",
+          "state": "pre",
+          "detail": "10/29 - 7:30 PM EDT",
+          "away": {
+            "abbr": "FAU",
+            "name": "Florida Atlantic Owls",
+            "nick": "Owls",
+            "color": "003366",
+            "alt": "cc0000",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-2",
+            "score": ""
+          },
+          "home": {
+            "abbr": "UNT",
+            "name": "North Texas Mean Green",
+            "nick": "Mean Green",
+            "color": "068f33",
+            "alt": "ffffff",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "5-2",
+            "score": ""
+          },
+          "tv": "ESPN",
+          "channels": [
+            {
+              "id": "1500",
+              "number": "1500",
+              "name": "ESPN",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NC State at Wake Forest",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "NC State at Wake Forest",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T22:14:35Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401869963",
+          "start": "2026-10-29T23:30Z",
+          "state": "pre",
+          "detail": "10/29 - 7:30 PM EDT",
+          "away": {
+            "abbr": "TROY",
+            "name": "Troy Trojans",
+            "nick": "Trojans",
+            "color": "862633",
+            "alt": "b1b1b1",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-4",
+            "score": ""
+          },
+          "home": {
+            "abbr": "JMU",
+            "name": "James Madison Dukes",
+            "nick": "Dukes",
+            "color": "450084",
+            "alt": "cbb677",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "7-1",
+            "score": ""
+          },
+          "tv": "ESPN2",
+          "channels": [
+            {
+              "id": "1501",
+              "number": "1501",
+              "name": "ESPN2",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NCAAF",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NCAAF",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401862813",
+          "start": "2026-10-30T23:00Z",
+          "state": "pre",
+          "detail": "10/30 - 7:00 PM EDT",
+          "away": {
+            "abbr": "TULN",
+            "name": "Tulane Green Wave",
+            "nick": "Green Wave",
+            "color": "006747",
+            "alt": "418fde",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-4",
+            "score": ""
+          },
+          "home": {
+            "abbr": "CLT",
+            "name": "Charlotte 49ers",
+            "nick": "49ers",
+            "color": "005035",
+            "alt": "a49665",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "1-6",
+            "score": ""
+          },
+          "tv": "ESPN2",
+          "channels": [
+            {
+              "id": "1501",
+              "number": "1501",
+              "name": "ESPN2",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NCAAF",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NCAAF",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401856844",
+          "start": "2026-10-30T23:30Z",
+          "state": "pre",
+          "detail": "10/30 - 7:30 PM EDT",
+          "away": {
+            "abbr": "BAY",
+            "name": "Baylor Bears",
+            "nick": "Bears",
+            "color": "154734",
+            "alt": "ffb81c",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-3",
+            "score": ""
+          },
+          "home": {
+            "abbr": "UCF",
+            "name": "UCF Knights",
+            "nick": "Knights",
+            "color": "000000",
+            "alt": "b4a169",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "4-3",
+            "score": ""
+          },
+          "tv": "ESPN",
+          "channels": [
+            {
+              "id": "1500",
+              "number": "1500",
+              "name": "ESPN",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NC State at Wake Forest",
+                  "start": "2026-10-29T16:14:35Z",
+                  "end": "2026-10-29T19:14:35Z"
+                },
+                {
+                  "title": "NC State at Wake Forest",
+                  "start": "2026-10-29T19:14:35Z",
+                  "end": "2026-10-29T22:14:35Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "401866451",
+          "start": "2026-10-31T02:30Z",
+          "state": "pre",
+          "detail": "10/30 - 10:30 PM EDT",
+          "away": {
+            "abbr": "KENT",
+            "name": "Kent State Golden Flashes",
+            "nick": "Golden Flashes",
+            "color": "002664",
+            "alt": "eaab00",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "3-5",
+            "score": ""
+          },
+          "home": {
+            "abbr": "SAC",
+            "name": "Sacramento State Hornets",
+            "nick": "Hornets",
+            "color": "00573C",
+            "alt": "cdb97d",
+            "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+            "record": "1-7",
+            "score": ""
+          },
+          "tv": "ESPN2",
+          "channels": [
+            {
+              "id": "1501",
+              "number": "1501",
+              "name": "ESPN2",
+              "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+              "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+              "epg": [
+                {
+                  "title": "NCAAF",
+                  "start": "2026-10-29T16:00:00Z",
+                  "end": "2026-10-29T20:00:00Z"
+                },
+                {
+                  "title": "NCAAF",
+                  "start": "2026-10-29T20:00:00Z",
+                  "end": "2026-10-30T00:00:00Z"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "channels": [
+        {
+          "id": "1500",
+          "number": "1500",
+          "name": "ESPN",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NC State at Wake Forest",
+              "start": "2026-10-29T16:14:35Z",
+              "end": "2026-10-29T19:14:35Z"
+            },
+            {
+              "title": "NC State at Wake Forest",
+              "start": "2026-10-29T19:14:35Z",
+              "end": "2026-10-29T22:14:35Z"
+            }
+          ]
+        },
+        {
+          "id": "1501",
+          "number": "1501",
+          "name": "ESPN2",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1502",
+          "number": "1502",
+          "name": "ESPNU",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1503",
+          "number": "1503",
+          "name": "ABC",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1504",
+          "number": "1504",
+          "name": "CBS",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1505",
+          "number": "1505",
+          "name": "FOX",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1506",
+          "number": "1506",
+          "name": "NBC",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1507",
+          "number": "1507",
+          "name": "ACC NETWORK",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1508",
+          "number": "1508",
+          "name": "BIG TEN NETWORK",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1509",
+          "number": "1509",
+          "name": "BIG TEN NETWORK ALT",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1510",
+          "number": "1510",
+          "name": "SEC NETWORK",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1511",
+          "number": "1511",
+          "name": "CBSSN",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1512",
+          "number": "1512",
+          "name": "FS1",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1513",
+          "number": "1513",
+          "name": "CW",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1514",
+          "number": "1514",
+          "name": "TNT",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1515",
+          "number": "1515",
+          "name": "USA NETWORK",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1516",
+          "number": "1516",
+          "name": "UAlbany at lowa 6pm",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "id": "1517",
+          "number": "1517",
+          "name": "7PM North Carolina at Charlotte",
+          "stream": "http://192.0.2.10:9191/proxy/ts/stream/00000000-0000-0000-0000-000000000000?output_format=hls",
+          "logo": "/logo?u=https%3A%2F%2Fexample.com%2Flogo.png&s=96",
+          "epg": [
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T16:00:00Z",
+              "end": "2026-10-29T20:00:00Z"
+            },
+            {
+              "title": "NCAAF",
+              "start": "2026-10-29T20:00:00Z",
+              "end": "2026-10-30T00:00:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,57 +1,45 @@
 # TV
 
-A live TV player for a [Dispatcharr](https://github.com/Dispatcharr/Dispatcharr) server on the home network, for the iPad mini 2 (iOS 10.3.3). Objective-C and UIKit. Prototype.
+Native live TV guide and player for the iPad mini 2 on iOS 10.3.3, built with Objective-C/UIKit and Theos.
 
-**Release:** [IPTV-0.2.0.ipa](dist/IPTV-0.2.0.ipa), the Debian package in `packages/`, and [checksums](dist/SHA256SUMS).
+**Release:** [IPTV-0.3.0.ipa](dist/IPTV-0.3.0.ipa), [Debian package](packages/com.local.iptv_0.3.0_iphoneos-arm.deb), [checksums](dist/SHA256SUMS).
 
 ## Use
 
-On first launch, enter the Dispatcharr base URL (for example `http://192.168.1.x:9191`). It's stored on the iPad only; the **Server** button changes it. The app loads `<base>/output/m3u` and lists the channels by group. Tap one to play it.
+Enter the gateway base URL in **Server settings**, alongside the Dispatcharr base URL. Both stay in device defaults. The gateway supplies the stream addresses; the Dispatcharr setting is retained for server configuration and the legacy path.
 
-## How it works
+Choose NFL, NBA or NCAAF. Game cards show start time or status, teams, records and scores. Network tiles show current/next EPG with progress when available. The guide refreshes every 30 seconds while visible using ETag, retaining the last valid data during outages. Logos come through the gateway at 96 pixels, decode off the main thread, and use an 8 MB NSCache; unavailable logos show abbreviation badges.
 
-AVPlayer only plays live video as HLS, and Dispatcharr's channel URLs (`/proxy/ts/stream/<id>`) are raw MPEG-TS. So the app repackages on the device, without transcoding:
+Tap a game to play, or a network tile to watch that channel. Pre-game cards show the start time and request no stream. In the player, tap to show controls; they hide after three seconds. Swipe between games in the selected league. Pause and **GO LIVE** control playback; system volume/AirPlay controls sit at the bottom. Failed feeds advance through the game's backups (including a 20-second no-progress timeout). Backgrounding releases playback; returning creates a new item from the original endpoint, avoiding expired HLS tokens.
 
-1. `IPTVRelay` streams the channel's TS over HTTP.
-2. `IPTVSegmenter` cuts it at H.264 keyframes into segments of at least 2 s, each starting with the PAT and PMT, and keeps the last 8 in memory (24 MB cap).
-3. `IPTVLocalServer` serves `/live.m3u8` and `/seg/<n>.ts` on `127.0.0.1`, and AVPlayer plays that, decoding in hardware.
+## Stream compatibility
 
-Dispatcharr sends a burst of about 30 s of buffered video on connect. The relay waits for segments to arrive in real time before publishing the playlist, and the player starts 5 s behind the newest segment. Expect a 6–7 s wait before playback and a picture that runs several seconds behind the source.
+The player uses AVPlayerLayer with Dispatcharr's `?output_format=hls` stream directly. The A7 needs H.264/AAC; HEVC requires a server-side H.264 profile. See [stream findings](docs/STREAMS.md).
 
-## Supported streams
-
-The A7 decodes H.264 up to 1080p60 (High profile, level 4.2), with AAC audio. Channels in other video codecs, like 4K HEVC (H.265), can't play on this iPad: the app detects the codec from the stream's PMT and says so instead of spinning. To watch such a channel, give it a Dispatcharr ffmpeg stream profile that transcodes to H.264, for example:
-
-```
--c:v libx264 -preset veryfast -vf scale=-2:720 -r 30 -b:v 4M -c:a aac -ac 2
-```
-
-That makes the server decode 4K live, and the same profile is the fallback if a 1080p60 channel stutters.
+The Foundation-only legacy relay, segmenter, local server and M3U parser remain in the source and build until physical-device HLS acceptance. They are not used by the new guide/player. Existing 0.2.0 packages remain available for rollback.
 
 ## Build and test
 
 ```sh
 export THEOS=~/theos
-make package FINALPACKAGE=1 -j4   # .deb in packages/
-scripts/package-ipa.sh            # .ipa in dist/
-scripts/test-stream.sh            # M3U parsing, segmentation, HEVC rejection (needs ffmpeg with libx265)
-scripts/test-live.sh <stream-url> # end to end on the Mac: relay a live channel, read it with ffprobe and ffmpeg
+make package FINALPACKAGE=1 -j4
+vtool -show-build .theos/_/Applications/IPTV.app/IPTV
+scripts/package-ipa.sh
+scripts/test-guide.sh                 # Foundation model and scrubbed live fixture
+scripts/test-stream.sh                # retained relay regression tests; ffmpeg required
+python3 -m unittest discover -s gateway/tests
+scripts/build-simulator.sh            # /tmp/tv-simulator/IPTV.app, arm64 simulator
 ```
 
-`test-stream.sh` also runs `/tmp/espn.ts` if present (any real channel capture, `curl -m 10 -o /tmp/espn.ts <stream-url>`).
+Use the device tools to install and operate the simulator build. Configure the live gateway through its settings UI. The simulator-only launch-screen dictionary avoids modern iPad compatibility-window coordinates; release resources are unchanged. Shut down the simulator after testing. For deterministic failure/304 testing, `scripts/serve-guide-fixture.py <fixture> --fail-flag /tmp/tv-guide-fail` serves on loopback port 19493: create the flag for 503, remove it for recovery. Never commit a private live fixture.
 
-## Code
+## Code and validation
 
-- `Application/Stream/`: Foundation-only, compiled for macOS by `scripts/build-tests.sh`. `IPTVPlaylist` (M3U parsing and grouping), `IPTVSegmenter`, `IPTVLocalServer`, `IPTVRelay`.
-- `Application/UI/`: `IPTVChannelListController` (server prompt, grouped channel table) and `IPTVPlayerController` (an `AVPlayerViewController` that owns the relay and stops it on close, failure, or backgrounding).
+- `Application/Guide/`: Foundation-only typed guide parser; malformed responses cannot replace the last good guide.
+- `Application/UI/`: native collection guide and custom AVPlayerLayer player.
+- `Application/Stream/`: retained legacy relay and model.
+- [Gateway API](gateway/README.md), [implementation plan](docs/NEXT.md), [design mock](docs/design/browser-mock.html).
+- [0.3.0 validation](docs/VALIDATION-0.3.0.md) records simulator evidence and its limits.
+- [Device checklist](Tests/DEVICE_CHECKLIST.md) remains unchecked for this release. No iPad install was performed.
 
-## Gateway and next steps
-
-- `gateway/`: Python service on the home server that serves one `/guide.json` (Dispatcharr channels, EPG and ESPN scores, matched to games) plus small cached logos. See `gateway/README.md`.
-- `docs/STREAMS.md`: stream path tests. Dispatcharr's own HLS output (`?output_format=hls`) plays in AVPlayer without the on-device relay, which the native build should adopt.
-- `docs/design/browser-mock.html`: the guide and player design at iPad mini 2 size.
-- `docs/NEXT.md`: plan for the native UIKit build of that design.
-
-## Not yet
-
-The new guide and player (see `docs/NEXT.md`), pull to refresh, and Dispatcharr authentication.
+Dispatcharr authentication and provider credentials are not handled by this app. Keep the gateway and Dispatcharr on a trusted private network.

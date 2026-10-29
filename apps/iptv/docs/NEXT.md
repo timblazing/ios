@@ -1,8 +1,14 @@
-# Next session: native UIKit build of the guide and player
+# Native guide and player: 0.3.0
 
 The design is `docs/design/browser-mock.html` (open it with `file://`; press G or P to switch views, T to change the time, and use arrow keys to switch channels). The data comes from the gateway (`gateway/README.md`), and streams from Dispatcharr HLS (`docs/STREAMS.md`).
 
-## Plan
+## Status
+
+Implemented in 0.3.0: gateway settings, Foundation model/tests, native collection guide with ETag polling and cached logos, direct HLS player, backup feeds, swipe controls and pre-game handling. See `VALIDATION-0.3.0.md` for proof and remaining limits.
+
+Next: run the unchecked physical-device checklist. Keep the relay code until direct HLS plays on the mini 2, then remove the relay/M3U implementation in a separate change. Network-logo sources sampled during validation returned gateway 404 responses; the app uses abbreviation fallbacks.
+
+## Implemented plan
 
 1. **Settings.** Store a gateway URL (`gateway.baseURL`) next to `server.baseURL`. Drop the M3U parsing path once the guide works.
 2. **Model.** Add `IPTVGuide` (Foundation only, in `Application/Stream/` or a new `Application/Guide/`). It parses `/guide.json` into leagues → games → channels. Unit-test it with `clang` on the Mac, like Solitaire's `test-rules.sh`, using a fixture JSON with `192.0.2.x` and zero UUIDs.
