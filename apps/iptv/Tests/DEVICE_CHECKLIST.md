@@ -14,6 +14,12 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 - Keep USB connected and the Mac awake during testing; see `tools/tv-usb/README.md` at the repository root for bridge cleanup/restoration.
 - Run one interaction at a time and record pass/fail/pending plus actual observations: HLS picture/audio and tap-to-picture time first, then controls, 2+ minute background recovery, rotation and sustained 720p60. Test one stream at a time. Record remaining checks without treating simulator results as physical passes.
 
+### Owner-reported physical results
+
+- **Pass — guide rendering:** after reopening TV with the bridge configured, the owner confirmed populated game cards/network tiles.
+- **Pass — HLS picture:** the owner started NFL RedZone and reported that playback worked on the physical iPad. This is direct-HLS playback through the USB/Mac/tailnet adapter, without the legacy TS segmenter.
+- **Pending:** audible synchronized audio, measured startup, source resolution/frame rate, sustained smoothness, controls, background recovery, rotation and remaining checklist items. Keep the current RedZone stream as the only active acceptance stream.
+
 ## Guide and interaction
 
 - [ ] Enter gateway and Dispatcharr URLs; relaunch and verify settings persist.

@@ -54,3 +54,7 @@ Reproduced a new source mismatch: production `/guide.json` had zero games/tiles 
 A guide request made **from the physical iPad** through the bridge returned NFL 14 games / 3 tiles, NBA 3 / 1 and NCAAF 1 / 18 at the snapshot. All emitted stream URLs used iPad loopback. The adapter's 5 tests pass, including a synthetic HTTP redirect→playlist→segment round trip and conditional-guide responses. This does not prove live HLS playback or UIKit rendering. Owner confirmation of the visible guide is next; no video stream has been opened in this acceptance run.
 
 The bridge forwards HLS without transcoding or TS segmentation. Later startup/throughput results must be labeled as using this USB/Mac/tailnet path. Keep the legacy relay until physical acceptance is complete. See `../../../tools/tv-usb/README.md` for task-owned process cleanup and preference restoration.
+
+### First owner-reported guide and HLS result
+
+After reopening TV with the private bridge configured, the owner confirmed that the guide was populated and reported successful NFL RedZone playback on the physical iPad mini 2 / iOS 10.3.3. This establishes visible guide content and a working HLS picture through the USB/Mac/tailnet adapter. Audio synchronization, startup time, codec/resolution/frame rate, sustained performance, controls, background recovery and rotation have not yet been verified. No second acceptance stream was started by the agent. Keep the legacy relay while the remaining acceptance is incomplete.
