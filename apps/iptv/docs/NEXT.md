@@ -30,7 +30,7 @@ Next: run the unchecked physical-device checklist. Keep the relay code until dir
 
 ## Working mode
 
-The owner has resumed physical acceptance after charging and rejailbreaking. Read-only discovery confirmed iPad4,5 / iOS 10.3.3 over USB and Wi-Fi. The owner approved the USB install; TV 0.3.0 is now installed and its version verified. Next, confirm first-launch guide/settings behavior, then use `Tests/DEVICE_CHECKLIST.md` one interaction at a time. Keep the legacy relay while acceptance is incomplete.
+The owner has resumed physical acceptance after charging and rejailbreaking. Read-only discovery confirmed iPad4,5 / iOS 10.3.3 over USB and Wi-Fi. The owner approved the USB install; TV 0.3.0 is now installed and its version verified. First launch showed a blank Gateway URL and retained Dispatcharr URL. The iPad and Mac are currently away from home; next establish secure access for both guide and HLS, plus private URL provisioning, then use `Tests/DEVICE_CHECKLIST.md` one interaction at a time. Keep the legacy relay while acceptance is incomplete.
 
 Verify each step yourself, without the device:
 - `make package FINALPACKAGE=1 -j4` builds warning-free, and `vtool` shows iOS 10.0.
