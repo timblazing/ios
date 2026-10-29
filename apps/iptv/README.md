@@ -31,7 +31,7 @@ python3 -m unittest discover -s gateway/tests
 scripts/build-simulator.sh            # /tmp/tv-simulator/IPTV.app, arm64 simulator
 ```
 
-Use the device tools to install and operate the simulator build. Configure the live gateway through its settings UI. The simulator-only launch-screen dictionary avoids modern iPad compatibility-window coordinates; release resources are unchanged. Shut down the simulator after testing. For deterministic failure/304 testing, `scripts/serve-guide-fixture.py <fixture> --fail-flag /tmp/tv-guide-fail` serves on loopback port 19493: create the flag for 503, remove it for recovery. Never commit a private live fixture.
+In T3 Code, follow the [Device panel workflow](../../AGENTS.md#verifying-without-the-device): `device_list`, then `device_open` with the selected host/device IDs, then the returned device-bound `agent-device` command for launches and interaction, and `device_screenshot` for inspection. Command-line builds and installs remain allowed. Configure the live gateway through its settings UI. The simulator-only launch-screen dictionary avoids modern iPad compatibility-window coordinates; release resources are unchanged. Shut down only the simulator started for this task once the owner is done interacting. For deterministic failure/304 testing, `scripts/serve-guide-fixture.py <fixture> --fail-flag /tmp/tv-guide-fail` serves on loopback port 19493: create the flag for 503, remove it for recovery. Never commit a private live fixture.
 
 ## Code and validation
 
