@@ -139,3 +139,5 @@ A live TV player for a Dispatcharr server, v0.2.0 prototype. Read `README.md` fi
 
 - AVPlayer can't play raw MPEG-TS, so `Application/Stream/` repackages the channel's TS into HLS in memory and serves it on 127.0.0.1. No transcoding: only H.264 video plays; other codecs (4K HEVC) are detected and reported.
 - The server URL is entered on the device. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.
+- Direction (see `docs/NEXT.md`): play Dispatcharr's own HLS (`?output_format=hls`) in AVPlayer and retire the relay; the guide comes from `gateway/`, a Python service running in Docker on the home server `raygun` (`~/docker/tv-gateway/`, port 9292, reachable with `ssh raygun`). Docker is allowed there, never on the Mac.
+- The provider allows 2 concurrent streams: capture or test one channel at a time and stop sessions when done.

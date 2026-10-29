@@ -1,0 +1,10 @@
+services:
+  tv-gateway:
+    build: .
+    container_name: tv-gateway
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "9292:9292"
+    volumes:
+      - ./cache:/cache

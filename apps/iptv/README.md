@@ -45,6 +45,13 @@ scripts/test-live.sh <stream-url> # end to end on the Mac: relay a live channel,
 - `Application/Stream/`: Foundation-only, compiled for macOS by `scripts/build-tests.sh`. `IPTVPlaylist` (M3U parsing and grouping), `IPTVSegmenter`, `IPTVLocalServer`, `IPTVRelay`.
 - `Application/UI/`: `IPTVChannelListController` (server prompt, grouped channel table) and `IPTVPlayerController` (an `AVPlayerViewController` that owns the relay and stops it on close, failure, or backgrounding).
 
+## Gateway and next steps
+
+- `gateway/`: Python service on the home server that serves one `/guide.json` (Dispatcharr channels, EPG and ESPN scores, matched to games) plus small cached logos. See `gateway/README.md`.
+- `docs/STREAMS.md`: stream path tests. Dispatcharr's own HLS output (`?output_format=hls`) plays in AVPlayer without the on-device relay, which the native build should adopt.
+- `docs/design/browser-mock.html`: the guide and player design at iPad mini 2 size.
+- `docs/NEXT.md`: plan for the native UIKit build of that design.
+
 ## Not yet
 
-Channel logos, pull to refresh, the EPG (`<base>/output/epg`), channel switching from the player, and Dispatcharr authentication.
+The new guide and player (see `docs/NEXT.md`), pull to refresh, and Dispatcharr authentication.
