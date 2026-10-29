@@ -4,13 +4,13 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 
 ## Acceptance log — 2026-10-29
 
-- **Pending:** read-only usbmuxd discovery returned zero USB/Wi-Fi connections. T3 `device_list` listed simulators only; no physical iPad was exposed.
+- **Initial preflight (historical):** read-only usbmuxd discovery returned zero USB/Wi-Fi connections. T3 `device_list` listed simulators only; no physical iPad was exposed.
 - Initial preflight performed no installation or physical playback test. All functional acceptance items below remain pending; retain the legacy relay.
 - The owner initially paused acceptance to charge and rejailbreak the iPad, then resumed. Read-only discovery now confirms iPad mini 2 (`iPad4,5`), iOS 10.3.3, reachable over USB and Wi-Fi; TV **0.2.0** was installed at discovery. The owner approved installing 0.3.0 over USB.
 - **Pass — installation:** verified the release IPA SHA256, installed over USB (`Install: Complete`), then queried `com.local.iptv`: `CFBundleShortVersionString` is **0.3.0**. No physical playback checks have run.
 - **Observed — first launch/settings:** owner opened TV; Gateway URL was blank and the previous Dispatcharr URL was retained. Guide and playback acceptance remain pending.
 - **Pass — bridge transport:** owner approved a temporary USB/Mac bridge. Existing SSH key authentication succeeded. A loopback-only reverse SSH forward and Mac guide/HLS adapter reach an isolated gateway candidate on raygun through Tailscale. Fetching the guide from the physical iPad returned NFL 14 games / 3 tiles, NBA 3 / 1, NCAAF 1 / 18 at the snapshot; all stream URLs use iPad loopback. This is transport evidence, not UIKit rendering or playback acceptance.
-- **Configured:** while TV was closed, backed up its preferences outside the repo and set only `gateway.baseURL` to the bridge. Preserved the existing Dispatcharr setting. No reinstall or public endpoint. Owner to reopen TV and confirm visible guide content; HLS picture/audio and all remaining functional checks are pending.
+- **Configured:** while TV was closed, backed up its preferences outside the repo and set only `gateway.baseURL` to the bridge. Preserved the existing Dispatcharr setting. No reinstall or public endpoint. The owner subsequently confirmed populated guide content, RedZone video and good audio; remaining checks are listed below.
 - Keep USB connected and the Mac awake during testing; see `tools/tv-usb/README.md` at the repository root for bridge cleanup/restoration.
 - Run one interaction at a time and record pass/fail/pending plus actual observations: HLS picture/audio and tap-to-picture time first, then controls, 2+ minute background recovery, rotation and sustained 720p60. Test one stream at a time. Record remaining checks without treating simulator results as physical passes.
 
@@ -18,7 +18,8 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 
 - **Pass — guide rendering:** after reopening TV with the bridge configured, the owner confirmed populated game cards/network tiles.
 - **Pass — HLS picture:** the owner started NFL RedZone and reported that playback worked on the physical iPad. This is direct-HLS playback through the USB/Mac/tailnet adapter, without the legacy TS segmenter.
-- **Pending:** audible synchronized audio, measured startup, source resolution/frame rate, sustained smoothness, controls, background recovery, rotation and remaining checklist items. Keep the current RedZone stream as the only active acceptance stream.
+- **Pass — audio:** in response to the audio/synchronization check, the owner reported that RedZone audio is good.
+- **Pending:** measured startup, source resolution/frame rate, sustained smoothness, controls, background recovery, rotation and remaining checklist items. Keep the current RedZone stream as the only active acceptance stream.
 
 ## Guide and interaction
 
@@ -34,7 +35,7 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 
 ## Direct Dispatcharr HLS (no relay)
 
-- [ ] A channel's original `?output_format=hls` endpoint plays in the app on iOS 10.3.3. This gates retiring the legacy relay.
+- [x] HLS plays in the app on iOS 10.3.3: owner confirmed RedZone picture and good audio through the USB/Mac/tailnet adapter, which forwards the original endpoint without transcoding or TS segmentation. Keep the relay while remaining physical acceptance is incomplete.
 - [ ] Startup on a 24/7 channel is acceptable (aim under 3 s; record actual tap-to-picture time).
 - [ ] 720p60 plays smoothly, with audible synchronized audio and no dropped frames.
 - [ ] A 1080p60 H.264 channel plays smoothly for several minutes.

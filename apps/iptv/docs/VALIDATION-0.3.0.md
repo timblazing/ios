@@ -33,7 +33,7 @@ The checked-in guide images contain only public game/network metadata. Player ev
 
 ## Physical acceptance
 
-The owner-approved USB install completed on the physical iPad mini 2 / iOS 10.3.3; a subsequent installed-app query reports TV 0.3.0. First-launch settings have been observed; playback acceptance is blocked on remote network access. All human checks remain unchecked in `Tests/DEVICE_CHECKLIST.md`, including iOS 10 HLS, smooth 720p60/1080p60, audio/routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
+The owner-approved USB install completed on the physical iPad mini 2 / iOS 10.3.3; a subsequent installed-app query reports TV 0.3.0. The owner confirmed populated guide rendering, RedZone HLS picture and good audio through the USB bridge. Remaining checks in `Tests/DEVICE_CHECKLIST.md` include startup timing, source resolution/frame rate, smooth 720p60/1080p60, audio routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
 
 Read-only acceptance preflight on 2026-10-29 found zero USB/Wi-Fi devices through usbmuxd; T3 Device panel discovery exposed simulators only. No install or physical test followed. See the device checklist acceptance log for the next step.
 
@@ -57,4 +57,4 @@ The bridge forwards HLS without transcoding or TS segmentation. Later startup/th
 
 ### First owner-reported guide and HLS result
 
-After reopening TV with the private bridge configured, the owner confirmed that the guide was populated and reported successful NFL RedZone playback on the physical iPad mini 2 / iOS 10.3.3. This establishes visible guide content and a working HLS picture through the USB/Mac/tailnet adapter. Audio synchronization, startup time, codec/resolution/frame rate, sustained performance, controls, background recovery and rotation have not yet been verified. No second acceptance stream was started by the agent. Keep the legacy relay while the remaining acceptance is incomplete.
+After reopening TV with the private bridge configured, the owner confirmed that the guide was populated and reported successful NFL RedZone playback on the physical iPad mini 2 / iOS 10.3.3. This establishes visible guide content and a working HLS picture through the USB/Mac/tailnet adapter. In response to the audio/synchronization check, the owner reported that audio is good. Startup time, codec/resolution/frame rate, sustained performance, controls, background recovery and rotation have not yet been verified. No second acceptance stream was started by the agent. Keep the legacy relay while the remaining acceptance is incomplete.
