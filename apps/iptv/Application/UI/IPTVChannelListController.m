@@ -1,118 +1,335 @@
 #import "IPTVChannelListController.h"
 #import "IPTVPlayerController.h"
-#import "../Stream/IPTVPlaylist.h"
+#import "../Guide/IPTVGuide.h"
 
-static NSString *const IPTVServerDefault = @"server.baseURL";
+static UIColor *TVColor(unsigned rgb) {
+    return [UIColor colorWithRed:((rgb >> 16) & 255)/255.0 green:((rgb >> 8) & 255)/255.0 blue:(rgb & 255)/255.0 alpha:1];
+}
+static UIImage *TVFill(UIColor *color) {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(8, 8), NO, 0);
+    [color setFill]; UIRectFill(CGRectMake(0, 0, 8, 8));
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext(); UIGraphicsEndImageContext();
+    return [image resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+}
+static UIImage *TVIcon(BOOL refresh) {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(24, 24), NO, 0);
+    [TVColor(0xa3a8b3) setStroke];
+    UIBezierPath *path = [UIBezierPath bezierPath]; path.lineWidth = 1.8; path.lineCapStyle = kCGLineCapRound; path.lineJoinStyle = kCGLineJoinRound;
+    if (refresh) {
+        [path addArcWithCenter:CGPointMake(12, 12) radius:8 startAngle:0 endAngle:5.5 clockwise:YES];
+        [path moveToPoint:CGPointMake(20, 4)]; [path addLineToPoint:CGPointMake(20, 11)]; [path addLineToPoint:CGPointMake(13, 11)];
+    } else {
+        [path appendPath:[UIBezierPath bezierPathWithRoundedRect:CGRectMake(3, 4, 18, 7) cornerRadius:2]];
+        [path appendPath:[UIBezierPath bezierPathWithRoundedRect:CGRectMake(3, 13, 18, 7) cornerRadius:2]];
+        [path moveToPoint:CGPointMake(7, 7.5)]; [path addLineToPoint:CGPointMake(7.1, 7.5)];
+        [path moveToPoint:CGPointMake(7, 16.5)]; [path addLineToPoint:CGPointMake(7.1, 16.5)];
+    }
+    [path stroke]; UIImage *image = UIGraphicsGetImageFromCurrentImageContext(); UIGraphicsEndImageContext(); return image;
+}
+static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *color, CGRect frame) {
+    UILabel *label = [[UILabel alloc] initWithFrame:frame];
+    label.text = text; label.font = [UIFont systemFontOfSize:size weight:UIFontWeightSemibold];
+    label.textColor = color; [parent addSubview:label]; return label;
+}
+
+@interface IPTVGuideCell : UICollectionViewCell
+@property(nonatomic, strong) NSObject *represented;
+@property(nonatomic, strong) NSMutableSet *logoKeys;
+@end
+@implementation IPTVGuideCell
+@end
+
+@interface IPTVChannelListController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+@end
 
 @implementation IPTVChannelListController {
-    NSArray<NSDictionary *> *_groups;
+    UISegmentedControl *_tabs;
+    UIButton *_refresh, *_settings;
+    UICollectionView *_collection;
+    UILabel *_message;
+    IPTVGuide *_guide;
+    NSArray<NSArray *> *_sections;
+    NSArray<NSString *> *_headings;
+    NSCache *_logos;
+    NSMutableDictionary<NSString *, NSURLSessionDataTask *> *_logoTasks;
+    NSMutableSet *_failedLogos;
+    NSURLSessionDataTask *_task;
+    NSString *_etag;
+    NSTimer *_poll;
+    BOOL _visible;
+    NSUInteger _generation;
 }
-
-- (instancetype)init {
-    return [super initWithStyle:UITableViewStylePlain];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"TV";
-    self.tableView.backgroundColor = [UIColor colorWithWhite:0.07 alpha:1];
-    self.tableView.separatorColor = [UIColor colorWithWhite:0.2 alpha:1];
-    self.tableView.rowHeight = 56;
-    UIBarButtonItem *server = [[UIBarButtonItem alloc] initWithTitle:@"Server" style:UIBarButtonItemStylePlain target:self action:@selector(editServer)];
-    server.accessibilityLabel = @"Server settings";
-    self.navigationItem.rightBarButtonItem = server;
+    self.view.backgroundColor = TVColor(0x0b0c0f);
+    _logos = [NSCache new]; _logos.totalCostLimit = 8 * 1024 * 1024;
+    _logoTasks = [NSMutableDictionary new]; _failedLogos = [NSMutableSet new];
+    _tabs = [[UISegmentedControl alloc] initWithItems:@[@"NFL", @"NBA", @"NCAAF"]];
+    _tabs.selectedSegmentIndex = 0; _tabs.tintColor = TVColor(0xa3a8b3);
+    [_tabs setBackgroundImage:TVFill(TVColor(0x15171c)) forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    [_tabs setBackgroundImage:TVFill(TVColor(0x1f2229)) forState:UIControlStateSelected barMetrics:UIBarMetricsDefault];
+    [_tabs setDividerImage:TVFill(TVColor(0x15171c)) forLeftSegmentState:UIControlStateNormal rightSegmentState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+    [_tabs setTitleTextAttributes:@{NSForegroundColorAttributeName:TVColor(0xa3a8b3), NSFontAttributeName:[UIFont systemFontOfSize:15 weight:UIFontWeightSemibold]} forState:UIControlStateNormal];
+    [_tabs setTitleTextAttributes:@{NSForegroundColorAttributeName:TVColor(0xf2f3f5)} forState:UIControlStateSelected];
+    _tabs.layer.cornerRadius = 10; _tabs.clipsToBounds = YES;
+    [_tabs addTarget:self action:@selector(selectTab) forControlEvents:UIControlEventValueChanged];
+    [self.view addSubview:_tabs];
+    _refresh = [self button:@"↻" label:@"Refresh guide" action:@selector(reload)];
+    _settings = [self button:@"☷" label:@"Server settings" action:@selector(editServer)];
+    UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
+    layout.minimumInteritemSpacing = 12; layout.minimumLineSpacing = 12;
+    layout.sectionInset = UIEdgeInsetsMake(0, 20, 16, 20);
+    layout.headerReferenceSize = CGSizeMake(100, 38);
+    _collection = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+    _collection.backgroundColor = self.view.backgroundColor;
+    _collection.dataSource = self;
+    _collection.delegate = self;
+    [_collection registerClass:IPTVGuideCell.class forCellWithReuseIdentifier:@"card"];
+    [_collection registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"heading"];
+    [self.view addSubview:_collection];
+    _message = TVLabel(self.view, @"Set a gateway URL in Server settings.", 16, TVColor(0xa3a8b3), CGRectZero);
+    _message.textAlignment = NSTextAlignmentCenter; _message.numberOfLines = 0;
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(background) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(foreground) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
-
+- (UIButton *)button:(NSString *)title label:(NSString *)label action:(SEL)action {
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
+    [button setImage:TVIcon([title isEqual:@"↻"]) forState:UIControlStateNormal];
+    button.tintColor = TVColor(0xa3a8b3); button.accessibilityLabel = label;
+    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:button]; return button;
+}
+- (UIStatusBarStyle)preferredStatusBarStyle { return UIStatusBarStyleLightContent; }
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    CGFloat w = self.view.bounds.size.width, h = self.view.bounds.size.height;
+    _tabs.frame = CGRectMake(20, 28, MIN(350, w - 132), 44);
+    _refresh.frame = CGRectMake(w-104, 28, 44, 44); _settings.frame = CGRectMake(w-56, 28, 44, 44);
+    _collection.frame = CGRectMake(0, 80, w, h-80);
+    _message.frame = CGRectMake(30, h/2-40, w-60, 80);
+    [_collection.collectionViewLayout invalidateLayout];
+}
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    _collection.panGestureRecognizer.enabled = NO; _collection.panGestureRecognizer.enabled = YES;
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) { [self->_collection reloadData]; }];
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated]; self.navigationController.navigationBarHidden = YES; _visible = YES; [self foreground];
+}
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (![NSUserDefaults.standardUserDefaults stringForKey:IPTVServerDefault].length) [self editServer];
-    else if (!_groups) [self reload];
+    if (![NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"].length) [self editServer];
 }
-
+- (void)viewWillDisappear:(BOOL)animated { [super viewWillDisappear:animated]; _visible = NO; [self background]; }
+- (void)background { [_poll invalidate]; _poll = nil; [_task cancel]; _task = nil; _generation++; }
+- (void)foreground {
+    if (!_visible) return;
+    [self reload]; [_poll invalidate];
+    _poll = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(reload) userInfo:nil repeats:YES];
+}
 - (void)editServer {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Server" message:@"Dispatcharr base URL" preferredStyle:UIAlertControllerStyleAlert];
-    [alert addTextFieldWithConfigurationHandler:^(UITextField *field) {
-        field.placeholder = @"http://192.168.1.x:9191";
-        field.text = [NSUserDefaults.standardUserDefaults stringForKey:IPTVServerDefault];
-        field.keyboardType = UIKeyboardTypeURL;
-        field.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        field.autocorrectionType = UITextAutocorrectionTypeNo;
-    }];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self background];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Server settings" message:@"Gateway URL, then Dispatcharr URL. Addresses stay on this device." preferredStyle:UIAlertControllerStyleAlert];
+    for (NSString *key in @[@"gateway.baseURL", @"server.baseURL"]) {
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *field) {
+            field.placeholder = [key hasPrefix:@"gateway"] ? @"Gateway URL" : @"Dispatcharr URL";
+            field.text = [NSUserDefaults.standardUserDefaults stringForKey:key];
+            field.keyboardType = UIKeyboardTypeURL; field.autocapitalizationType = UITextAutocapitalizationTypeNone;
+            field.autocorrectionType = UITextAutocorrectionTypeNo;
+        }];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *a) { [self foreground]; }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
-        NSString *s = [alert.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-        if (s.length && ![s containsString:@"://"]) s = [@"http://" stringByAppendingString:s];
-        while ([s hasSuffix:@"/"]) s = [s substringToIndex:s.length - 1];
-        [NSUserDefaults.standardUserDefaults setObject:s forKey:IPTVServerDefault];
-        [self reload];
+        NSMutableArray *values = [NSMutableArray new];
+        for (UITextField *field in alert.textFields) {
+            NSString *value = [field.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if (value.length && ![value containsString:@"://"]) value = [@"http://" stringByAppendingString:value];
+            while ([value hasSuffix:@"/"]) value = [value substringToIndex:value.length-1];
+            NSURL *url = [NSURL URLWithString:value];
+            if (value.length && (!url.host.length || ![@[@"http", @"https"] containsObject:url.scheme.lowercaseString] || url.user || url.password || url.query || url.fragment)) {
+                self->_message.text = @"Enter an HTTP or HTTPS base URL."; self->_message.hidden = NO;
+                [self foreground]; return;
+            }
+            [values addObject:value];
+        }
+        [NSUserDefaults.standardUserDefaults setObject:values[0] forKey:@"gateway.baseURL"];
+        [NSUserDefaults.standardUserDefaults setObject:values[1] forKey:@"server.baseURL"];
+        self->_etag = nil; self->_guide = nil; [self->_failedLogos removeAllObjects]; [self->_logos removeAllObjects];
+        for (NSURLSessionDataTask *task in self->_logoTasks.allValues) [task cancel];
+        [self->_logoTasks removeAllObjects]; [self selectTab]; [self foreground];
     }]];
     [self presentViewController:alert animated:YES completion:nil];
 }
-
-- (void)showMessage:(NSString *)message {
-    UILabel *label = [UILabel new];
-    label.text = message;
-    label.textColor = [UIColor colorWithWhite:0.7 alpha:1];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.numberOfLines = 0;
-    self.tableView.backgroundView = message ? label : nil;
-}
-
 - (void)reload {
-    NSString *base = [NSUserDefaults.standardUserDefaults stringForKey:IPTVServerDefault];
-    NSURL *url = [NSURL URLWithString:[base stringByAppendingString:@"/output/m3u"]];
-    if (!url) {
-        [self showMessage:@"Set the server address with the Server button."];
-        return;
-    }
-    [self showMessage:@"Loading channels..."];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    request.timeoutInterval = 10;
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *r, NSError *error) {
-        NSString *text = data ? [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] : nil;
-        NSArray *channels = text ? [IPTVPlaylist channelsFromM3U:text baseURL:url] : @[];
+    NSString *base = [NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"];
+    if (!base.length || _task) return;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[base stringByAppendingString:@"/guide.json"]] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:15];
+    if (_etag) [request setValue:_etag forHTTPHeaderField:@"If-None-Match"];
+    NSUInteger generation = _generation;
+    __weak typeof(self) weakSelf = self;
+    _task = [NSURLSession.sharedSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSHTTPURLResponse *http = (NSHTTPURLResponse *)response;
+        NSError *parseError = nil;
+        IPTVGuide *guide = http.statusCode == 200 && data ? [[IPTVGuide alloc] initWithData:data error:&parseError] : nil;
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_groups = [IPTVPlaylist groupedChannels:channels];
-            [self.tableView reloadData];
-            [self showMessage:channels.count ? nil : [NSString stringWithFormat:@"No channels. %@", error.localizedDescription ?: @""]];
+            typeof(self) self = weakSelf; if (!self || generation != self->_generation) return;
+            self->_task = nil;
+            if (guide) { self->_guide = guide; self->_etag = [http.allHeaderFields objectForKey:@"Etag"] ?: [http.allHeaderFields objectForKey:@"ETag"]; [self selectTab]; }
+            else if (http.statusCode == 304 && self->_guide) { [self selectTab]; }
+            else {
+                self->_message.text = self->_guide ? @"Guide unavailable. Showing last update; retrying in 30 seconds." : @"Can't load guide. Check the gateway URL and connection.";
+                self->_message.hidden = NO;
+            }
         });
-    }] resume];
+    }]; [_task resume];
 }
-
-#pragma mark - Table
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return _groups.count;
+- (IPTVLeague *)league {
+    NSString *identifier = @[@"nfl", @"nba", @"ncaaf"][_tabs.selectedSegmentIndex];
+    for (IPTVLeague *league in _guide.leagues) if ([league.identifier isEqual:identifier]) return league;
+    return nil;
 }
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_groups[section][@"channels"] count];
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return _groups[section][@"title"];
-}
-
-- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
-    if ([view isKindOfClass:UITableViewHeaderFooterView.class]) {
-        UITableViewHeaderFooterView *header = (UITableViewHeaderFooterView *)view;
-        header.contentView.backgroundColor = [UIColor colorWithWhite:0.15 alpha:1];
-        header.textLabel.textColor = [UIColor colorWithWhite:0.8 alpha:1];
+- (void)selectTab {
+    IPTVLeague *league = [self league];
+    for (NSUInteger index = 0; index < 3; index++) {
+        NSString *identifier = @[@"nfl", @"nba", @"ncaaf"][index];
+        for (IPTVLeague *item in _guide.leagues) if ([item.identifier isEqual:identifier])
+            [_tabs setTitle:[NSString stringWithFormat:@"%@  %lu", item.title, (unsigned long)item.games.count] forSegmentAtIndex:index];
     }
+    NSMutableArray *sections = [NSMutableArray new], *headings = [NSMutableArray new];
+    NSDateFormatter *day = [NSDateFormatter new]; day.dateFormat = @"EEEE, MMM d";
+    for (NSString *state in @[@"in", @"pre", @"post"]) {
+        for (IPTVGame *game in league.games) {
+            if (![game.state isEqual:state]) continue;
+            NSString *heading = [state isEqual:@"in"] ? @"● LIVE" : [state isEqual:@"post"] ? @"FINAL" : ([NSCalendar.currentCalendar isDateInToday:game.start] ? @"TONIGHT" : [[day stringFromDate:game.start] uppercaseString]);
+            if (![headings.lastObject isEqual:heading]) { [headings addObject:heading]; [sections addObject:[NSMutableArray new]]; }
+            [sections.lastObject addObject:game];
+        }
+    }
+    if (league.channels.count) { [sections addObject:league.channels]; [headings addObject:@"CHANNELS"]; }
+    _sections = sections; _headings = headings; [_collection reloadData];
+    _message.hidden = sections.count > 0;
+    _message.text = _guide ? @"No games or channels in this league." : @"Set a gateway URL in Server settings.";
 }
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"c"] ?: [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"c"];
-    IPTVChannel *channel = _groups[indexPath.section][@"channels"][indexPath.row];
-    cell.backgroundColor = [UIColor colorWithWhite:0.11 alpha:1];
-    cell.textLabel.textColor = UIColor.whiteColor;
-    cell.textLabel.text = channel.number.length ? [NSString stringWithFormat:@"%@  %@", channel.number, channel.name] : channel.name;
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView { return _sections.count; }
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section { return _sections[section].count; }
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)layout sizeForItemAtIndexPath:(NSIndexPath *)path {
+    CGFloat w = collectionView.bounds.size.width; NSInteger columns = self.view.bounds.size.width > self.view.bounds.size.height ? 3 : 2;
+    return CGSizeMake(floor((w-40-(columns-1)*12)/columns), [_sections[path.section][path.item] isKindOfClass:IPTVGame.class] ? 138 : 86);
+}
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)path {
+    UICollectionReusableView *view = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"heading" forIndexPath:path];
+    for (UIView *child in view.subviews) [child removeFromSuperview];
+    TVLabel(view, _headings[path.section], 13, [_headings[path.section] isEqual:@"● LIVE"] ? TVColor(0xff3b30) : TVColor(0xa3a8b3), CGRectMake(20, 0, collectionView.bounds.size.width-40, 38));
+    return view;
+}
+- (void)logo:(NSString *)path inView:(UIView *)parent frame:(CGRect)frame fallback:(NSString *)fallback color:(NSString *)hex {
+    UILabel *badge = TVLabel(parent, fallback, 11, UIColor.whiteColor, frame);
+    unsigned rgb = 0x333333; [[NSScanner scannerWithString:hex ?: @""] scanHexInt:&rgb];
+    badge.backgroundColor = TVColor(rgb); badge.textAlignment = NSTextAlignmentCenter; badge.layer.cornerRadius = frame.size.height/2; badge.clipsToBounds = YES;
+    if (![path hasPrefix:@"/logo?"]) return;
+    NSString *base = [NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"];
+    NSURLComponents *components = [NSURLComponents componentsWithString:[base stringByAppendingString:path]];
+    NSMutableArray *query = [NSMutableArray new]; for (NSURLQueryItem *item in components.queryItems) if (![item.name isEqual:@"s"]) [query addObject:item];
+    [query addObject:[NSURLQueryItem queryItemWithName:@"s" value:@"96"]]; components.queryItems = query;
+    NSString *key = components.URL.absoluteString;
+    IPTVGuideCell *cell = (IPTVGuideCell *)parent.superview;
+    [cell.logoKeys addObject:key];
+    UIImage *cached = [_logos objectForKey:key];
+    if (cached) { badge.hidden = YES; UIImageView *image = [[UIImageView alloc] initWithImage:cached]; image.frame = frame; image.contentMode = UIViewContentModeScaleAspectFit; [parent addSubview:image]; return; }
+    if (_logoTasks[key] || [_failedLogos containsObject:key]) return;
+    __weak typeof(self) weakSelf = self;
+    NSURLSessionDataTask *task = [NSURLSession.sharedSession dataTaskWithURL:components.URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        UIImage *source = data.length <= 1024*1024 ? [UIImage imageWithData:data] : nil;
+        UIImage *decoded = nil;
+        if (source && source.size.width <= 256 && source.size.height <= 256) {
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 2);
+            CGFloat scale = MIN(48/source.size.width, 48/source.size.height);
+            CGSize size = CGSizeMake(source.size.width*scale, source.size.height*scale);
+            [source drawInRect:CGRectMake((48-size.width)/2, (48-size.height)/2, size.width, size.height)];
+            decoded = UIGraphicsGetImageFromCurrentImageContext(); UIGraphicsEndImageContext();
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            typeof(self) self = weakSelf; if (!self) return;
+            [self->_logoTasks removeObjectForKey:key];
+            if (!decoded) [self->_failedLogos addObject:key];
+            if (decoded) { [self->_logos setObject:decoded forKey:key cost:96*96*4];
+                NSMutableArray *affected = [NSMutableArray new];
+                for (NSIndexPath *index in self->_collection.indexPathsForVisibleItems) {
+                    IPTVGuideCell *visible = (IPTVGuideCell *)[self->_collection cellForItemAtIndexPath:index];
+                    if ([visible.logoKeys containsObject:key]) [affected addObject:index];
+                }
+                if (affected.count) [self->_collection reloadItemsAtIndexPaths:affected];
+            }
+        });
+    }]; _logoTasks[key] = task; [task resume];
+}
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)path {
+    IPTVGuideCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"card" forIndexPath:path];
+    for (UIView *child in cell.contentView.subviews) [child removeFromSuperview];
+    cell.contentView.backgroundColor = TVColor(0x15171c); cell.contentView.layer.cornerRadius = 14;
+    NSObject *object = _sections[path.section][path.item]; cell.represented = object; cell.isAccessibilityElement = YES; cell.accessibilityTraits = UIAccessibilityTraitButton; cell.logoKeys = [NSMutableSet new];
+    CGFloat w = cell.bounds.size.width;
+    if ([object isKindOfClass:IPTVGame.class]) {
+        IPTVGame *game = (IPTVGame *)object;
+        cell.accessibilityLabel = [NSString stringWithFormat:@"%@ at %@, %@, %@, %@ to %@", game.away.name, game.home.name, game.detail, game.tv, game.away.score, game.home.score];
+        if ([game.state isEqual:@"pre"]) cell.accessibilityLabel = [NSString stringWithFormat:@"%@ at %@, %@, %@", game.away.name, game.home.name, game.detail, game.tv];
+        NSDateFormatter *clock = [NSDateFormatter new]; clock.dateFormat = @"h:mm a";
+        NSString *status = [game.state isEqual:@"pre"] ? [clock stringFromDate:game.start] : game.detail;
+        TVLabel(cell.contentView, status, 13, [game.state isEqual:@"in"] ? TVColor(0xff3b30) : TVColor(0xf2f3f5), CGRectMake(14, 10, w*.45, 20));
+        UILabel *network = TVLabel(cell.contentView, game.tv, 11, TVColor(0xa3a8b3), CGRectMake(w*.45, 10, w*.55-14, 20)); network.textAlignment = NSTextAlignmentCenter;
+        CGSize chip = [network sizeThatFits:CGSizeMake(w*.55-14, 20)];
+        network.frame = CGRectMake(w-MIN(w*.55-14, chip.width+12)-14, 12, MIN(w*.55-14, chip.width+12), 17);
+        network.backgroundColor = TVColor(0x1f2229); network.layer.cornerRadius = 4; network.clipsToBounds = YES;
+        NSArray *teams = @[game.away, game.home];
+        for (NSUInteger i=0; i<2; i++) {
+            IPTVTeam *team = teams[i]; CGFloat y = 36+i*46;
+            [self logo:team.logo inView:cell.contentView frame:CGRectMake(14, y+5, 36, 36) fallback:team.abbr color:team.color];
+            BOOL pre = [game.state isEqual:@"pre"];
+            UILabel *name = TVLabel(cell.contentView, team.nick.length ? team.nick : team.name, 18, TVColor(0xf2f3f5), CGRectMake(62, y, w-(pre ? 76 : 130), 46));
+            if (pre && team.record.length) {
+                NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@  %@", name.text, team.record]];
+                [text addAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13], NSForegroundColorAttributeName:TVColor(0x6b7180)} range:NSMakeRange(text.length-team.record.length, team.record.length)];
+                name.attributedText = text;
+            }
+            UILabel *score = TVLabel(cell.contentView, pre ? @"" : team.score, pre ? 13 : 24, TVColor(pre ? 0x6b7180 : 0xf2f3f5), CGRectMake(w-66, y, 52, 46)); score.textAlignment = NSTextAlignmentRight;
+        }
+    } else {
+        IPTVGuideChannel *channel = (IPTVGuideChannel *)object;
+        cell.accessibilityLabel = channel.name;
+        [self logo:channel.logo inView:cell.contentView frame:CGRectMake(14, 20, 56, 44) fallback:[channel.name substringToIndex:MIN(2, channel.name.length)] color:@"1f2229"];
+        NSDictionary *now = nil, *next = nil; NSDate *date = [NSDate date];
+        for (NSDictionary *entry in channel.epg) {
+            NSDate *start = [IPTVGuide dateFromString:entry[@"start"]], *end = [IPTVGuide dateFromString:entry[@"end"]];
+            if (start && end && [start compare:date] != NSOrderedDescending && [end compare:date] == NSOrderedDescending) now = entry;
+            else if (start && [start compare:date] == NSOrderedDescending && !next) next = entry;
+        }
+        TVLabel(cell.contentView, now[@"title"] ?: channel.name, 15, TVColor(0xf2f3f5), CGRectMake(84, 14, w-98, 22));
+        TVLabel(cell.contentView, [NSString stringWithFormat:@"%@ · %@", channel.name, next ? [@"Next: " stringByAppendingString:next[@"title"]] : @"No guide data"], 12, TVColor(0x6b7180), CGRectMake(84, 38, w-98, 20));
+        if (now) {
+            UIProgressView *progress = [[UIProgressView alloc] initWithFrame:CGRectMake(84, 68, w-98, 3)];
+            NSDate *start = [IPTVGuide dateFromString:now[@"start"]], *end = [IPTVGuide dateFromString:now[@"end"]];
+            progress.progress = MIN(1, MAX(0, [date timeIntervalSinceDate:start]/[end timeIntervalSinceDate:start]));
+            progress.progressTintColor = TVColor(0xa3a8b3); progress.trackTintColor = TVColor(0x1f2229); [cell.contentView addSubview:progress];
+        }
+    }
     return cell;
 }
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    IPTVChannel *channel = _groups[indexPath.section][@"channels"][indexPath.row];
-    [self presentViewController:[[IPTVPlayerController alloc] initWithChannel:channel] animated:YES completion:nil];
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)path {
+    NSObject *object = _sections[path.section][path.item];
+    if ([object isKindOfClass:IPTVGame.class]) {
+        IPTVGame *game = (IPTVGame *)object;
+        if ([game.state isEqual:@"pre"]) {
+            NSDateFormatter *format = [NSDateFormatter new]; format.dateStyle = NSDateFormatterFullStyle; format.timeStyle = NSDateFormatterShortStyle;
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Game hasn't started" message:[format stringFromDate:game.start] preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]]; [self presentViewController:alert animated:YES completion:nil]; return;
+        }
+        NSArray *games = [self league].games;
+        [self presentViewController:[[IPTVPlayerController alloc] initWithGames:games index:[games indexOfObject:game]] animated:YES completion:nil];
+    } else [self presentViewController:[[IPTVPlayerController alloc] initWithChannel:(IPTVGuideChannel *)object] animated:YES completion:nil];
+}
+- (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self]; [_poll invalidate]; [_task cancel];
+    for (NSURLSessionDataTask *task in _logoTasks.allValues) [task cancel];
 }
 @end

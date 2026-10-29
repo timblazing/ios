@@ -1,4 +1,3 @@
 #import <UIKit/UIKit.h>
-
-@interface IPTVChannelListController : UITableViewController
+@interface IPTVChannelListController : UIViewController
 @end

@@ -5,7 +5,7 @@ INSTALL_TARGET_PROCESSES = IPTV
 include $(THEOS)/makefiles/common.mk
 APPLICATION_NAME = IPTV
 IPTV_FILES = $(wildcard Application/*.m Application/*/*.m)
-IPTV_FRAMEWORKS = UIKit Foundation CoreGraphics QuartzCore AVFoundation AVKit CoreMedia
+IPTV_FRAMEWORKS = UIKit Foundation CoreGraphics QuartzCore AVFoundation AVKit CoreMedia MediaPlayer
 IPTV_CFLAGS = -fobjc-arc -fno-exceptions -fno-objc-exceptions -Wall -Wextra -Wno-unused-parameter
 IPTV_RESOURCE_DIRS = Resources
 IPTV_INFOPLIST = Resources/Info.plist

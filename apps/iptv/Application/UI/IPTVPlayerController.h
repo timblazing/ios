@@ -1,6 +1,7 @@
-#import <AVKit/AVKit.h>
-#import "../Stream/IPTVPlaylist.h"
+#import <UIKit/UIKit.h>
+#import "../Guide/IPTVGuide.h"
 
-@interface IPTVPlayerController : AVPlayerViewController
-- (instancetype)initWithChannel:(IPTVChannel *)channel;
+@interface IPTVPlayerController : UIViewController
+- (instancetype)initWithGames:(NSArray<IPTVGame *> *)games index:(NSUInteger)index;
+- (instancetype)initWithChannel:(IPTVGuideChannel *)channel;
 @end
