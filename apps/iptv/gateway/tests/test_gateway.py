@@ -95,6 +95,17 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual([p["title"] for p in epg["1500"]], ["Now", "Next"])
         self.assertNotIn("9999", epg)
 
+    def test_guide_accepts_provider_prefixed_league_groups(self):
+        guide = gw.Guide()
+        guide.chans = [dict(c, group={"NFL": "US| NFL PPV", "NBA": "US| NBA PASS PPV ⁸ᴷ",
+                                     "NCAAF": "US| NCAAF PPV"}[c["group"]]) for c in self.chans]
+        guide.chans.append(dict(self.chans[0], group="US| WNBA PPV"))
+        guide.rebuild()
+        import json
+        leagues = json.loads(guide.body)["leagues"]
+        self.assertEqual([(l["id"], len(l["channels"])) for l in leagues],
+                         [("nfl", 4), ("nba", 1), ("ncaaf", 2)])
+
     def test_logo_host_allowlist(self):
         with self.assertRaises(PermissionError):
             gw.logo_png("http://203.0.113.9/x.png", 64)

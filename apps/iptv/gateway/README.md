@@ -46,7 +46,7 @@ About 25 KB, or about 4 KB gzipped. Supports `ETag`/`If-None-Match` (returns 304
   "epg": [ { "title": "...", "start": "...Z", "end": "...Z" } ] }   // now and next, may be empty
 ```
 
-Games with no channel are dropped. A game is matched to a channel when both teams' nickname, location or short name appear as whole words in the channel name (`PELICANS vs KINGS`, `Panthers at Packers`, `NFL | 02 - 1pm Ravens at Bills`, `NC State at Wake Forest`). Network channels (ESPN, CBSSN, NFL NETWORK…) are added as feeds for the games ESPN says they carry. Name aliases live in `NETWORKS`/`ALIASES` in `gateway.py`.
+Games with no channel are dropped. A game is matched to a channel when both teams' nickname, location or short name appear as whole words in the channel name (`PELICANS vs KINGS`, `Panthers at Packers`, `NFL | 02 - 1pm Ravens at Bills`, `NC State at Wake Forest`). Network channels (ESPN, CBSSN, NFL NETWORK…) are added as feeds for the games ESPN says they carry. League group names are matched as whole tokens, so both `NFL` and provider labels such as `US| NFL PPV` are accepted without matching WNBA as NBA. Name aliases live in `NETWORKS`/`ALIASES` in `gateway.py`.
 
 ### `GET /logo?u=<url>&s=<px>`
 

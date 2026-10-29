@@ -209,7 +209,7 @@ class Guide:
     def rebuild(self):
         leagues = []
         for lid, title, _, _ in LEAGUES:
-            chans = [c for c in self.chans if c["group"].upper() == title]
+            chans = [c for c in self.chans if words(title) in words(c["group"])]
             leagues.append(build_league(lid, title, chans, self.scores.get(lid, []), self.epg))
         doc = {"updated": iso(datetime.now(timezone.utc)), "leagues": leagues}
         body = json.dumps(doc, separators=(",", ":")).encode()
