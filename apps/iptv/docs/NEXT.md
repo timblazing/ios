@@ -6,7 +6,7 @@ The design is `docs/design/browser-mock.html` (open it with `file://`; press G o
 
 Implemented in 0.3.0: gateway settings, Foundation model/tests, native collection guide with ETag polling and cached logos, direct HLS player, backup feeds, swipe controls and pre-game handling. See `VALIDATION-0.3.0.md` for proof and remaining limits.
 
-Next: run the unchecked physical-device checklist. Keep the relay code until direct HLS plays on the mini 2, then remove the relay/M3U implementation in a separate change. Network-logo sources sampled during validation returned gateway 404 responses; the app uses abbreviation fallbacks.
+Next: run the unchecked physical-device checklist. Keep the relay code until direct HLS plays on the mini 2, then remove the relay/M3U implementation in a separate change. The network-logo 404s were traced to a repository-owner typo and fixed in the gateway source; all 18 corrected URLs passed through the running gateway as 96×96 PNGs. Deployment and physical rendering remain pending; the app keeps abbreviation fallbacks. See `../gateway/README.md`.
 
 ## Implemented plan
 
@@ -30,7 +30,7 @@ Next: run the unchecked physical-device checklist. Keep the relay code until dir
 
 ## Working mode
 
-The user wants work agents can do and verify alone. They will run `Tests/DEVICE_CHECKLIST.md` items later, and can plug the iPad into the Mac on request. Don't block on device checks.
+Physical acceptance is paused at the owner's request: the iPad needs charging and rejailbreaking. Wait for the owner to resume device work, then use `Tests/DEVICE_CHECKLIST.md` one interaction at a time and ask before installing. Keep the legacy relay while acceptance is incomplete.
 
 Verify each step yourself, without the device:
 - `make package FINALPACKAGE=1 -j4` builds warning-free, and `vtool` shows iOS 10.0.

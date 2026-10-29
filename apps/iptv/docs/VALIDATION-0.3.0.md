@@ -36,3 +36,11 @@ The checked-in guide images contain only public game/network metadata. Player ev
 No physical iPad install or test. All human checks remain unchecked in `Tests/DEVICE_CHECKLIST.md`, including iOS 10 HLS, smooth 720p60/1080p60, audio/routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
 
 Read-only acceptance preflight on 2026-10-29 found zero USB/Wi-Fi devices through usbmuxd; T3 Device panel discovery exposed simulators only. No install or physical test followed. See the device checklist acceptance log for the next step.
+
+The owner then reported that the iPad battery was depleted and requested stopping device work until it is charged and rejailbroken. No physical results were collected.
+
+## Network-logo follow-up — 2026-10-29
+
+Reproduced upstream 404s for ESPN, NFL Network and CBS Sports Network. The source repository owner was misspelled (`tv-logos` instead of `tv-logo`). All 18 configured filenames exist in the corrected public repository. Requests through raygun's running `/logo` endpoint with the corrected URLs returned HTTP 200, `image/png`, and 96×96 PNGs for all 18. The gateway Python suite passes all 7 tests, including the corrected NFL Network URL assertion. No video streams were opened.
+
+The gateway source fix is prepared for review; the live gateway has not been redeployed, and its generated guide still needs verification after deployment. This is gateway endpoint evidence, not physical-device logo/rendering acceptance. No app version or package changed.

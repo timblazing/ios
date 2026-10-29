@@ -1,5 +1,6 @@
 import os, sys, unittest
 from datetime import datetime, timezone
+from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import gateway as gw
@@ -58,7 +59,8 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual([c["number"] for c in lg["games"][0]["channels"]], ["1402", "1403", "1400"])  # event feeds, then the network
         self.assertEqual(lg["games"][0]["away"]["score"], "7")
         self.assertEqual([c["name"] for c in lg["channels"]], ["NFL NETWORK"])
-        self.assertIn("nfl-network-us", lg["channels"][0]["logo"])
+        self.assertEqual(parse_qs(urlparse(lg["channels"][0]["logo"]).query)["u"],
+                         ["https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/nfl-network-us.png"])
 
     def test_nba_uppercase_home_vs_away(self):
         games = gw.parse_scoreboard({"events": [

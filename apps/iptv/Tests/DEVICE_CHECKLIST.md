@@ -6,7 +6,7 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 
 - **Pending:** read-only usbmuxd discovery returned zero USB/Wi-Fi connections. T3 `device_list` listed simulators only; no physical iPad was exposed.
 - No installation or physical playback test was performed. All acceptance items below remain pending; retain the legacy relay.
-- Next: connect and unlock the iPad, verify iPad mini 2 / iOS 10.3.3 and the installed TV version, then ask before installing 0.3.0.
+- **Paused by owner:** the iPad battery is depleted; it must charge and be rejailbroken. Wait for the owner to resume. Then connect and unlock it, verify iPad mini 2 / iOS 10.3.3 and the installed TV version, and ask before installing 0.3.0.
 - Run one interaction at a time and record pass/fail/pending plus actual observations: HLS picture/audio and tap-to-picture time first, then controls, 2+ minute background recovery, rotation and sustained 720p60. Test one stream at a time. Record remaining checks without treating simulator results as physical passes.
 
 ## Guide and interaction

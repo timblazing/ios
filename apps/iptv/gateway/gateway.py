@@ -21,7 +21,7 @@ LEAGUES = [  # tab order in the app; NFL asks for the whole current week, the ot
 ]
 ESPN = "https://site.api.espn.com/apis/site/v2/sports/{}/scoreboard"
 LOGO_HOSTS = ("a.espncdn.com", "raw.githubusercontent.com")
-TV_LOGOS = "https://raw.githubusercontent.com/tv-logos/tv-logos/main/countries/united-states/{}.png"
+TV_LOGOS = "https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/{}.png"
 # Normalized network name -> tv-logos file. ESPN broadcast names and channel names both normalize here.
 NETWORKS = {
     "espn": "espn-us", "espn2": "espn-2-us", "espnu": "espn-u-us", "abc": "abc-us",

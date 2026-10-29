@@ -50,7 +50,7 @@ Games with no channel are dropped. A game is matched to a channel when both team
 
 ### `GET /logo?u=<url>&s=<px>`
 
-Fetches, fits into an `s`×`s` transparent PNG (default 96, 16–256), and caches it on disk for good. Only ESPN's CDN, `raw.githubusercontent.com` (tv-logos) and the Dispatcharr host are allowed. Use `s=96` for 48 pt marks on Retina. The response has `Cache-Control: max-age=604800`.
+Fetches, fits into an `s`×`s` transparent PNG (default 96, 16–256), and caches it on disk for good. Only ESPN's CDN, `raw.githubusercontent.com` ([tv-logo/tv-logos](https://github.com/tv-logo/tv-logos)) and the Dispatcharr host are allowed. Use `s=96` for 48 pt marks on Retina. The response has `Cache-Control: max-age=604800`.
 
 ### `GET /health`
 
@@ -79,3 +79,9 @@ ssh raygun 'curl -s localhost:9292/health'
 ```
 
 Standard library only, plus Pillow for logos.
+
+## Network-logo source repair — 2026-10-29
+
+The original source used the nonexistent `tv-logos/tv-logos` repository, causing upstream and gateway 404s. The source is now `tv-logo/tv-logos`; all 18 configured filenames exist there. Through the running gateway on raygun, each corrected source URL returned HTTP 200, `image/png`, and a 96×96 PNG. This exercised the existing allowlist, fetch, resize and cache path without opening video streams.
+
+The corrected source is in this checkout; the live gateway has not been redeployed and still generates the old logo URLs. After review, deploy with the commands above, verify newly generated `/guide.json` logo URLs use the corrected repository, and check the app after a guide refresh/relaunch. Physical iPad logo rendering remains unverified. The app's abbreviation fallback stays available.
