@@ -22,6 +22,18 @@ The design is `docs/design/browser-mock.html` (open it with `file://`; press G o
 6. **Pre-game.** Tapping a `pre` game shows its start time and plays nothing (placeholder clips error out).
 7. **Retire the relay** once `Tests/DEVICE_CHECKLIST.md` confirms Dispatcharr HLS plays on the iPad.
 
+## Working mode
+
+The user wants work agents can do and verify alone. They will run `Tests/DEVICE_CHECKLIST.md` items later, and can plug the iPad into the Mac on request. Don't block on device checks.
+
+Verify each step yourself, without the device:
+- `make package FINALPACKAGE=1 -j4` builds warning-free, and `vtool` shows iOS 10.0.
+- Model tests run with plain `clang` against a fixture of `/guide.json` (save a live copy with `curl` and scrub its addresses).
+- In the simulator smoke test (see `AGENTS.md`), the guide renders from the live gateway and the player plays a real `?output_format=hls` URL. A modern simulator's AVPlayer is a fair proxy for the HLS format, but not for A7 decode speed. Take screenshots, compare them with the mock, and shut the simulator down afterwards.
+- `ssh raygun 'curl -s localhost:9292/health'` reports no errors.
+
+Add anything that needs a person (touch feel, frame rate, rotation) to `Tests/DEVICE_CHECKLIST.md`. Don't mark those items done. Ask before installing on the iPad.
+
 ## Constraints
 
 - iOS 10 APIs only, Objective-C, `-Wunguarded-availability-new` clean (see `AGENTS.md`).
