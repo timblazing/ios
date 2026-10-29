@@ -37,7 +37,7 @@ No physical iPad install or test. All human checks remain unchecked in `Tests/DE
 
 Read-only acceptance preflight on 2026-10-29 found zero USB/Wi-Fi devices through usbmuxd; T3 Device panel discovery exposed simulators only. No install or physical test followed. See the device checklist acceptance log for the next step.
 
-The owner then reported that the iPad battery was depleted and requested stopping device work until it is charged and rejailbroken. No physical results were collected.
+The owner then reported that the iPad battery was depleted and requested stopping device work until it is charged and rejailbroken. No physical playback results were collected. The owner subsequently resumed: read-only USB/Wi-Fi queries confirmed iPad4,5 / iOS 10.3.3, with TV 0.2.0 installed. Installation approval for 0.3.0 is pending.
 
 ## Network-logo follow-up — 2026-10-29
 

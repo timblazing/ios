@@ -25,7 +25,7 @@ Solitaire and Paint are offline. Wordle fetches and caches daily answers from th
 Objective-C and UIKit, with SpriteKit where appropriate, built with Theos on macOS for ARM64 and an iOS 10.0 deployment target. Build against the iPhoneOS 16.5 SDK; current Xcode cannot link the old 10.3 SDK. See [the shared development guide](docs/ipad-mini-2-ios10-game-development-guide.md).
 
 - `games/<name>/` and `apps/<name>/` each hold a self-contained project: `Makefile`, `control`, `Resources/`, `scripts/`, tests, and release output. Build and package inside that folder.
-- `docs/` holds shared notes. `.clang-format` applies throughout.
+- `docs/` holds shared notes, including [personal research to-dos](docs/PERSONAL_TODO.md). `.clang-format` applies throughout.
 - Release `.ipa`, `.deb`, and `dist/SHA256SUMS` files are committed. Generated build intermediates and private settings stay local.
 
 ```sh

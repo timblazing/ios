@@ -30,7 +30,7 @@ Next: run the unchecked physical-device checklist. Keep the relay code until dir
 
 ## Working mode
 
-Physical acceptance is paused at the owner's request: the iPad needs charging and rejailbreaking. Wait for the owner to resume device work, then use `Tests/DEVICE_CHECKLIST.md` one interaction at a time and ask before installing. Keep the legacy relay while acceptance is incomplete.
+The owner has resumed physical acceptance after charging and rejailbreaking. Read-only discovery confirms iPad4,5 / iOS 10.3.3 over USB and Wi-Fi, with TV 0.2.0 installed. Ask before installing 0.3.0, then use `Tests/DEVICE_CHECKLIST.md` one interaction at a time. Keep the legacy relay while acceptance is incomplete.
 
 Verify each step yourself, without the device:
 - `make package FINALPACKAGE=1 -j4` builds warning-free, and `vtool` shows iOS 10.0.
