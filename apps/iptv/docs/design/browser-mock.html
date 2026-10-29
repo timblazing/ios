@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TV: browser redesign mock</title>
+<!-- Design mock for apps/iptv. Not shipped in the app. Channel names and schedules are a real snapshot from Oct 29, 2026;
+     8:10 PM scores and the network EPG rows are sample data. Team and network logos load from their public CDNs. -->
+<style>
+  :root {
+    --bg: #0b0c0f; --surface: #15171c; --surface2: #1f2229; --line: #23262e;
+    --text: #f2f3f5; --text2: #a3a8b3; --text3: #6b7180; --live: #ff3b30; --accent: #ff8a1f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #26282d; }
+  body { font: 14px -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+  .page { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+  .controls { display: flex; gap: 8px 16px; margin-bottom: 18px; color: #bbb; font-size: 13px; align-items: center; flex-wrap: wrap; justify-content: center; max-width: 1100px; }
+  .controls label { display: flex; align-items: center; gap: 8px; }
+  .seg { display: flex; background: #1b1c20; border-radius: 8px; padding: 2px; }
+  .seg button { background: none; border: 0; color: #bbb; padding: 6px 11px; border-radius: 6px; font: inherit; cursor: pointer; }
+  .seg button.on { background: #45474e; color: #fff; }
+  .calib { display: none; align-items: center; gap: 8px; }
+  .calib.show { display: flex; }
+  .calib input { width: 120px; }
+  .card-ruler { height: 18px; border: 1.5px dashed #888; border-radius: 3px; color: #999; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .note { max-width: 900px; color: #9a9da4; font-size: 13px; line-height: 1.55; margin-top: 20px; }
+  .note b { color: #ddd; font-weight: 600; }
+
+  /* iPad mini 2: 200 x 134.7 x 7.5 mm body, 7.9" 1024x768 pt screen (163 pt/in, 6.42 pt/mm). Frame sizes below are in screen points. */
+  .scaler { position: relative; }
+  .ipad { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: 1283px; height: 864px; border-radius: 62px;
+    background: #0d0d0f; box-shadow: 0 0 0 3px #7b7d83, 0 0 0 4px #3b3c40, 0 30px 80px rgba(0,0,0,.55); }
+  .ipad .screen { position: absolute; left: 129.5px; top: 48px; }
+  .ipad .home { position: absolute; right: 31px; top: 398.5px; width: 67px; height: 67px; border-radius: 50%; box-shadow: inset 0 0 0 2.5px #2c2d31; }
+  .ipad .home:after { content: ""; position: absolute; left: 23px; top: 23px; width: 21px; height: 21px; border: 2px solid #2c2d31; border-radius: 5px; }
+  .ipad .cam { position: absolute; left: 60px; top: 427px; width: 10px; height: 10px; border-radius: 50%; background: #1d2230; box-shadow: inset 0 0 0 2px #121318; }
+  .ipad.portrait { width: 864px; height: 1283px; }
+  .ipad.portrait .screen { left: 48px; top: 129.5px; }
+  .ipad.portrait .home { right: auto; top: auto; left: 398.5px; bottom: 31px; }
+  .ipad.portrait .cam { left: 427px; top: 60px; }
+
+  .screen { width: 1024px; height: 768px; background: var(--bg); overflow: hidden; position: relative; }
+  .portrait .screen { width: 768px; height: 1024px; }
+  body.bare { background: var(--bg); overflow: hidden; }
+  body.bare .page { padding: 0; }
+  body.bare .controls, body.bare .note { display: none; }
+  body.bare .ipad { position: static; transform: none !important; background: none; box-shadow: none; border-radius: 0; width: auto; height: auto; }
+  body.bare .scaler { width: auto !important; height: auto !important; }
+  body.bare .ipad .screen { position: static; }
+  body.bare .home, body.bare .cam { display: none; }
+
+  /* ---- app ---- */
+  .status { height: 20px; display: flex; justify-content: space-between; align-items: center; padding: 0 6px; font-size: 12px; font-weight: 600; }
+  header { height: 60px; display: flex; align-items: center; padding: 0 16px 0 20px; }
+  .tabs { display: flex; background: var(--surface); border-radius: 10px; padding: 3px; }
+  .tabs div { padding: 0 18px; height: 38px; line-height: 38px; border-radius: 8px; font-weight: 600; font-size: 15px; color: var(--text2); cursor: pointer; }
+  .tabs div span { color: var(--text3); font-weight: 500; margin-left: 6px; }
+  .tabs div.on { background: var(--surface2); color: var(--text); }
+  .tabs div.on span { color: var(--text2); }
+  header .icons { flex: 1; display: flex; justify-content: flex-end; }
+  .icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--text2); cursor: pointer; }
+  .icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .scroll { position: absolute; top: 80px; bottom: 0; left: 0; right: 0; overflow-y: auto; padding: 0 20px 24px; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .section { margin-top: 14px; }
+  .section h2 { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .8px; height: 30px; display: flex; align-items: center; }
+  .section h2 .dot { width: 8px; height: 8px; border-radius: 4px; background: var(--live); margin-right: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .portrait .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .card { background: var(--surface); border-radius: 14px; cursor: pointer; padding: 12px 14px 10px; }
+  .card .top { display: flex; align-items: center; height: 20px; margin-bottom: 4px; font-size: 13px; color: var(--text2); }
+  .card .when { flex: 1; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+  .card .when.live { color: var(--live); }
+  .card .when.live:before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 4px; background: var(--live); margin-right: 6px; vertical-align: 1px; }
+  .chip { font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--surface2); color: var(--text2); margin-left: 6px; letter-spacing: .2px; white-space: nowrap; }
+  .team { display: flex; align-items: center; height: 46px; }
+  .mark { width: 36px; height: 36px; margin-right: 12px; flex: none; position: relative; }
+  .mark .badge { position: absolute; inset: 0; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
+  .mark img { position: absolute; inset: 0; width: 36px; height: 36px; }
+  .team .name { flex: 1; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .team .rec { font-size: 13px; color: var(--text3); font-weight: 500; margin-left: 8px; }
+  .team .score { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; margin-left: 8px; }
+  .team.lose .name, .team.lose .score { color: var(--text3); }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .portrait .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile { background: var(--surface); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; cursor: pointer; min-height: 76px; }
+  .tile .net { width: 64px; height: 44px; margin-right: 14px; flex: none; display: flex; align-items: center; justify-content: center; }
+  .tile .net img { max-width: 64px; max-height: 40px; }
+  .tile .net .ph { width: 44px; height: 44px; border-radius: 10px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text3); font-weight: 800; font-size: 13px; }
+  .tile .body { flex: 1; min-width: 0; }
+  .tile .nm { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .nm.live { color: var(--text); }
+  .tile .nm.live:before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 4px; background: var(--live); margin-right: 6px; vertical-align: 1px; }
+  .tile .meta { font-size: 12px; color: var(--text3); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  .tile .prog { height: 3px; background: var(--surface2); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+  .tile .prog i { display: block; height: 100%; background: var(--text2); }
+
+  /* player */
+  .player { position: absolute; inset: 0; background: #000; cursor: pointer; }
+  .video { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 55%, #2f5a3a 0%, #173022 45%, #070b08 100%); }
+  .video:after { content: "video"; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: rgba(255,255,255,.1); font-size: 40px; font-weight: 700; letter-spacing: 8px; text-transform: uppercase; }
+  .chrome { transition: opacity .25s; }
+  .chrome.hide { opacity: 0; pointer-events: none; }
+  .ptop { position: absolute; top: 0; left: 0; right: 0; height: 110px; padding: 24px 12px 0; display: flex; align-items: flex-start; background: linear-gradient(rgba(0,0,0,.7), transparent); }
+  .ghost { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .ghost svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .ptop > .ghost { margin-right: 32px; }
+  .ptitle { min-width: 0; flex: 1; text-align: center; padding-top: 2px; }
+  .ptitle b { display: block; font-size: 17px; font-weight: 600; }
+  .ptitle small { display: block; color: var(--text2); font-size: 13px; margin-top: 2px; }
+  .pbot { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; padding: 0 16px 14px; display: flex; align-items: flex-end; gap: 6px; background: linear-gradient(transparent, rgba(0,0,0,.75)); }
+  .pbot .ghost { width: 48px; height: 48px; }
+  .pbot .ghost svg { width: 24px; height: 24px; }
+  .pbot .ghost.fill svg { fill: #fff; stroke: none; }
+  .livepill { flex: none; height: 30px; margin: 7px 8px 0 0; padding: 0 12px; border-radius: 15px; display: flex; align-items: center; font-size: 13px; font-weight: 700; letter-spacing: .4px; background: rgba(255,255,255,.12); color: #fff; }
+  .livepill:before { content: ""; width: 8px; height: 8px; border-radius: 4px; background: var(--live); margin-right: 7px; }
+  .livepill.behind { background: rgba(255,255,255,.08); color: var(--text2); }
+  .livepill.behind:before { background: var(--text3); }
+  .pflex { flex: 1; }
+  .vol { width: 160px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.25); margin: 0 6px 22px; position: relative; }
+  .vol i { position: absolute; left: 0; top: 0; bottom: 0; width: 65%; background: #fff; border-radius: 2px; }
+  .vol i:after { content: ""; position: absolute; right: -9px; top: -7px; width: 18px; height: 18px; border-radius: 9px; background: #fff; }
+  .toast { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: rgba(20,20,24,.85); border-radius: 14px; padding: 14px 22px; text-align: center; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast b { display: block; font-size: 18px; }
+  .toast small { color: var(--text2); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="controls">
+    <label>View <span class="seg" data-k="view"><button data-v="guide">Guide</button><button data-v="player">Player</button></span></label>
+    <label>Time <span class="seg" data-k="time"><button data-v="1700">5:00 PM</button><button data-v="2010">8:10 PM</button></span></label>
+    <label>Orientation <span class="seg" data-k="ori"><button data-v="l">Landscape</button><button data-v="p">Portrait</button></span></label>
+    <label>Scale <span class="seg" data-k="scale"><button data-v="actual">Actual size</button><button data-v="points">1 pt = 1 px</button></span></label>
+    <span class="calib" id="calib">Screen ppi <input type="range" id="ppi" min="90" max="230" step="1"> <span id="ppiv"></span>
+      <span class="card-ruler" id="ruler">credit card width</span></span>
+  </div>
+  <div class="scaler" id="scaler"><div class="ipad" id="ipad"><div class="cam"></div><div class="screen" id="screen"></div><div class="home"></div></div></div>
+  <p class="note">
+    <b>Size.</b> "Actual size" draws the iPad mini 2 at its real 200 × 134.7 mm. Hold a credit card to the dashed box and drag the ppi slider until they match (about 127 on a MacBook at default scaling; it's remembered).
+    <b>DevTools.</b> A 1024 × 768 or 768 × 1024 viewport (device pixel ratio 2) shows the bare screen with no frame or controls. Keys: G guide, P player, T time, arrows switch channels in the player.<br>
+    <b>Guide.</b> Game cards come from ESPN's scoreboard, matched to Dispatcharr channels by team nickname ("A vs B", "A at B", any prefix). Duplicate channels for one game become one card with a backup feed. Network channels show what's on now, with a progress bar and what's next. During a game that comes from the scoreboard; otherwise from the XMLTV guide (sample titles here, since Dispatcharr's EPG is currently a placeholder).
+    <b>Player.</b> Tap toggles the controls; they hide after 3 s. Swipe left or right switches to the next game in the tab. LIVE turns gray when you're behind; tapping it jumps back to live.
+    Schedules are a real snapshot from Thursday, Oct 29; 8:10 PM scores are made up.
+  </p>
+</div>
+<script>
+const DATA = {"games":[{"league":"NBA","utc":"2026-10-30T00:00Z","away":{"abbr":"CLE","name":"Cavaliers","nick":"Cavaliers","color":"#860038","logo":"https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/cle.png","rec":"3-1"},"home":{"abbr":"ATL","name":"Hawks","nick":"Hawks","color":"#c8102e","logo":"https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/atl.png","rec":"2-3"},"tv":"NBA TV"},{"league":"NBA","utc":"2026-10-30T00:00Z","away":{"abbr":"SAC","name":"Kings","nick":"Kings","color":"#5a2d81","logo":"https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/sac.png","rec":"0-4"},"home":{"abbr":"NO","name":"Pelicans","nick":"Pelicans","color":"#0a2240","logo":"https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/no.png","rec":"0-4"},"tv":"NBA League Pass"},{"league":"NBA","utc":"2026-10-30T02:00Z","away":{"abbr":"MEM","name":"Grizzlies","nick":"Grizzlies","color":"#5d76a9","logo":"https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/mem.png","rec":"4-0"},"home":{"abbr":"POR","name":"Trail Blazers","nick":"Trail Blazers","color":"#e03a3e","logo":"https://a.espncdn.com/i/teamlogos/nba/500/scoreboard/por.png","rec":"3-0"},"tv":"NBA League Pass"},{"league":"NFL","utc":"2026-10-30T00:15Z","away":{"abbr":"CAR","name":"Panthers","nick":"Panthers","color":"#0085ca","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/car.png","rec":"3-3"},"home":{"abbr":"GB","name":"Packers","nick":"Packers","color":"#204e32","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/gb.png","rec":"4-3"},"tv":"Prime Video"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"BAL","name":"Ravens","nick":"Ravens","color":"#29126f","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/bal.png","rec":"4-3"},"home":{"abbr":"BUF","name":"Bills","nick":"Bills","color":"#00338d","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/buf.png","rec":"5-1"},"tv":"CBS"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"TEN","name":"Titans","nick":"Titans","color":"#4495d2","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ten.png","rec":"1-6"},"home":{"abbr":"CIN","name":"Bengals","nick":"Bengals","color":"#fb4f14","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/cin.png","rec":"4-2"},"tv":"CBS"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"ARI","name":"Cardinals","nick":"Cardinals","color":"#a40227","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ari.png","rec":"2-5"},"home":{"abbr":"DAL","name":"Cowboys","nick":"Cowboys","color":"#002a5c","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/dal.png","rec":"3-4"},"tv":"Fox"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"MIN","name":"Vikings","nick":"Vikings","color":"#4f2683","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/min.png","rec":"6-0"},"home":{"abbr":"DET","name":"Lions","nick":"Lions","color":"#0076b6","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/det.png","rec":"4-2"},"tv":"Fox"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"LV","name":"Raiders","nick":"Raiders","color":"#000000","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lv.png","rec":"3-4"},"home":{"abbr":"NYJ","name":"Jets","nick":"Jets","color":"#115740","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/nyj.png","rec":"2-5"},"tv":"Fox"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"CLE","name":"Browns","nick":"Browns","color":"#472a08","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/cle.png","rec":"5-2"},"home":{"abbr":"PIT","name":"Steelers","nick":"Steelers","color":"#000000","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/pit.png","rec":"5-2"},"tv":"CBS"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"ATL","name":"Falcons","nick":"Falcons","color":"#a71930","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/atl.png","rec":"3-4"},"home":{"abbr":"TB","name":"Buccaneers","nick":"Buccaneers","color":"#bd1c36","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/tb.png","rec":"2-5"},"tv":"Fox"},{"league":"NFL","utc":"2026-11-01T18:00Z","away":{"abbr":"IND","name":"Colts","nick":"Colts","color":"#003b75","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ind.png","rec":"2-5"},"home":{"abbr":"JAX","name":"Jaguars","nick":"Jaguars","color":"#007487","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/jax.png","rec":"4-2"},"tv":"CBS"},{"league":"NFL","utc":"2026-11-01T21:05Z","away":{"abbr":"LAC","name":"Chargers","nick":"Chargers","color":"#0080c6","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lac.png","rec":"0-6"},"home":{"abbr":"LAR","name":"Rams","nick":"Rams","color":"#003594","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/lar.png","rec":"3-4"},"tv":"Fox"},{"league":"NFL","utc":"2026-11-01T21:25Z","away":{"abbr":"KC","name":"Chiefs","nick":"Chiefs","color":"#e31837","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/kc.png","rec":"5-1"},"home":{"abbr":"DEN","name":"Broncos","nick":"Broncos","color":"#0a2343","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/den.png","rec":"5-2"},"tv":"CBS"},{"league":"NFL","utc":"2026-11-01T21:25Z","away":{"abbr":"NE","name":"Patriots","nick":"Patriots","color":"#002a5c","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/ne.png","rec":"4-3"},"home":{"abbr":"MIA","name":"Dolphins","nick":"Dolphins","color":"#008e97","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/mia.png","rec":"1-5"},"tv":"CBS"},{"league":"NFL","utc":"2026-11-02T01:20Z","away":{"abbr":"PHI","name":"Eagles","nick":"Eagles","color":"#06424d","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/phi.png","rec":"2-5"},"home":{"abbr":"WSH","name":"Commanders","nick":"Commanders","color":"#5a1414","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/wsh.png","rec":"1-4-1"},"tv":"NBC"},{"league":"NFL","utc":"2026-11-03T01:15Z","away":{"abbr":"CHI","name":"Bears","nick":"Bears","color":"#0b1c3a","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/chi.png","rec":"5-2"},"home":{"abbr":"SEA","name":"Seahawks","nick":"Seahawks","color":"#002a5c","logo":"https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png","rec":"4-3"},"tv":"ESPN"},{"league":"NCAAF","utc":"2026-10-29T23:30Z","away":{"abbr":"FAU","name":"FAU","nick":"Owls","color":"#003366","logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2226.png","rec":"5-2"},"home":{"abbr":"UNT","name":"North Texas","nick":"Mean Green","color":"#068f33","logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/249.png","rec":"5-2"},"tv":"ESPN"},{"league":"NCAAF","utc":"2026-10-29T23:30Z","away":{"abbr":"TROY","name":"Troy","nick":"Trojans","color":"#862633","logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/2653.png","rec":"3-4"},"home":{"abbr":"JMU","name":"James Madison","nick":"Dukes","color":"#450084","logo":"https://a.espncdn.com/i/teamlogos/ncaa/500/256.png","rec":"7-1"},"tv":"ESPN2"}],"channels":[{"no":1200,"group":"NBA","name":"PELICANS vs KINGS","game":1},{"no":1201,"group":"NBA","name":"HAWKS vs CAVALIERS","game":0},{"no":1202,"group":"NBA","name":"TRAIL BLAZERS vs GRIZZLIES","game":2},{"no":1400,"group":"NFL","name":"NFL NETWORK","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/nfl-network-us.png"},{"no":1401,"group":"NFL","name":"NFL REDZONE","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/nfl-red-zone-us.png"},{"no":1402,"group":"NFL","name":"Panthers at Packers","game":3},{"no":1403,"group":"NFL","name":"Panthers at Packers","game":3},{"no":1404,"group":"NFL","name":"NFL  | 02 - 1pm Ravens at Bills","game":4},{"no":1405,"group":"NFL","name":"NFL  | 03 - 1pm Titans at Bengals","game":5},{"no":1406,"group":"NFL","name":"NFL  | 04 - 1pm Cardinals at Cowboys","game":6},{"no":1407,"group":"NFL","name":"NFL  | 05 - 1pm Vikings at Lions","game":7},{"no":1408,"group":"NFL","name":"NFL  | 06 - 1pm Raiders at Jets","game":8},{"no":1409,"group":"NFL","name":"NFL  | 07 - 1pm Browns at Steelers","game":9},{"no":1410,"group":"NFL","name":"NFL  | 08 - 1pm Falcons at Buccaneers","game":10},{"no":1411,"group":"NFL","name":"NFL  | 09 - 1pm Colts at Jaguars","game":11},{"no":1412,"group":"NFL","name":"Chargers at Rams","game":12},{"no":1413,"group":"NFL","name":"Chiefs at Broncos","game":13},{"no":1414,"group":"NFL","name":"Patriots at Dolphins","game":14},{"no":1415,"group":"NFL","name":"Eagles at Commanders","game":15},{"no":1416,"group":"NFL","name":"Bears at Seahawks","game":16},{"no":1500,"group":"NCAAF","name":"ESPN","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/espn-us.png"},{"no":1501,"group":"NCAAF","name":"ESPN2","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/espn-2-us.png"},{"no":1502,"group":"NCAAF","name":"ESPNU","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/espn-u-us.png"},{"no":1503,"group":"NCAAF","name":"ABC","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/abc-us.png"},{"no":1504,"group":"NCAAF","name":"CBS","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/cbs-logo-white-us.png"},{"no":1505,"group":"NCAAF","name":"FOX","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/fox-us.png"},{"no":1506,"group":"NCAAF","name":"NBC","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/nbc-us.png"},{"no":1507,"group":"NCAAF","name":"ACC NETWORK","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/acc-network-us.png"},{"no":1508,"group":"NCAAF","name":"BIG TEN NETWORK","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/big-ten-network-us.png"},{"no":1509,"group":"NCAAF","name":"BIG TEN NETWORK ALT","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/big-ten-network-us.png"},{"no":1510,"group":"NCAAF","name":"SEC NETWORK","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/sec-network-us.png"},{"no":1511,"group":"NCAAF","name":"CBSSN","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/cbs-sports-network-us.png"},{"no":1512,"group":"NCAAF","name":"FS1","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/fox-sports-1-us.png"},{"no":1513,"group":"NCAAF","name":"CW","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/cw-us.png"},{"no":1514,"group":"NCAAF","name":"TNT","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/tnt-us.png"},{"no":1515,"group":"NCAAF","name":"USA NETWORK","game":null,"logo":"https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/usa-us.png"},{"no":1516,"group":"NCAAF","name":"UAlbany at lowa 6pm","game":null},{"no":1517,"group":"NCAAF","name":"7PM North Carolina at Charlotte","game":null}]};
+const G = DATA.games, CH = DATA.channels;
+const bareViewport = () => [1024, 768].includes(innerWidth) && innerWidth + innerHeight === 1792;
+const state = { view: "guide", tab: "NBA", time: "1700", ori: "l", scale: "actual", cur: null, chrome: true,
+  ppi: +localStorage.getItem("tvmock.ppi") || 127, bare: /bare/.test(location.search) || bareViewport() };
+
+// Thursday Oct 29, 2026, Central (CDT = UTC-5).
+const nowUTC = () => state.time === "1700" ? Date.UTC(2026, 9, 29, 22, 0) : Date.UTC(2026, 9, 30, 1, 10);
+const local = ms => new Date(ms - 5 * 3600e3);
+const clock = ms => { const d = local(ms); let h = d.getUTCHours(); const m = d.getUTCMinutes(), ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return h + ":" + String(m).padStart(2, "0") + " " + ap; };
+const dayKey = ms => local(ms).toISOString().slice(0, 10);
+const dayName = ms => local(ms).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" });
+const key = g => g.away.abbr + "@" + g.home.abbr;
+
+const AT_810 = { "CLE@ATL": [58, 61, "Half"], "SAC@NO": [50, 47, "Q2 1:04"], "CAR@GB": [7, 10, "Q2 3:21"], "FAU@UNT": [24, 17, "Q3 6:12"], "TROY@JMU": [10, 28, "Q3 2:40"] };
+function status(g) {
+  const s = state.time === "2010" && AT_810[key(g)];
+  if (s) return { kind: "live", a: s[0], h: s[1], text: s[2] };
+  const t = Date.parse(g.utc), today = dayKey(t) === dayKey(nowUTC());
+  return { kind: "up", today, text: today ? clock(t) : clock(t) };
+}
+const logo = (url, size) => url ? "https://a.espncdn.com/combiner/i?img=" + encodeURIComponent(url.replace("https://a.espncdn.com", "").replace("/500/", "/500-dark/")) + "&w=" + size + "&h=" + size : "";
+const mark = t => `<div class="mark"><div class="badge" style="background:${t.color === "#000000" ? "#333" : t.color}">${t.abbr}</div>${t.logo ? `<img src="${logo(t.logo, 72)}" onerror="this.remove()" alt="">` : ""}</div>`;
+const tvName = s => s.replace(/^Fox$/, "FOX");
+
+// Channels per tab. Event channels become games; duplicates of one game are backup feeds.
+function tabModel(tab) {
+  const chans = CH.filter(c => c.group === tab), byGame = new Map(), nets = [], other = [];
+  for (const c of chans) {
+    if (c.game != null) { if (!byGame.has(c.game)) byGame.set(c.game, []); byGame.get(c.game).push(c); }
+    else if (c.logo) nets.push(c); else other.push(c);
+  }
+  // Games without their own channel (college football) play on the network showing them.
+  G.forEach((g, i) => { if (g.league === tab && !byGame.has(i)) { const n = nets.find(c => c.name === g.tv.toUpperCase()); if (n) byGame.set(i, [n]); } });
+  const games = [...byGame].map(([i, feeds]) => ({ g: G[i], feeds, s: status(G[i]) })).sort((a, b) => Date.parse(a.g.utc) - Date.parse(b.g.utc));
+  return { games, nets, other };
+}
+
+const SAMPLE = { "ESPN": ["SportsCenter", "NFL Live"], "ESPN2": ["College Football Live", "Around the Horn"], "ESPNU": ["College Football Replay", "ESPNU Classics"],
+  "ABC": ["Local News", "Prime Time"], "CBS": ["Local News", "Prime Time"], "FOX": ["Local News", "Prime Time"], "NBC": ["Local News", "Prime Time"],
+  "ACC NETWORK": ["ACC Huddle", "ACC Football Replay"], "BIG TEN NETWORK": ["B1G Football Replay", "The Journey"], "BIG TEN NETWORK ALT": ["Off air", "Off air"],
+  "SEC NETWORK": ["SEC Now", "SEC Football Replay"], "CBSSN": ["Inside College Football", "Boxing"], "FS1": ["Speak", "The Herd Replay"],
+  "CW": ["Series", "Series"], "TNT": ["Movie", "Movie"], "USA NETWORK": ["Series", "Series"], "NFL NETWORK": ["NFL Total Access", "Thursday Night Postgame"], "NFL REDZONE": ["Off air", "NFL RedZone · Sun 12:00 PM"] };
+function epg(c) {
+  const now = nowUTC(), game = G.find(g => g.tv.toUpperCase() === c.name && status(g).kind === "live");
+  if (game) { const st = Date.parse(game.utc); return { now: `${game.away.name} at ${game.home.name}`, live: true, start: st, end: st + 3.5 * 3600e3, next: SAMPLE[c.name][1] }; }
+  const upcoming = G.filter(g => g.tv.toUpperCase() === c.name && Date.parse(g.utc) > now && dayKey(Date.parse(g.utc)) === dayKey(now))[0];
+  const st = now - (now % 3600e3), end = upcoming ? Date.parse(upcoming.utc) : st + 3600e3;
+  return { now: SAMPLE[c.name][0], start: st, end, next: upcoming ? `${upcoming.away.name} at ${upcoming.home.name}` : SAMPLE[c.name][1], nextAt: end };
+}
+const ICON = {
+  refresh: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
+  server: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>',
+  back: '<svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>',
+  speaker: '<svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>',
+  airplay: '<svg viewBox="0 0 24 24"><path d="M6 17H4.5A1.5 1.5 0 0 1 3 15.5v-10A1.5 1.5 0 0 1 4.5 4h15A1.5 1.5 0 0 1 21 5.5v10a1.5 1.5 0 0 1-1.5 1.5H18"/><path d="M12 14l5 6H7z"/></svg>',
+};
+const statusBar = () => `<div class="status"><span>iPad</span><span>${clock(nowUTC())}</span><span>100%</span></div>`;
+
+function card({ g, feeds, s }) {
+  const live = s.kind === "live";
+  const row = (t, sc, other) => `<div class="team ${live && sc < other ? "lose" : ""}">${mark(t)}<div class="name">${t.name}${live ? "" : `<span class="rec">${t.rec}</span>`}</div>${live ? `<div class="score">${sc}</div>` : ""}</div>`;
+  return `<div class="card" data-ch="${feeds[0].no}">
+    <div class="top"><span class="when ${live ? "live" : ""}">${s.text}</span>${g.tv ? `<span class="chip">${tvName(g.tv)}</span>` : ""}${feeds.length > 1 ? `<span class="chip">${feeds.length} feeds</span>` : ""}</div>
+    ${row(g.away, s.a, s.h)}${row(g.home, s.h, s.a)}</div>`;
+}
+function tile(c) {
+  if (!c.logo) return `<div class="tile" data-ch="${c.no}"><div class="net"><div class="ph">${c.name.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase()}</div></div><div class="body"><div class="nm">${c.name}</div><div class="meta">No guide data</div></div></div>`;
+  const e = epg(c), p = Math.max(0, Math.min(1, (nowUTC() - e.start) / (e.end - e.start)));
+  return `<div class="tile" data-ch="${c.no}"><div class="net"><img src="${c.logo}" alt="${c.name}" onerror="this.outerHTML='<div class=ph>${c.name.slice(0, 2)}</div>'"></div>
+    <div class="body"><div class="nm ${e.live ? "live" : ""}">${e.now}</div><div class="meta">${c.name} · Next: ${e.next}${e.nextAt ? " at " + clock(e.nextAt) : ""}</div><div class="prog"><i style="width:${(p * 100).toFixed(0)}%"></i></div></div></div>`;
+}
+function guide() {
+  const m = tabModel(state.tab), sections = [];
+  const sec = (title, html, dot) => html && sections.push(`<div class="section"><h2>${dot ? '<span class="dot"></span>' : ""}${title}</h2>${html}</div>`);
+  const grid = xs => xs.length ? `<div class="grid">${xs.map(card).join("")}</div>` : "";
+  sec("Live", grid(m.games.filter(x => x.s.kind === "live")), true);
+  const up = m.games.filter(x => x.s.kind === "up"), days = [...new Set(up.map(x => dayKey(Date.parse(x.g.utc))))];
+  days.forEach(d => sec(d === dayKey(nowUTC()) ? "Tonight" : dayName(Date.parse(up.find(x => dayKey(Date.parse(x.g.utc)) === d).g.utc)), grid(up.filter(x => dayKey(Date.parse(x.g.utc)) === d))));
+  if (m.nets.length) sec("Channels", `<div class="tiles">${m.nets.map(tile).join("")}</div>`);
+  if (m.other.length) sec("Other channels", `<div class="tiles">${m.other.map(tile).join("")}</div>`);
+  const count = t => tabModel(t).games.length;
+  return `${statusBar()}<header>
+    <div class="tabs">${["NBA", "NFL", "NCAAF"].map(t => `<div class="${state.tab === t ? "on" : ""}" data-tab="${t}">${t}<span>${count(t)}</span></div>`).join("")}</div>
+    <div class="icons"><div class="icon" aria-label="Refresh">${ICON.refresh}</div><div class="icon" aria-label="Server">${ICON.server}</div></div>
+  </header><div class="scroll">${sections.join("")}</div>`;
+}
+
+// Player order: the tab's games, then its channels, as in the guide.
+function playlist() { const m = tabModel(state.tab); return [...m.games.map(x => x.feeds[0].no), ...m.nets.map(c => c.no), ...m.other.map(c => c.no)]; }
+function nowPlaying(no) {
+  const m = tabModel(state.tab), x = m.games.find(x => x.feeds[0].no === no);
+  if (x) return { title: `${x.g.away.name} at ${x.g.home.name}`, sub: tvName(x.g.tv) || CH.find(c => c.no === no).group };
+  const c = CH.find(c => c.no === no);
+  return c.logo ? { title: epg(c).now, sub: c.name } : { title: c.name, sub: c.group };
+}
+function player() {
+  if (state.cur == null) state.cur = playlist()[0];
+  const n = nowPlaying(state.cur);
+  return `<div class="player" id="player"><div class="video"></div>
+    <div class="chrome ${state.chrome ? "" : "hide"}">
+      <div class="ptop"><div class="ghost" data-act="back" aria-label="Back to guide">${ICON.back}</div><div class="ptitle"><b>${n.title}</b><small>${n.sub}</small></div><div class="livepill ${state.behind ? "behind" : ""}" data-act="live">${state.behind ? "GO LIVE" : "LIVE"}</div></div>
+      <div class="pbot"><div class="ghost fill" aria-label="Pause">${ICON.pause}</div>
+        <div class="pflex"></div><div class="ghost" aria-label="Volume">${ICON.speaker}</div><div class="vol"><i></i></div><div class="ghost" aria-label="AirPlay">${ICON.airplay}</div></div>
+    </div><div class="toast" id="toast"><b></b><small></small></div></div>`;
+}
+let hideTimer;
+function armHide() { clearTimeout(hideTimer); if (state.view === "player" && state.chrome) hideTimer = setTimeout(() => { state.chrome = false; render(); }, 3000); }
+function layout() {
+  const ipad = document.getElementById("ipad"), scaler = document.getElementById("scaler");
+  document.body.classList.toggle("bare", state.bare);
+  if (state.bare) state.ori = innerWidth < innerHeight ? "p" : "l";
+  ipad.classList.toggle("portrait", state.ori === "p");
+  const w = state.ori === "p" ? 864 : 1283, h = state.ori === "p" ? 1283 : 864;
+  // 163 pt per inch on the iPad; CSS px per physical inch on this screen comes from the calibration.
+  const s = state.scale === "actual" ? state.ppi / 163 : 1;
+  ipad.style.transform = `scale(${s})`;
+  scaler.style.width = w * s + "px"; scaler.style.height = h * s + "px";
+  document.getElementById("calib").classList.toggle("show", state.scale === "actual");
+  document.getElementById("ppi").value = state.ppi; document.getElementById("ppiv").textContent = state.ppi;
+  document.getElementById("ruler").style.width = (85.6 / 25.4 * state.ppi).toFixed(0) + "px";
+  document.querySelectorAll(".seg").forEach(seg => [...seg.children].forEach(b => b.classList.toggle("on", state[seg.dataset.k] === b.dataset.v)));
+}
+function render() {
+  const sc = document.querySelector(".scroll"), y = sc ? sc.scrollTop : 0;
+  layout();
+  document.getElementById("screen").innerHTML = state.view === "guide" ? guide() : player();
+  const sc2 = document.querySelector(".scroll"); if (sc2) sc2.scrollTop = y;
+  armHide();
+}
+function switchChannel(dir) {
+  const list = playlist(); state.cur = list[(list.indexOf(state.cur) + dir + list.length) % list.length];
+  state.behind = false; render();
+  const n = nowPlaying(state.cur), t = document.getElementById("toast");
+  t.querySelector("b").textContent = n.title; t.querySelector("small").textContent = n.sub; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1200);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".seg button");
+  if (b) { state[b.parentNode.dataset.k] = b.dataset.v; if (b.parentNode.dataset.k === "view") state.chrome = true; return render(); }
+  const tab = e.target.closest("[data-tab]"); if (tab) { state.tab = tab.dataset.tab; state.cur = null; return render(); }
+  const act = e.target.closest("[data-act]");
+  if (act && act.dataset.act === "back") { state.view = "guide"; return render(); }
+  if (act && act.dataset.act === "live") { state.behind = !state.behind; return render(); }
+  const c = e.target.closest("[data-ch]"); if (c) { state.cur = +c.dataset.ch; state.view = "player"; state.chrome = true; state.behind = false; return render(); }
+  if (e.target.closest("#player") && !e.target.closest(".ghost, .vol")) { state.chrome = !state.chrome; render(); }
+});
+let dragX = null;
+document.addEventListener("pointerdown", e => { if (e.target.closest("#player")) dragX = e.clientX; });
+document.addEventListener("pointerup", e => { if (dragX != null && Math.abs(e.clientX - dragX) > 60) switchChannel(e.clientX < dragX ? 1 : -1); dragX = null; });
+document.addEventListener("keydown", e => {
+  const k = e.key.toLowerCase();
+  if (k === "g") state.view = "guide"; else if (k === "p") { state.view = "player"; state.chrome = true; }
+  else if (k === "t") state.time = state.time === "1700" ? "2010" : "1700";
+  else if (state.view === "player" && (k === "arrowright" || k === "arrowleft")) return switchChannel(k === "arrowright" ? 1 : -1);
+  else return;
+  render();
+});
+document.getElementById("ppi").addEventListener("input", e => { state.ppi = +e.target.value; localStorage.setItem("tvmock.ppi", state.ppi); layout(); });
+addEventListener("resize", () => { state.bare = /bare/.test(location.search) || bareViewport(); render(); });
+render();
+</script>
+</body>
+</html>

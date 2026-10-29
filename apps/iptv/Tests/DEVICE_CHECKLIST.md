@@ -12,3 +12,10 @@ Run on the iPad mini 2 with the Dispatcharr server reachable on the same network
 - [ ] Going to the home screen stops playback; reopening the channel works.
 - [ ] 30 minutes of playback without the app being killed (memory) or drifting further behind live.
 - [ ] Changing the server URL reloads the channel list; a wrong URL shows an error.
+
+## Dispatcharr HLS (no relay)
+
+- [ ] A channel's `…?output_format=hls` URL plays in AVPlayer on the iPad (open it in Safari as a quick check)
+- [ ] Startup is under 3 s on a 24/7 channel (e.g. NFL NETWORK)
+- [ ] After 2+ minutes in the background, returning re-requests the stream and plays
+- [ ] 720p60 (NFL NETWORK) plays smoothly without dropped frames
