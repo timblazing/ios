@@ -2,6 +2,14 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Latest checkpoint — agreed home acceptance complete
+
+Owner confirms all final short checks on 0.3.2 / build 5: first-picture controls/tap/Back, actual volume changes, responsive guide tabs/scrolling/final-row reachability, and future-game messages. Three sequential NFL open/close attempts all succeeded, usually 1–3 seconds to playback; owner explicitly accepts that delay for now. AirPlay also works. Earlier sampled NBA/NFL/NCAAF playback, home cards/logos, short pause/resume, >2-minute Home/background recovery and playback rotation passes remain valid. No more short home questions are outstanding.
+
+The earlier first-start failures are retained as historical observations; their transient cause is not proven. Later accepted repeated starts have no current failure reproduction. Revisit if it recurs rather than claiming the transient cause was fixed.
+
+Deferred follow-ups: physical USB fallback/home-return with an explicitly running bridge; extended endurance and explicit 1080p60; accessibility/Reduce Transparency and lock/interruption/network-loss edge cases. Keep the legacy relay; retire it separately only when warranted. No temporary agent servers, forwards, simulator or captures remain running; production gateway remains deployed. Owner playback may still be active and must not be stopped by the agent. PR #5 remains for review; no merge is authorized. Historical sections below describe earlier checkpoints.
+
 ## Current checkpoint — short remaining home checks
 
 Owner confirms portrait/landscape rotation preserves playback and usable controls. Prior sampled NBA/NFL/NCAAF playback, home guide/logos, short pause/resume and >2-minute Home/background recovery pass. NFL first-start reliability is still unresolved. Owner requested all remaining questions together; use the consolidated four short checks at the top of [DEVICE_CHECKLIST.md](../Tests/DEVICE_CHECKLIST.md): controls/Back, actual volume, guide tabs/scroll/future game, and three sequential NFL startup attempts. AirPlay, extended endurance, accessibility/edge cases and physical USB fallback remain explicitly deferred/unverified. Do not start concurrent agent probes while the owner is testing. No merge is authorized.

@@ -59,3 +59,9 @@ Owner reports NFL played fine through the requested approximately one-minute obs
 ## Owner rotation result
 
 Owner confirms portrait → landscape rotation preserves playing video and correctly positioned, working controls. Pause/resume and >2-minute Home/background recovery also passed in subsequent owner checks (see device checklist). Initial-start reliability remains unresolved; remaining short home checks are consolidated at the top of that checklist.
+
+## Final agreed short home acceptance — owner passes
+
+Owner confirms all four requested final batches: controls remain until first picture, hide after about 2.5 seconds, tap restores them and Back returns to guide; bottom volume slider changes actual sound level; league tabs/scrolling/final-card reachability and future-game messages work; three sequential NFL starts all work, usually 1–3 seconds. Owner explicitly accepts this startup time for now and additionally confirms AirPlay works. Together with earlier sampled NBA/NFL/NCAAF playback, short NFL stability, pause/resume, >2-minute Home/background recovery and portrait/landscape rotation, the agreed short home checks are complete.
+
+Earlier static-picture/startup failures remain historical observations; their transient cause is not proven. The subsequent repeat-start sample passes, so no current reproduction is claimed. Reinvestigate if they recur. Extended endurance, explicit 1080p60, accessibility/Reduce Transparency, lock/interruption/network-loss edge cases and physical USB fallback/home-return remain deferred and unverified. No temporary agent process or capture remains running. Keep the legacy relay; no merge or retirement was performed.

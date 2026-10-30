@@ -2,7 +2,7 @@
 
 Native live TV guide and player for the iPad mini 2 on iOS 10.3.3, built with Objective-C/UIKit and Theos.
 
-**Current build:** [IPTV-0.3.2.ipa](dist/IPTV-0.3.2.ipa), [Debian package](packages/com.local.iptv_0.3.2_iphoneos-arm.deb), [checksums](dist/SHA256SUMS). Adds automatic home-first gateway fallback. Owner-approved USB installation and an independent query confirm 0.3.2 / build 5 on the physical iPad; functional acceptance is pending.
+**Current build:** [IPTV-0.3.2.ipa](dist/IPTV-0.3.2.ipa), [Debian package](packages/com.local.iptv_0.3.2_iphoneos-arm.deb), [checksums](dist/SHA256SUMS). Adds automatic home-first gateway fallback. Owner-approved USB installation and an independent query confirm 0.3.2 / build 5 on the physical iPad; the agreed short home checks pass by owner report. Physical USB fallback and extended coverage remain unverified.
 
 **Resume here:** [backlog](docs/BACKLOG.md), [handoff](docs/HANDOFF.md), [next steps](docs/NEXT.md).
 
@@ -52,6 +52,6 @@ In T3 Code, follow the [Device panel workflow](../../AGENTS.md#verifying-without
 - [0.3.0 validation](docs/VALIDATION-0.3.0.md) records simulator evidence and its limits.
 - [0.3.1 validation](docs/VALIDATION-0.3.1.md) covers the earlier build and simulator evidence.
 - [0.3.2 validation](docs/VALIDATION-0.3.2.md) covers automatic gateway selection and release checks.
-- [Device checklist](Tests/DEVICE_CHECKLIST.md) preserves the 0.3.0 guide/RedZone picture/audio passes; 0.3.2 installation is verified; functional acceptance is pending.
+- [Device checklist](Tests/DEVICE_CHECKLIST.md) preserves the 0.3.0 guide/RedZone picture/audio passes; 0.3.2 installation and agreed short home checks pass; deferred coverage is listed in the checklist.
 
 Dispatcharr authentication and provider credentials are not handled by this app. Keep the gateway and Dispatcharr on a trusted private network.

@@ -2,18 +2,18 @@
 
 Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. These checks require a person; simulator evidence is in `docs/VALIDATION-0.3.0.md`. The owner-reported 0.3.0 picture/audio checks below are historical; 0.3.1 physical checks remain pending. Historical 0.1.0 relay playback passed on 720p channels; that is not direct-HLS acceptance.
 
-## Current 0.3.2 acceptance summary
+## Current 0.3.2 acceptance summary — short home checks complete
 
-Owner-reported passes: home guide/cards/logos, sampled NBA/NFL/NCAAF playback, approximately one minute of NFL stability, short pause/resume, Home/background recovery after >2 minutes, and portrait/landscape playback with usable controls. NFL first-attempt startup failed before succeeding on retry; reliability remains unresolved. Historical sections below retain the sequence and version boundaries; they do not override this current summary.
+Owner accepts the current home experience on installed 0.3.2 / build 5. Reported passes:
 
-Remaining short home checks (owner requested all questions together):
+- Home guide/cards/logos; responsive league tabs and scrolling; final cards reachable; future-game start-time message.
+- Sampled NBA, regular NFL and NCAAF picture/audio; approximately one minute of smooth NFL playback.
+- Controls remain visible until picture, hide after about 2.5 seconds, tap restores them, and Back returns to the guide.
+- Short pause/resume, bottom volume slider and functional AirPlay.
+- Home/background recovery after more than two minutes; portrait/landscape playback with usable controls.
+- Three sequential NFL open/close attempts all succeeded, usually 1–3 seconds to moving video. Owner explicitly accepts this startup time for now. Earlier startup failures remain historical evidence; their transient cause is not established, but no current reproduction remains after these retests.
 
-1. On a fresh channel open, controls remain visible until picture, then hide in about 2.5 seconds; tap restores them and Back returns to the guide.
-2. Bottom volume slider changes actual sound level.
-3. League tabs and guide scrolling are responsive, last rows clear the floating controls, and a future game shows its start time rather than opening playback.
-4. Open/close the regular NFL matchup three times, one stream at a time; report startup delays, frozen pictures or retries.
-
-Optional/deferred: real AirPlay when a receiver is available; extended endurance; accessibility/Reduce Transparency and interruption/network-loss edge cases; physical USB fallback/home-return with an explicitly running bridge. These remain unverified, not required as extra questions in this short home check. Keep the legacy relay while startup/acceptance work remains.
+No further questions are needed for the agreed short home check. Deferred/unverified: extended endurance, explicit 1080p60 testing, accessibility/Reduce Transparency, lock/interruption/network-loss edge cases, and physical USB fallback/home-return with a running bridge. These are follow-up items, not claimed passes. Keep the legacy relay; any retirement is a separate change. Historical logs below preserve the sequence and version boundaries and do not override this summary.
 
 ## Acceptance log — 2026-10-29
 
@@ -74,9 +74,9 @@ The owner approved installing 0.3.1, but no install was attempted: USB discovery
 - [ ] 720p60 plays smoothly, with audible synchronized audio and no dropped frames.
 - [ ] A 1080p60 H.264 channel plays smoothly for several minutes.
 - [ ] HEVC-only feeds fail clearly or use a configured server-side H.264 profile; no indefinite spinner.
-- [ ] On 0.3.1 controls stay visible until a picture is ready and playback runs, then hide after 2.5 s. Tap toggles thereafter; Back reliably closes playback.
-- [ ] Pause/resume work on 0.3.1; LIVE/GO LIVE controls are absent.
-- [ ] System volume slider works at the bottom; AirPlay works at the top right when a route is available; only one centered title appears.
+- [x] **0.3.2 owner pass:** controls stay visible until picture, hide after about 2.5 seconds, tap restores them and Back returns to the guide.
+- [x] **0.3.2 owner pass:** short pause/resume works. LIVE/GO LIVE removal is covered by the existing code/simulator evidence.
+- [x] **0.3.2 owner pass:** bottom volume slider changes actual sound level; AirPlay works. Single-title layout is captured in prior evidence.
 - [ ] Floating glass navigation scrolls smoothly on A7; last rows remain reachable; Reduce Transparency gives a solid capsule.
 - [ ] Swipe left/right changes games and shows the correct toast; pre-game targets show start time without streaming.
 - [ ] A failed primary feed switches to a backup; all failed feeds show an inline error with a usable Back control.
@@ -117,3 +117,7 @@ On installed 0.3.2, owner pressed Home, left TV in the background for just over 
 ## Rotation — owner pass
 
 Owner confirms video keeps playing through portrait then landscape rotation, with controls positioned correctly and working on 0.3.2. Owner asked for all remaining checks together and a short finish; the current summary at the top is the consolidated remaining question set. No agent stream was opened.
+
+## Final short home batch — owner passes
+
+Owner answered yes to controls/Back, actual volume changes and guide interaction (tabs, scrolling/final-card reachability, future-game message). Three NFL open/close attempts all worked, usually 1–3 seconds to playback; owner says that is acceptable for now. Owner additionally confirms AirPlay works. These complete the requested short home checks; deferred coverage is listed in the current summary. No agent streams were opened during owner testing.
