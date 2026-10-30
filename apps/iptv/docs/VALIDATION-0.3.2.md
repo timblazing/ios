@@ -25,3 +25,13 @@ Owner-approved USB installation passed after reverifying iPad4,5 / iOS 10.3.3 an
 ## Owner-reported home rendering
 
 On installed 0.3.2 / build 5, the owner opened TV at home and confirmed game/channel cards and logos appear. No Mac video bridge was running. This accepts home guide/logo rendering; playback, route switching and the remaining physical checklist are pending.
+
+## Physical playback report and investigation
+
+Owner tested the live Panthers @ Packers game: long loading, backup attempt, black video and eventual unavailable-feed error. Troy @ James Madison fails similarly. Cleveland @ Atlanta and Sacramento @ New Orleans reportedly worked great. This is a pass for those two NBA playback attempts, not blanket league acceptance or measured startup/audio-sync/endurance evidence.
+
+Retrieved existing iPad screenshots privately by USB file access (no automated capture or app interaction). Five recent TV screenshots show the NFL guide, loading, backup toast and unavailable-feed error. Originals remain on the iPad; copies are outside Git under the private acceptance directory. They contain private device metadata, so were not committed. Older unrelated copied PNGs were removed from the task's local copy directory.
+
+Read-only production guide and Dispatcharr metadata identify two NFL event feeds and one NCAAF event feed. The first NFL source is labeled 4K; its regular backup is separate. The NCAAF source is named `NCAAF 02: ESPN2`. Source names/quality labels alone do not prove codec or availability. During the owner's failures, correlated Dispatcharr logs show each selected upstream delivering briefly, ending, retrying three times and entering ERROR with no untried source remaining. This reproduces upstream exhaustion in server evidence but does not yet establish its root cause or exclude an app issue. No server configuration was changed and no additional streams were opened by the agent.
+
+Next: owner returns to the guide so playback is stopped, then inspect one failing feed at a time (playlist/segments, codec and whether it is a finite placeholder) and compare the working path. Do not guess a transcoding or source-mapping fix from labels alone. Keep the legacy relay.

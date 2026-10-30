@@ -74,3 +74,11 @@ The owner approved installing 0.3.1, but no install was attempted: USB discovery
 - [ ] 30 minutes without memory termination, stutter or increasing live delay.
 
 Test one stream at a time; the provider allows only two connections. Ask before installing on the physical iPad.
+
+## 0.3.2 first playback attempts — owner report
+
+- **Pass — sampled NBA playback:** Cleveland @ Atlanta and Sacramento @ New Orleans worked great, per owner. No measured startup, source-codec, sync or endurance pass inferred.
+- **Fail — NFL Panthers @ Packers:** loading, backup toast, black screen, then unavailable-feed error. Existing physical screenshots inspected privately.
+- **Fail — NCAAF Troy @ James Madison:** same reported failure.
+- Correlated Dispatcharr logs show selected upstreams ending briefly after connection, three retries, then ERROR. First NFL source is labeled 4K, backup is regular; NCAAF source is `NCAAF 02: ESPN2`. Actual codec/placeholder diagnosis remains pending. No corrective server changes or extra playback sessions started.
+- Await owner confirmation that playback is stopped before testing one feed at a time. See `docs/VALIDATION-0.3.2.md` for evidence and limits.

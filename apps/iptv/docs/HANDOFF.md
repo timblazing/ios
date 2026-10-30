@@ -2,6 +2,12 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Current investigation — first 0.3.2 playback failures
+
+Owner confirms home cards/logos appear. Cleveland @ Atlanta and Sacramento @ New Orleans playback worked great. NFL Panthers @ Packers loads, attempts backup, shows black video and eventually errors; NCAAF Troy @ James Madison similarly fails. Existing TV screenshots were retrieved privately from DCIM by USB file access; originals were untouched. Copies and raw logs/guide are private under `~/.config/ios-games/iptv/acceptance-2026-10-29/`, never committed.
+
+Correlated Dispatcharr logs show selected upstreams connecting, ending shortly afterward, retrying three times and entering ERROR. NFL first source is labeled 4K, its backup regular; NCAAF is `NCAAF 02: ESPN2`. Codec/finite-placeholder/root cause is unverified. No new streams, server changes or speculative fixes were performed. Asked the owner to return to the guide/stop playback before probing one source at a time. USB file-access transport was stopped after screenshot retrieval. Next work is bounded source/media inspection, then a confirmed fix and physical retest; see [validation](VALIDATION-0.3.2.md).
+
 ## 0.3.2 installation — 2026-10-29 evening
 
 The owner approved installing 0.3.2. Reverified USB target iPad4,5 / iOS 10.3.3, IPA checksum and bundle identity/version/build, then installed (`Install: Complete`). Independent installed-app query confirms **0.3.2 / build 5**. Earlier approval/install-pending statements below are historical. The owner has been asked to open TV and confirm guide cards/logos; that response and all physical playback/fallback acceptance remain pending. No video bridge is running, no stream was opened and no app launch/touch was automated. Home/USB preferences were provisioned before upgrading, as recorded below.
