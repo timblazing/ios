@@ -74,6 +74,24 @@ xcrun vtool -show-build /path/to/Payload/LaunchCanary.app/LaunchCanary
 
 `codesign --verify` alone does not establish that the profile authorizes this iPad or remains valid. A final signing tool may alter metadata; inspect **its output**, not just the intermediate build.
 
+### Dedicated development signing
+
+`sign-canary.py` signs only the two canary bundle IDs with an exact-ID Apple development profile. It refuses unrelated or wildcard profiles, expired/not-yet-valid profiles, an unenrolled target device, and a certificate not listed in the profile. Inputs and output stay outside Git. The source app is copied, never modified. The final app must pass the Apple signature-chain requirement, exact entitlement and signing-certificate checks, and unchanged linked-SDK metadata before the IPA is emitted. The modern metadata check is pinned to the current builder's SDK 16.4; inspect/revise that explicit gate if the build SDK changes.
+
+```sh
+python3 tools/rejailbreak-lab/test-sign-canary.py
+python3 tools/rejailbreak-lab/sign-canary.py \
+  --app /private/build/legacy/Payload/LaunchCanary.app \
+  --profile /private/profiles/legacy.mobileprovision \
+  --identity <certificate-SHA1-from-security-find-identity> \
+  --udid-file /private/target-ipad-udid.txt \
+  --out /private/new-signed-legacy
+```
+
+Repeat with the modern app and its own profile. Do not use the House Capture profile. Signing validation is a preflight, not physical stock-iOS launch proof. The signer's five local tests exercise valid authorization and rejection of invalid device/certificate/team/app/expiry/development-profile inputs, without contacting Apple.
+
+2026-10-30 follow-up: Xcode's existing Personal Team session obtained dedicated `com.local.launchcanary.legacy` and `.modern` profiles. Both include the available local Apple Development certificate, but **neither includes the target iPad**. Their UTC expiries are November 6 at 20:32:57 and 20:34:42 respectively. A real signing preflight rejected the unenrolled target before creating an output directory. No canary was installed. The provisioning-only scratch Xcode project uses the current SDK/minimum iOS 15 to obtain profiles; its binary is **not** the iOS 10 canary and must never be substituted for the Theos-SDK build. Wi-Fi libimobiledevice discovery identifies the iPad, but Xcode's destination list currently omits it. USB connection/unlock is the pending owner interaction before enrollment can be investigated.
+
 A controlled physical test eventually launches each canary once and backgrounds it (do not force-quit), then cold-boots and performs the first unlock without tapping either icon. Read the launch logs afterward and distinguish a background entry from the later manual inspection launch using timestamps and boot IDs. Log absence before first unlock is inconclusive because container data protection may prevent writing. Keep the known TNS manual recovery route available. This step is pending, not performed.
 
 If the legacy canary launches automatically and the control does not, the next separate question is whether that background execution can open the offline TNS WebClip, or instead needs an audited native TNS-compatible reactivation entry point. Safari opening restrictions, foreground/JIT requirements, signature renewal and tweak/bootstrap compatibility remain separate tests. Do not install ap0110 wholesale to answer them.
