@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Latest check — pause/resume passes
+
+Owner confirms NCAAF picture/audio continue normally after showing controls, pausing five seconds and resuming on 0.3.2. Next physical interaction: press Home, leave TV in the background for more than two minutes, then reopen and check playback recovery. Initial-start reliability and the rest of the checklist remain open. No concurrent agent capture is running.
+
 ## Latest physical results — NFL short stability and NCAAF playback pass
 
 On 0.3.2, owner reports NFL played fine during the requested approximately one-minute observation. Then returned to the guide, selected Troy @ James Madison and confirmed picture/sound work. Prior NBA successes and home cards/logos remain recorded. Earlier first-start failures are unresolved; do not mark startup, long endurance, synchronization measurement or automatic USB fallback accepted. Owner is currently watching NCAAF; no concurrent agent probe should be opened. Next interaction: show controls, pause for five seconds, resume and confirm picture/audio continue. [Device checklist](../Tests/DEVICE_CHECKLIST.md) contains the per-check log.

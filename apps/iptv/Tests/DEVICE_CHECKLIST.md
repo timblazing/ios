@@ -92,3 +92,7 @@ Owner refreshed/reopened TV and selected Panthers @ Packers. First attempt displ
 - **Pass — NFL short stability observation:** owner left Panthers @ Packers playing for approximately one minute and reported it played fine. This does not resolve the failed first attempt or establish longer endurance/measured synchronization.
 - **Pass — NCAAF retest:** after returning to the guide and selecting Troy Trojans @ James Madison Dukes, owner confirmed picture and sound work. Earlier failure remains historical evidence of startup unreliability; no blanket reliability pass inferred.
 - Current owner stream is NCAAF; do not start concurrent agent probes. Next interaction: show controls, pause, wait five seconds, resume and confirm picture/audio continue.
+
+## Pause/resume — owner pass
+
+On the playing NCAAF stream, owner showed controls, paused for five seconds and resumed; reported picture and sound continue normally ("works great"). This accepts short pause/resume on installed 0.3.2. Long-pause/token-expiry recovery is separate. Next interaction: background TV for more than two minutes and reopen, then report playback recovery. No concurrent agent stream is running.
