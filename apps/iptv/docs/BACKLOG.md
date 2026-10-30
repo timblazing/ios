@@ -7,7 +7,7 @@ Start here when the owner says “let’s work on my IPTV backlog/next steps.”
 - [ ] Reconnect and identify iPad mini 2 / iPad4,5 / iOS 10.3.3 using read-only tools; confirm jailbreak and installed version. Last verified installed app: **0.3.0**.
 - [x] Repaired private routing at home: backed up settings, verified home gateway reachability from the iPad, saved home primary plus optional USB fallback, and verified unrelated preferences unchanged. Automatic selection is prepared in 0.3.2; bridge operation when away remains separate.
 - [x] Installed the owner-approved **0.3.1 IPA / build 4** over USB after identifying iPad4,5 / iOS 10.3.3 and verifying checksum/identity. Independent installed-app query confirms the version/build. Private configuration and physical acceptance remain pending.
-- [ ] Get owner approval for prepared **0.3.2 / build 5**, install, and verify the installed version. 0.3.1 approval/install is historical and does not itself approve this new build.
+- [x] Owner approved **0.3.2 / build 5**; verified USB target and IPA checksum/identity, installed successfully, and independently queried installed version/build. Physical guide/playback/fallback acceptance remains pending.
 - [ ] Run [DEVICE_CHECKLIST.md](../Tests/DEVICE_CHECKLIST.md) one interaction at a time, recording pass/fail/pending for the actual version. Prioritize picture/audio, measured tap-to-picture, first-picture control timing, pause/resume/back, 2+ minute background recovery, rotation and smooth 720p60. Physical AirPlay/volume and glass rendering/performance are also pending. One video stream at a time.
 - [ ] Leave the legacy relay compiled until remaining physical acceptance supports removing it; remove it separately, with retained regression coverage until then.
 

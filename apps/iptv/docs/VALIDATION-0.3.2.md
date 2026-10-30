@@ -1,6 +1,6 @@
 # TV 0.3.2 validation — 2026-10-29
 
-Prepared 0.3.2 / build 5. Physical installation approval and acceptance are pending; 0.3.1 / build 4 is installed. No UI layout changes or new simulator evidence in this continuation.
+TV 0.3.2 / build 5 is installed with owner approval; an independent installed-app query verifies version/build. Functional acceptance remains pending. No UI layout changes or new simulator evidence in this continuation.
 
 ## Gateway selection
 
@@ -20,4 +20,4 @@ Foundation-only `IPTVGuideClient` tries the private primary gateway first and th
 
 With TV closed by the owner, verified home guide reachability from iPad4,5 / iOS 10.3.3. Backed up preferences privately and saved home-primary plus USB-fallback defaults through mobile preferences. Read back both values and verified every unrelated preference was preserved. No private profile exists to override them. No video stream was opened and no physical guide/UI/playback claim follows from the transport check.
 
-Physical 0.3.2 installation, route switching and the existing UI/playback checklist remain pending. The USB video bridge is stopped; no fallback playback has been attempted. Keep the legacy relay compiled.
+Owner-approved USB installation passed after reverifying iPad4,5 / iOS 10.3.3 and the IPA checksum/identity/version/build (`Install: Complete`). Independent installed-app query confirms 0.3.2 / build 5. The owner has been asked to open TV and confirm guide cards/logos. Physical route switching and the UI/playback checklist remain pending. The USB video bridge is stopped; no fallback playback has been attempted. Keep the legacy relay compiled.

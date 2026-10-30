@@ -142,7 +142,7 @@ A T3 Code companion: UIKit shell, bundled HTML/CSS/JS UI in WKWebView, native ne
 
 ### TV (`apps/iptv/`)
 
-A native guide and direct-HLS player for a Dispatcharr server, v0.3.2 prepared (physical iPad has 0.3.1; new behavior awaits acceptance). Read `apps/iptv/README.md`, `apps/iptv/docs/BACKLOG.md` and `apps/iptv/docs/HANDOFF.md` first.
+A native guide and direct-HLS player for a Dispatcharr server, v0.3.2 installed (physical UI/playback and fallback acceptance pending). Read `apps/iptv/README.md`, `apps/iptv/docs/BACKLOG.md` and `apps/iptv/docs/HANDOFF.md` first.
 
 - The guide/player uses Dispatcharr HLS (`?output_format=hls`) directly in AVPlayer. The legacy TS relay in `Application/Stream/` remains in the source/build until physical iOS 10 acceptance; the new player does not use it. The A7 requires H.264/AAC; HEVC needs a server-side H.264 profile.
 - Server URLs are privately provisioned through device defaults or an external on-device profile; there is no in-app settings UI. 0.3.2 tries the privately configured home gateway first, then an optional USB bridge fallback; the bridge must still be running. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.

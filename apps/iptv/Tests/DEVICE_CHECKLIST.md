@@ -38,7 +38,7 @@ The owner approved installing 0.3.1, but no install was attempted: USB discovery
 ## 0.3.2 routing preparation
 
 - **Pass — device transport only:** owner is home and confirmed TV closed. Direct guide request from the physical iPad to the home gateway succeeded. Saved home-primary and USB-fallback defaults, read both back and confirmed Dispatcharr/unrelated settings unchanged. This resolves the stale primary loopback preference. No private profile was present. No video stream was opened.
-- **Prepared:** 0.3.2 / build 5 with automatic home-first fallback; installation approval and functional acceptance pending. Foundation HTTP fixture tests exercise switching/recovery, not the physical app.
+- **Pass — 0.3.2 installation:** owner-approved USB installation completed after verifying target and IPA checksum/identity; independent installed-app query confirms 0.3.2 / build 5. Physical functional acceptance remains pending. Foundation HTTP fixture tests exercise switching/recovery, not the physical app.
 - [ ] On 0.3.2, confirm home guide/logos render without a Mac video bridge.
 - [ ] With an explicitly established USB bridge, confirm unavailable home falls back and returning home selects the home guide on a subsequent refresh.
 

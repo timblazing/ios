@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## 0.3.2 installation — 2026-10-29 evening
+
+The owner approved installing 0.3.2. Reverified USB target iPad4,5 / iOS 10.3.3, IPA checksum and bundle identity/version/build, then installed (`Install: Complete`). Independent installed-app query confirms **0.3.2 / build 5**. Earlier approval/install-pending statements below are historical. The owner has been asked to open TV and confirm guide cards/logos; that response and all physical playback/fallback acceptance remain pending. No video bridge is running, no stream was opened and no app launch/touch was automated. Home/USB preferences were provisioned before upgrading, as recorded below.
+
 ## Automatic gateway selection — 2026-10-29 evening
 
 The owner asked TV to choose between home and USB routes automatically. Prepared **0.3.2 / build 5** implements home-first requests, then optional `gateway.fallbackBaseURL` on HTTP/network/timeout/parse failure. Each later refresh retries home. Guide data, absolute stream addresses, logo origin and ETag remain associated with the successful endpoint. Exhausting both routes preserves the last valid guide; cancellation suppresses stale completions. [0.3.2 validation](VALIDATION-0.3.2.md) records tests and package checks. New build installation awaits explicit approval; **0.3.1 / build 4 remains installed**.
