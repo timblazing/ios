@@ -47,3 +47,7 @@ Final read-only Dispatcharr cleanup check: zero active proxy clients. No agent c
 ## Incompatible-source filter deployment
 
 Owner-approved deployment completed at approximately 01:33 UTC October 30 (October 29 Central). Backed up source and private environment; preserved unrelated environment values and recreated only `tv-gateway`. Running source SHA256 `f29125939d5caf5d6013e04eb24be5e172278e1de051116bfc3310df81ec835f` matches the tested checkout. Live guide verification confirms the incompatible NFL source is absent from games, backups and tiles, and the regular H.264 feed is the sole feed for Panthers–Packers. All three leagues remain populated (NFL 14/3, NBA 13/1, NCAAF 1/67 games/tiles), health reports 100 input channels and no source errors. Nine gateway tests pass. Dispatcharr was unchanged and no video capture was opened by this deployment. Owner physical retest is pending; rollback details are in the latest handoff.
+
+## Owner NFL retest after deployment
+
+After refreshing TV, owner reports Panthers–Packers initially showed a static image and failed. Exiting and selecting it again produced a frozen image for roughly 4–5 seconds, then played fine. Playback is a partial pass on the second attempt; startup/reliability remains unresolved. No synchronized-audio or sustained-stability pass is inferred. No parallel agent stream was opened. Continue with the same stream for a one-minute stability/audio observation before further diagnostic captures.

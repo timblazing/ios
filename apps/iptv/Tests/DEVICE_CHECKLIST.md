@@ -82,3 +82,7 @@ Test one stream at a time; the provider allows only two connections. Ask before 
 - **Fail — NCAAF Troy @ James Madison:** same reported failure.
 - Correlated Dispatcharr logs show selected upstreams ending briefly after connection, three retries, then ERROR. First NFL source is labeled 4K, backup is regular; NCAAF source is `NCAAF 02: ESPN2`. Actual codec/placeholder diagnosis remains pending. No corrective server changes or extra playback sessions started.
 - Await owner confirmation that playback is stopped before testing one feed at a time. See `docs/VALIDATION-0.3.2.md` for evidence and limits.
+
+## NFL retest after incompatible-source exclusion
+
+Owner refreshed/reopened TV and selected Panthers @ Packers. First attempt displayed a static image and failed. After exiting/reselecting, the picture froze for approximately 4–5 seconds, then playback worked fine. This is a partial pass for playback on the second attempt; first-attempt startup/reliability remains a failure and is not accepted. Owner has not separately confirmed audio synchronization or sustained stability. No agent probe was opened during the owner retest. Next check: leave this single stream playing for one minute and report freezes and audio synchronization.

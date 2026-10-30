@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Current owner retest — NFL plays on retry, startup still fails
+
+After guide refresh, owner reports Panthers–Packers first showed a static image and failed. On exiting/reselecting, it froze for approximately 4–5 seconds, then played fine. Treat this as second-attempt playback success with unresolved first-start reliability, not completed acceptance. Audio synchronization/endurance are unverified. Do not start agent captures while the owner is watching. Next interaction is a one-minute stability/audio observation on this same stream. NCAAF retest remains pending.
+
 ## Incompatible-source filter deployed — 2026-10-29 evening
 
 Owner approved the gateway filter deployment. Backed up the pre-filter `gateway.py` and private `.env` on raygun at `~/docker/tv-gateway/backups/pr5-hevc-20261030T013256Z/` (directory 700, files 600). Set only the private known-incompatible channel exclusion, preserving unrelated environment settings, then rebuilt/recreated only `tv-gateway`. Dispatcharr and the installed iPad app were unchanged.
