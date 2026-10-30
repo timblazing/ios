@@ -58,3 +58,7 @@ The bridge forwards HLS without transcoding or TS segmentation. Later startup/th
 ### First owner-reported guide and HLS result
 
 After reopening TV with the private bridge configured, the owner confirmed that the guide was populated and reported successful NFL RedZone playback on the physical iPad mini 2 / iOS 10.3.3. This establishes visible guide content and a working HLS picture through the USB/Mac/tailnet adapter. In response to the audio/synchronization check, the owner reported that audio is good. Startup time, codec/resolution/frame rate, sustained performance, controls, background recovery and rotation have not yet been verified. No second acceptance stream was started by the agent. Keep the legacy relay while the remaining acceptance is incomplete.
+
+## Archived-session checkpoint
+
+The owner requested stopping and saving a handoff. 0.3.0 remains installed; 0.3.1 UI/packages are prepared separately and are not physically accepted. Temporary bridge/candidate/simulator processes were stopped. USB SSH dropped before the gateway preference could be restored, so it may still reference the stopped bridge. See `HANDOFF.md` and `BACKLOG.md` before resuming.

@@ -10,3 +10,9 @@ IPTV_CFLAGS = -fobjc-arc -fno-exceptions -fno-objc-exceptions -Wall -Wextra -Wno
 IPTV_RESOURCE_DIRS = Resources
 IPTV_INFOPLIST = Resources/Info.plist
 include $(THEOS_MAKE_PATH)/application.mk
+
+before-all::
+	@python3 scripts/check-public-resources.py Resources
+
+before-package::
+	@python3 scripts/check-public-resources.py .theos/_/Applications/IPTV.app

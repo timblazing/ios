@@ -5,27 +5,6 @@
 static UIColor *TVColor(unsigned rgb) {
     return [UIColor colorWithRed:((rgb >> 16) & 255)/255.0 green:((rgb >> 8) & 255)/255.0 blue:(rgb & 255)/255.0 alpha:1];
 }
-static UIImage *TVFill(UIColor *color) {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(8, 8), NO, 0);
-    [color setFill]; UIRectFill(CGRectMake(0, 0, 8, 8));
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext(); UIGraphicsEndImageContext();
-    return [image resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
-}
-static UIImage *TVIcon(BOOL refresh) {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(24, 24), NO, 0);
-    [TVColor(0xa3a8b3) setStroke];
-    UIBezierPath *path = [UIBezierPath bezierPath]; path.lineWidth = 1.8; path.lineCapStyle = kCGLineCapRound; path.lineJoinStyle = kCGLineJoinRound;
-    if (refresh) {
-        [path addArcWithCenter:CGPointMake(12, 12) radius:8 startAngle:0 endAngle:5.5 clockwise:YES];
-        [path moveToPoint:CGPointMake(20, 4)]; [path addLineToPoint:CGPointMake(20, 11)]; [path addLineToPoint:CGPointMake(13, 11)];
-    } else {
-        [path appendPath:[UIBezierPath bezierPathWithRoundedRect:CGRectMake(3, 4, 18, 7) cornerRadius:2]];
-        [path appendPath:[UIBezierPath bezierPathWithRoundedRect:CGRectMake(3, 13, 18, 7) cornerRadius:2]];
-        [path moveToPoint:CGPointMake(7, 7.5)]; [path addLineToPoint:CGPointMake(7.1, 7.5)];
-        [path moveToPoint:CGPointMake(7, 16.5)]; [path addLineToPoint:CGPointMake(7.1, 16.5)];
-    }
-    [path stroke]; UIImage *image = UIGraphicsGetImageFromCurrentImageContext(); UIGraphicsEndImageContext(); return image;
-}
 static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *color, CGRect frame) {
     UILabel *label = [[UILabel alloc] initWithFrame:frame];
     label.text = text; label.font = [UIFont systemFontOfSize:size weight:UIFontWeightSemibold];
@@ -43,8 +22,11 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
 @end
 
 @implementation IPTVChannelListController {
-    UISegmentedControl *_tabs;
-    UIButton *_refresh, *_settings;
+    NSArray<UIButton *> *_tabs;
+    NSInteger _selectedTab;
+    UIVisualEffectView *_tabDock;
+    UIView *_dockShadow;
+    CAGradientLayer *_dockSheen;
     UICollectionView *_collection;
     UILabel *_message;
     IPTVGuide *_guide;
@@ -64,18 +46,6 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     self.view.backgroundColor = TVColor(0x0b0c0f);
     _logos = [NSCache new]; _logos.totalCostLimit = 8 * 1024 * 1024;
     _logoTasks = [NSMutableDictionary new]; _failedLogos = [NSMutableSet new];
-    _tabs = [[UISegmentedControl alloc] initWithItems:@[@"NFL", @"NBA", @"NCAAF"]];
-    _tabs.selectedSegmentIndex = 0; _tabs.tintColor = TVColor(0xa3a8b3);
-    [_tabs setBackgroundImage:TVFill(TVColor(0x15171c)) forState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-    [_tabs setBackgroundImage:TVFill(TVColor(0x1f2229)) forState:UIControlStateSelected barMetrics:UIBarMetricsDefault];
-    [_tabs setDividerImage:TVFill(TVColor(0x15171c)) forLeftSegmentState:UIControlStateNormal rightSegmentState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
-    [_tabs setTitleTextAttributes:@{NSForegroundColorAttributeName:TVColor(0xa3a8b3), NSFontAttributeName:[UIFont systemFontOfSize:15 weight:UIFontWeightSemibold]} forState:UIControlStateNormal];
-    [_tabs setTitleTextAttributes:@{NSForegroundColorAttributeName:TVColor(0xf2f3f5)} forState:UIControlStateSelected];
-    _tabs.layer.cornerRadius = 10; _tabs.clipsToBounds = YES;
-    [_tabs addTarget:self action:@selector(selectTab) forControlEvents:UIControlEventValueChanged];
-    [self.view addSubview:_tabs];
-    _refresh = [self button:@"↻" label:@"Refresh guide" action:@selector(reload)];
-    _settings = [self button:@"☷" label:@"Server settings" action:@selector(editServer)];
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
     layout.minimumInteritemSpacing = 12; layout.minimumLineSpacing = 12;
     layout.sectionInset = UIEdgeInsetsMake(0, 20, 16, 20);
@@ -87,25 +57,62 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     [_collection registerClass:IPTVGuideCell.class forCellWithReuseIdentifier:@"card"];
     [_collection registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"heading"];
     [self.view addSubview:_collection];
-    _message = TVLabel(self.view, @"Set a gateway URL in Server settings.", 16, TVColor(0xa3a8b3), CGRectZero);
+    UIBlurEffect *blur = UIAccessibilityIsReduceTransparencyEnabled() ? nil : [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    _tabDock = [[UIVisualEffectView alloc] initWithEffect:blur];
+    _tabDock.backgroundColor = UIAccessibilityIsReduceTransparencyEnabled() ? TVColor(0x292a2c) : UIColor.clearColor;
+    _tabDock.layer.cornerRadius = 30; _tabDock.clipsToBounds = YES;
+    _tabDock.layer.borderWidth = 1/UIScreen.mainScreen.scale;
+    _tabDock.layer.borderColor = [UIColor colorWithWhite:1 alpha:0.22].CGColor;
+    _dockSheen = [CAGradientLayer layer];
+    _dockSheen.colors = @[(id)[UIColor colorWithWhite:1 alpha:0.14].CGColor,
+                         (id)[UIColor colorWithWhite:1 alpha:0.02].CGColor,
+                         (id)[UIColor colorWithWhite:1 alpha:0.06].CGColor];
+    _dockSheen.locations = @[@0, @0.55, @1];
+    _dockSheen.hidden = UIAccessibilityIsReduceTransparencyEnabled();
+    [_tabDock.contentView.layer addSublayer:_dockSheen];
+    _dockShadow = [UIView new];
+    _dockShadow.layer.shadowColor = UIColor.blackColor.CGColor;
+    _dockShadow.layer.shadowOpacity = 0.28;
+    _dockShadow.layer.shadowRadius = 12;
+    _dockShadow.layer.shadowOffset = CGSizeMake(0, 5);
+    _dockShadow.userInteractionEnabled = NO;
+    [self.view addSubview:_dockShadow];
+    NSMutableArray *tabs = [NSMutableArray new];
+    NSArray *titles = @[@"NFL", @"NBA", @"NCAAF"];
+    for (NSUInteger index = 0; index < titles.count; index++) {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.tag = index; button.layer.cornerRadius = 22;
+        button.titleLabel.font = [UIFont systemFontOfSize:15 weight:UIFontWeightSemibold];
+        [button setTitle:titles[index] forState:UIControlStateNormal];
+        [button setTitleColor:TVColor(0xa3a8b3) forState:UIControlStateNormal];
+        [button setTitleColor:TVColor(0xf2f3f5) forState:UIControlStateSelected];
+        button.accessibilityLabel = titles[index];
+        [button addTarget:self action:@selector(tabTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [_tabDock.contentView addSubview:button]; [tabs addObject:button];
+    }
+    _tabs = tabs;
+    [self selectTab];
+    [self.view addSubview:_tabDock];
+    _message = TVLabel(self.view, @"TV isn’t configured yet.", 16, TVColor(0xa3a8b3), CGRectZero);
     _message.textAlignment = NSTextAlignmentCenter; _message.numberOfLines = 0;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(background) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(foreground) name:UIApplicationWillEnterForegroundNotification object:nil];
-}
-- (UIButton *)button:(NSString *)title label:(NSString *)label action:(SEL)action {
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    [button setImage:TVIcon([title isEqual:@"↻"]) forState:UIControlStateNormal];
-    button.tintColor = TVColor(0xa3a8b3); button.accessibilityLabel = label;
-    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:button]; return button;
 }
 - (UIStatusBarStyle)preferredStatusBarStyle { return UIStatusBarStyleLightContent; }
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CGFloat w = self.view.bounds.size.width, h = self.view.bounds.size.height;
-    _tabs.frame = CGRectMake(20, 28, MIN(350, w - 132), 44);
-    _refresh.frame = CGRectMake(w-104, 28, 44, 44); _settings.frame = CGRectMake(w-56, 28, 44, 44);
-    _collection.frame = CGRectMake(0, 80, w, h-80);
+    CGFloat dockWidth = MIN(350, w - 40);
+    _tabDock.frame = CGRectMake((w-dockWidth)/2, h-84, dockWidth, 60);
+    _dockShadow.frame = _tabDock.frame;
+    _dockShadow.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:_dockShadow.bounds cornerRadius:30].CGPath;
+    _dockSheen.frame = _tabDock.bounds;
+    CGFloat tabWidth = (dockWidth-16)/3;
+    for (NSUInteger index = 0; index < _tabs.count; index++)
+        _tabs[index].frame = CGRectMake(8+index*tabWidth, 8, tabWidth, 44);
+    _collection.frame = self.view.bounds;
+    _collection.contentInset = UIEdgeInsetsMake(20, 0, 104, 0);
+    _collection.scrollIndicatorInsets = UIEdgeInsetsMake(20, 0, 104, 0);
     _message.frame = CGRectMake(30, h/2-40, w-60, 80);
     [_collection.collectionViewLayout invalidateLayout];
 }
@@ -117,49 +124,12 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated]; self.navigationController.navigationBarHidden = YES; _visible = YES; [self foreground];
 }
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if (![NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"].length) [self editServer];
-}
 - (void)viewWillDisappear:(BOOL)animated { [super viewWillDisappear:animated]; _visible = NO; [self background]; }
 - (void)background { [_poll invalidate]; _poll = nil; [_task cancel]; _task = nil; _generation++; }
 - (void)foreground {
     if (!_visible) return;
     [self reload]; [_poll invalidate];
     _poll = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(reload) userInfo:nil repeats:YES];
-}
-- (void)editServer {
-    [self background];
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Server settings" message:@"Gateway URL, then Dispatcharr URL. Addresses stay on this device." preferredStyle:UIAlertControllerStyleAlert];
-    for (NSString *key in @[@"gateway.baseURL", @"server.baseURL"]) {
-        [alert addTextFieldWithConfigurationHandler:^(UITextField *field) {
-            field.placeholder = [key hasPrefix:@"gateway"] ? @"Gateway URL" : @"Dispatcharr URL";
-            field.text = [NSUserDefaults.standardUserDefaults stringForKey:key];
-            field.keyboardType = UIKeyboardTypeURL; field.autocapitalizationType = UITextAutocapitalizationTypeNone;
-            field.autocorrectionType = UITextAutocorrectionTypeNo;
-        }];
-    }
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *a) { [self foreground]; }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
-        NSMutableArray *values = [NSMutableArray new];
-        for (UITextField *field in alert.textFields) {
-            NSString *value = [field.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-            if (value.length && ![value containsString:@"://"]) value = [@"http://" stringByAppendingString:value];
-            while ([value hasSuffix:@"/"]) value = [value substringToIndex:value.length-1];
-            NSURL *url = [NSURL URLWithString:value];
-            if (value.length && (!url.host.length || ![@[@"http", @"https"] containsObject:url.scheme.lowercaseString] || url.user || url.password || url.query || url.fragment)) {
-                self->_message.text = @"Enter an HTTP or HTTPS base URL."; self->_message.hidden = NO;
-                [self foreground]; return;
-            }
-            [values addObject:value];
-        }
-        [NSUserDefaults.standardUserDefaults setObject:values[0] forKey:@"gateway.baseURL"];
-        [NSUserDefaults.standardUserDefaults setObject:values[1] forKey:@"server.baseURL"];
-        self->_etag = nil; self->_guide = nil; [self->_failedLogos removeAllObjects]; [self->_logos removeAllObjects];
-        for (NSURLSessionDataTask *task in self->_logoTasks.allValues) [task cancel];
-        [self->_logoTasks removeAllObjects]; [self selectTab]; [self foreground];
-    }]];
-    [self presentViewController:alert animated:YES completion:nil];
 }
 - (void)reload {
     NSString *base = [NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"];
@@ -178,23 +148,27 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
             if (guide) { self->_guide = guide; self->_etag = [http.allHeaderFields objectForKey:@"Etag"] ?: [http.allHeaderFields objectForKey:@"ETag"]; [self selectTab]; }
             else if (http.statusCode == 304 && self->_guide) { [self selectTab]; }
             else {
-                self->_message.text = self->_guide ? @"Guide unavailable. Showing last update; retrying in 30 seconds." : @"Can't load guide. Check the gateway URL and connection.";
+                self->_message.text = self->_guide ? @"Guide unavailable. Showing last update; retrying in 30 seconds." : @"Can’t load guide. Check the connection; retrying automatically.";
                 self->_message.hidden = NO;
             }
         });
     }]; [_task resume];
 }
 - (IPTVLeague *)league {
-    NSString *identifier = @[@"nfl", @"nba", @"ncaaf"][_tabs.selectedSegmentIndex];
+    NSString *identifier = @[@"nfl", @"nba", @"ncaaf"][_selectedTab];
     for (IPTVLeague *league in _guide.leagues) if ([league.identifier isEqual:identifier]) return league;
     return nil;
 }
+- (void)tabTapped:(UIButton *)button { _selectedTab = button.tag; [self selectTab]; }
 - (void)selectTab {
     IPTVLeague *league = [self league];
-    for (NSUInteger index = 0; index < 3; index++) {
-        NSString *identifier = @[@"nfl", @"nba", @"ncaaf"][index];
-        for (IPTVLeague *item in _guide.leagues) if ([item.identifier isEqual:identifier])
-            [_tabs setTitle:[NSString stringWithFormat:@"%@  %lu", item.title, (unsigned long)item.games.count] forSegmentAtIndex:index];
+    for (NSUInteger index = 0; index < _tabs.count; index++) {
+        UIButton *button = _tabs[index];
+        button.selected = index == (NSUInteger)_selectedTab;
+        button.backgroundColor = button.selected ? [UIColor colorWithWhite:1 alpha:0.14] : UIColor.clearColor;
+        button.layer.borderWidth = button.selected ? 1/UIScreen.mainScreen.scale : 0;
+        button.layer.borderColor = [UIColor colorWithWhite:1 alpha:0.14].CGColor;
+        button.accessibilityTraits = UIAccessibilityTraitButton | (button.selected ? UIAccessibilityTraitSelected : 0);
     }
     NSMutableArray *sections = [NSMutableArray new], *headings = [NSMutableArray new];
     NSDateFormatter *day = [NSDateFormatter new]; day.dateFormat = @"EEEE, MMM d";
@@ -209,7 +183,7 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     if (league.channels.count) { [sections addObject:league.channels]; [headings addObject:@"CHANNELS"]; }
     _sections = sections; _headings = headings; [_collection reloadData];
     _message.hidden = sections.count > 0;
-    _message.text = _guide ? @"No games or channels in this league." : @"Set a gateway URL in Server settings.";
+    _message.text = _guide ? @"No games or channels in this league." : @"TV isn’t configured yet.";
 }
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView { return _sections.count; }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section { return _sections[section].count; }

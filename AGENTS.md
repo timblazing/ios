@@ -142,9 +142,9 @@ A T3 Code companion: UIKit shell, bundled HTML/CSS/JS UI in WKWebView, native ne
 
 ### TV (`apps/iptv/`)
 
-A native guide and direct-HLS player for a Dispatcharr server, v0.3.0. Read `README.md` first.
+A native guide and direct-HLS player for a Dispatcharr server, v0.3.1 prepared (physical iPad last verified on 0.3.0). Read `apps/iptv/README.md`, `apps/iptv/docs/BACKLOG.md` and `apps/iptv/docs/HANDOFF.md` first.
 
 - The guide/player uses Dispatcharr HLS (`?output_format=hls`) directly in AVPlayer. The legacy TS relay in `Application/Stream/` remains in the source/build until physical iOS 10 acceptance; the new player does not use it. The A7 requires H.264/AAC; HEVC needs a server-side H.264 profile.
-- The server URL is entered on the device. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.
+- Server URLs are privately provisioned through device defaults or an external on-device profile; there is no in-app settings UI in 0.3.1. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.
 - Next (see `apps/iptv/docs/NEXT.md`): physical-device acceptance, then relay retirement only if supported by device evidence. The guide comes from `gateway/`, a Python service running in Docker on the home server `raygun` (`~/docker/tv-gateway/`, port 9292, reachable with `ssh raygun`). Docker is allowed there, never on the Mac.
 - The provider allows 2 concurrent streams: capture or test one channel at a time and stop sessions when done.

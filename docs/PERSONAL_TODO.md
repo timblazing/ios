@@ -1,5 +1,7 @@
 # Personal research notes
 
+For the full TV work queue and archived-chat checkpoint, start at [IPTV backlog](../apps/iptv/docs/BACKLOG.md).
+
 - [ ] Research whether re-jailbreaking the iPad mini 2 (iPad4,5, iOS 10.3.3) after each restart can be automated or made less manual. Start with [LukeZGD/tns-sockport](https://github.com/LukeZGD/tns-sockport). Determine what is possible after a cold boot, what still needs an on-device interaction, and whether any option depends on a Mac/USB connection or works over Wi-Fi. Research only: no boot or jailbreak changes are authorized by this note, and automation feasibility has not been established.
 
 - [x] Preconfigure TV for the current USB acceptance run without publishing private URLs: device-only gateway preference, private original-preferences backup and Mac bridge config outside the repo. Public IPA/DEB packages remain unconfigured.
@@ -7,3 +9,5 @@
 - [ ] Choose secure TV access away from home for the iOS 10 iPad. Tailscale's [iOS client requires iOS 15+](https://tailscale.com/docs/install/ios); [subnet routers can connect unsupported devices](https://tailscale.com/docs/reference/devices-without-tailscale), but a home-side subnet router alone does not give a remote iPad a route. Consider a Tailscale-capable travel router for independent use, or a temporary USB/SSH bridge through the Mac for testing. USB SSH banner and Mac-to-home gateway health are confirmed; authentication, routing and HLS handling remain untested. [Funnel exposes services publicly](https://tailscale.com/docs/features/tailscale-funnel); [Cloudflare Access service credentials](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/) require authentication on requests, including the video path. Do not publish an unauthenticated TV endpoint.
 
 - Travel-router candidate within the owner's $69.99 ceiling: [Slate Plus GL-A1300](https://www.gl-inet.com/en-us/products/gl-a1300), listed at $69.99 on 2026-10-29. GL.iNet lists it as [Tailscale-supported](https://docs.gl-inet.com/router/en/4/interface_guide/tailscale/); the cheaper Opal GL-SFT1200 is unsupported. No purchase or router setup performed.
+
+- [ ] Rebuild Dispatcharr sports setup with [EPG & Sports Editor](https://github.com/jstevenscl/epg-and-sports-editor), using the [owner-provided setup handoff](../apps/iptv/docs/DISPATCHARR-SPORTS-SETUP.md) as planning context. Check the current installation and plugin version, back up before cleanup, align exact channel groups with enabled plugin sections, and verify nonzero scanning, matchup names/logos and Central-time Pregame/Live/Postgame EPG. Then check the TV gateway matching/EPG and Jellyfin refresh. Do not execute the destructive cleanup just because it appears in the handoff.

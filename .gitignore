@@ -23,3 +23,7 @@ games/rent-trivia/Resources/Jellyfin.plist
 # Python tooling intermediates
 **/__pycache__/
 *.pyc
+
+# TV private provisioning lives on-device or outside the checkout, never in releases.
+**/com.local.iptv.configuration.plist
+apps/iptv/Resources/*.local.plist
