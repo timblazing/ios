@@ -11,6 +11,11 @@ Start here when the owner says “let’s work on my IPTV backlog/next steps.”
 - [ ] Run [DEVICE_CHECKLIST.md](../Tests/DEVICE_CHECKLIST.md) one interaction at a time, recording pass/fail/pending for the actual version. Prioritize picture/audio, measured tap-to-picture, first-picture control timing, pause/resume/back, 2+ minute background recovery, rotation and smooth 720p60. Physical AirPlay/volume and glass rendering/performance are also pending. One video stream at a time.
 - [ ] Leave the legacy relay compiled until remaining physical acceptance supports removing it; remove it separately, with retained regression coverage until then.
 
+## Playback issue follow-up
+
+- [ ] Get approval for the tested gateway exclusion change and private configuration that omits the probe-confirmed HEVC NFL primary; deploy with backup/rollback and verify only the regular H.264 feed remains.
+- [ ] Retest NFL and NCAAF on the physical iPad after probe sessions have drained. Current bounded server captures succeed for the regular NFL and NCAAF sources; earlier upstream failures remain unexplained.
+
 ## 2. Review and finish the prepared changes
 
 - [x] Review PR #5 (2026-10-29 continuation: focused tests, fresh compile, release checksums and IPA metadata pass). It includes the 0.3.1 UI/packages plus earlier guide/logo fixes, USB tooling, device-panel guidance and validation. Do not merge without the owner's instruction.

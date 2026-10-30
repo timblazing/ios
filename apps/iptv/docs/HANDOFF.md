@@ -2,6 +2,12 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Source diagnosis — after owner stopped playback
+
+Sequential bounded Dispatcharr HLS captures confirm the NFL primary is 2160p59.94 HEVC Main 10/AC-3 (incompatible A7), while its regular backup and the selected NCAAF ESPN2 source now deliver 720p59.94 H.264 Main/HE-AAC video. NFL first frame shows Panthers–Packers; NCAAF first frame shows an ESPN2 studio segment. Earlier brief upstream failures remain unexplained; physical retest is still required.
+
+Implemented a private gateway `EXCLUDED_CHANNEL_NUMBERS` option (empty by default) to remove probe-confirmed incompatible sources from all game/backup/tile selections. All 9 gateway tests pass; a current-data candidate retains only the regular NFL feed for that matchup. New gateway deployment plus private exclusion configuration awaits owner approval. No new IPA is needed. Dispatcharr itself was not changed. See [stream evidence](STREAMS.md#032-physical-failure-follow-up); raw endpoints/frames remain outside Git. A final read-only Dispatcharr check confirmed zero active proxy clients; no agent capture remains running.
+
 ## Current investigation — first 0.3.2 playback failures
 
 Owner confirms home cards/logos appear. Cleveland @ Atlanta and Sacramento @ New Orleans playback worked great. NFL Panthers @ Packers loads, attempts backup, shows black video and eventually errors; NCAAF Troy @ James Madison similarly fails. Existing TV screenshots were retrieved privately from DCIM by USB file access; originals were untouched. Copies and raw logs/guide are private under `~/.config/ios-games/iptv/acceptance-2026-10-29/`, never committed.

@@ -35,3 +35,11 @@ Retrieved existing iPad screenshots privately by USB file access (no automated c
 Read-only production guide and Dispatcharr metadata identify two NFL event feeds and one NCAAF event feed. The first NFL source is labeled 4K; its regular backup is separate. The NCAAF source is named `NCAAF 02: ESPN2`. Source names/quality labels alone do not prove codec or availability. During the owner's failures, correlated Dispatcharr logs show each selected upstream delivering briefly, ending, retrying three times and entering ERROR with no untried source remaining. This reproduces upstream exhaustion in server evidence but does not yet establish its root cause or exclude an app issue. No server configuration was changed and no additional streams were opened by the agent.
 
 Next: owner returns to the guide so playback is stopped, then inspect one failing feed at a time (playlist/segments, codec and whether it is a finite placeholder) and compare the working path. Do not guess a transcoding or source-mapping fix from labels alone. Keep the legacy relay.
+
+## Bounded source probes after playback stopped
+
+Owner confirmed returning to the guide. Sequential, bounded captures through Dispatcharr HLS found regular NFL and NCAAF sources currently delivering 720p59.94 H.264 Main/HE-AAC broadcast video, while the first NFL source delivers 2160p59.94 HEVC Main 10/AC-3, unsupported on this iPad. No transcoding or Dispatcharr changes were made. Earlier upstream-end/retry evidence remains valid; these later successful captures do not explain that transient condition or establish iPad playback acceptance. See [stream findings](STREAMS.md#032-physical-failure-follow-up).
+
+Gateway exclusion support passes 9 tests, including primary/backup/tile exclusion and unrelated league preservation. An in-memory candidate against current M3U/EPG/scoreboards selects the regular NFL source without the incompatible primary. Deployment of this new gateway source and private exclusion setting awaits owner approval. There is no new app package/install in this investigation.
+
+Final read-only Dispatcharr cleanup check: zero active proxy clients. No agent capture remains running.

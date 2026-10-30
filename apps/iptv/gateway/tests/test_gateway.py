@@ -1,4 +1,5 @@
 import os, sys, unittest
+from unittest.mock import patch
 from datetime import datetime, timezone
 from urllib.parse import parse_qs, urlparse
 
@@ -109,6 +110,21 @@ class GatewayTests(unittest.TestCase):
     def test_logo_host_allowlist(self):
         with self.assertRaises(PermissionError):
             gw.logo_png("http://203.0.113.9/x.png", 64)
+
+    def test_excluded_feed_never_reaches_game_or_network_tiles(self):
+        guide = gw.Guide()
+        guide.chans = self.chans
+        guide.scores = {"nfl": gw.parse_scoreboard({"events": [
+            event("1", ("CAR", "Carolina", "Panthers"), ("GB", "Green Bay", "Packers"), ["NFL Net"], "in")
+        ]})}
+        with patch.object(gw, "EXCLUDED_CHANNEL_NUMBERS", frozenset(["1402", "1400"])):
+            guide.rebuild()
+        import json
+        leagues = json.loads(guide.body)["leagues"]
+        nfl = next(l for l in leagues if l["id"] == "nfl")
+        self.assertEqual([c["number"] for c in nfl["games"][0]["channels"]], ["1403"])
+        self.assertNotIn("1400", [c["number"] for c in nfl["channels"]])
+        self.assertEqual(next(l for l in leagues if l["id"] == "nba")["channels"][0]["number"], "1200")
 
 
 if __name__ == "__main__":

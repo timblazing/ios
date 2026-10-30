@@ -26,7 +26,7 @@ Details:
 
 ## Codecs
 
-All sports channels sampled so far are H.264 + AAC, which the A7 decodes in hardware: event placeholders (1080p30 Baseline) and NFL Network (720p60 High). Dispatcharr's HLS output is a packet copy, so HEVC channels would still not play. If one shows up, add a Dispatcharr stream profile with ffmpeg `-c:v libx264` for that channel only (raygun is 4-core ARM, so budget about one 720p transcode).
+The initial sports channels sampled were H.264 + AAC, which the A7 decodes in hardware: event placeholders (1080p30 Baseline) and NFL Network (720p60 High). Dispatcharr's HLS output is a packet copy, so HEVC channels would still not play. If one shows up, add a Dispatcharr stream profile with ffmpeg `-c:v libx264` for that channel only (raygun is 4-core ARM, so budget about one 720p transcode).
 
 ## Dispatcharr settings and plugins
 
@@ -35,3 +35,15 @@ All sports channels sampled so far are H.264 + AAC, which the A7 decodes in hard
 - **EPG:** the Custom Dummy EPGs for NBA, NFL and NCAAF carry no game info, and the gateway replaces them with ESPN data. The provider's XMLTV ("Primary", about 4400 entries) is not mapped to any channel yet. Mapping it to the 24/7 network channels (ESPN, FS1, NFL NETWORK…) with **EPG Janitor** or **Channel Mapparr** (both installed) fills the tiles' now/next for free. The gateway passes the EPG through.
 - **Worth trying:** *Event Channel Managarr*, to hide event channels without a current event, so the guide stays clean between weeks. *Underfed*, for source failover when a provider stream dies.
 - **Skip:** delay-buffer and fallback-loop plugins. HLS already gives a small buffer, and a fallback loop would look "live" to the app when it isn't.
+
+## 0.3.2 physical-failure follow-up
+
+Owner-reported Panthers @ Packers and Troy @ James Madison failures were correlated with Dispatcharr upstreams ending and retrying. Later, with owner playback stopped, sequential bounded server captures found:
+
+- NFL regular backup: eight seconds of real Panthers–Packers video, 1280×720 at 60000/1001 fps, H.264 Main + stereo HE-AAC, approximately 2.7 MB. Capture completed in 4.16 seconds; that is server capture elapsed time, not iPad tap-to-picture time.
+- NFL primary: eight seconds, 3840×2160 at 60000/1001 fps, HEVC Main 10 + six-channel AC-3, approximately 18.8 MB. This is confirmed incompatible with the A7 target; the primary selection should be excluded for this client. No transcoding was enabled.
+- NCAAF selected ESPN2 source: eight seconds of broadcast video, 1280×720 at 60000/1001 fps, H.264 Main + stereo HE-AAC, approximately 3.2 MB. It is delivering compatible media now; the earlier short-lived upstream failure remains unexplained and requires physical retest.
+
+A first frame from the regular NFL capture shows the actual game. The NCAAF capture shows an ESPN2 studio segment; this verifies media delivery, not continuous correct-event coverage. Capture files were temporary and removed remotely; private first frames and sanitized probe summaries are saved outside Git. Closed each capture before the next and checked Dispatcharr client expiry between channels. After the final capture, a read-only Dispatcharr check confirmed zero active proxy clients before handback.
+
+The gateway now supports a private `EXCLUDED_CHANNEL_NUMBERS` list, with regression coverage ensuring exclusions cannot leak into primary/backup feeds or tiles and that unrelated leagues remain present. A candidate using current data removes only the probe-confirmed incompatible NFL source and retains the compatible regular source. New deployment/configuration awaits explicit owner approval. No new iPad build is required for this guide change.
