@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Physical installation resumed — 2026-10-29 evening
+
+The owner connected the iPad by USB. Read-only queries confirmed iPad4,5 / iOS 10.3.3 with TV 0.3.0 / build 3 installed. After verifying the committed IPA checksum and bundle identity/version/build, installed the owner-approved TV 0.3.1 / build 4 over USB (`Install: Complete`). A separate installed-app query confirms 0.3.1 / build 4. The earlier connectivity/install blocker below is resolved. Private gateway preferences and physical guide/playback acceptance remain pending; installation alone does not validate them. No app launch or touch was automated.
+
 ## Continuation — 2026-10-29 evening
 
 This section supersedes the earlier production-deployment and installation-approval status below. The owner explicitly approved deploying the gateway fixes and installing the prepared 0.3.1 IPA; no merge was authorized.

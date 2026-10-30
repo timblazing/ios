@@ -31,6 +31,10 @@ All task-owned test services and the simulator are stopped. **Gateway restoratio
 
 The owner approved installing 0.3.1, but no install was attempted: USB discovery found no device and the usbmuxd Wi-Fi entry returned no model/version. Reconnect and identify the iPad before proceeding; approval persists. The production gateway fixes are deployed and verified independently. Device preferences, installed version and all revised UI checks remain unverified.
 
+### Installation resumed
+
+- **Pass — 0.3.1 USB installation:** owner connected the device; verified iPad4,5 / iOS 10.3.3 and previous TV 0.3.0 / build 3. Verified committed IPA checksum and bundle identity/version/build, then installed with existing owner approval (`Install: Complete`). Independent installed-app query confirms **0.3.1 / build 4**. The earlier discovery blocker is resolved. Private routing/preferences and all 0.3.1 functional/visual checks remain pending. No launch/touch automation or playback test occurred.
+
 ## Guide and interaction
 
 - [ ] Privately provision gateway/Dispatcharr configuration for 0.3.1; relaunch and verify persistence without a settings screen.
