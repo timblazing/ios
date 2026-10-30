@@ -7,6 +7,7 @@ import html
 import json
 from pathlib import Path
 import plistlib
+import uuid
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--out', type=Path, required=True, help='New output directory outside the repo')
@@ -57,6 +58,18 @@ h1{font-size:30px}pre{font:inherit;white-space:pre-wrap;word-wrap:break-word}</s
     clip.mkdir()
     with (clip / 'Info.plist').open('wb') as f:
         plistlib.dump(dict(Title=title, URL=url, FullScreen=True, IsRemovable=True), f)
+    # Settings installs the WebClip through the OS; copying its folder alone may not register an icon.
+    identifier = 'com.local.offlineprobe.' + label
+    webclip_payload = dict(PayloadType='com.apple.webClip.managed', PayloadVersion=1,
+                           PayloadIdentifier=identifier + '.webclip', PayloadUUID=str(uuid.uuid4()),
+                           PayloadDisplayName=title, Label=title, URL=url, FullScreen=True,
+                           IsRemovable=True)
+    profile = dict(PayloadType='Configuration', PayloadVersion=1, PayloadIdentifier=identifier,
+                   PayloadUUID=str(uuid.uuid4()), PayloadDisplayName=title,
+                   PayloadDescription='Adds one harmless offline test shortcut. No jailbreak code, certificates, VPN, or management.',
+                   PayloadContent=[webclip_payload])
+    with (out / (label + '.mobileconfig')).open('wb') as f:
+        plistlib.dump(profile, f)
     (out / (label + '-url.txt')).write_text(url)
     (out / (label + '-manifest.json')).write_text(json.dumps(dict(
         bytes=count, sha256=hashlib.sha256(data).hexdigest(), html_bytes=len(page.encode()),

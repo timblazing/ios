@@ -82,4 +82,4 @@ The repo ships a prebuilt payload. This session inspected source and dependencie
 
 ## Current checkpoint
 
-Harmless offline probes are installed; the owner is testing the small probe first. Native canaries compile and their final ad-hoc signatures/SDK metadata validate, but a matching Apple provisioning profile is still needed for a meaningful stock-boot test. Detailed per-step acceptance and cleanup live in [the lab README](../tools/rejailbreak-lab/README.md).
+Harmless offline probe files were copied, but the owner could not see the small icon. This does not establish WebClip registration or reject the data-URL hypothesis. The generator now also produces a single-WebClip configuration profile so Safari/Settings can perform registration through the stock OS; profile installation and physical acceptance are pending. Native canaries compile and their final ad-hoc signatures/SDK metadata validate, but a matching Apple provisioning profile is still needed for a meaningful stock-boot test. Detailed per-step acceptance and cleanup live in [the lab README](../tools/rejailbreak-lab/README.md).

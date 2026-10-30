@@ -8,18 +8,18 @@ For iPad4,5 / iOS 10.3.3. These probes isolate two questions before involving th
 python3 tools/rejailbreak-lab/build-webclip-probes.py --out /tmp/offline-probes-new
 ```
 
-Creates two HTML pages and corresponding `.webclip/Info.plist` files with the entire page in a `data:` URL:
+Creates two HTML pages, corresponding `.webclip/Info.plist` files, and single-WebClip `.mobileconfig` profiles with the entire page in a `data:` URL:
 
 - `Offline probe small`: 32 embedded test bytes; tests whether the URL scheme and automatic page JavaScript work.
 - `Offline probe large`: 548,984 embedded test bytes, exactly the size of the reviewed TNS payload; tests URL length, loading and buffer decoding without the exploit.
 
 Both verify every byte after base64 decoding. A successful page shows `PASS`, the number of bytes, opening time, URL scheme, standalone state and the browser's online flag. The flag alone does not prove that the network is disabled. The generated page has **zero network resources** and no telemetry or result upload.
 
-On 2026-10-30 these two uniquely named WebClip folders were added to `/var/mobile/Library/WebClips/` with mobile ownership, then `uicache` completed. The original TotallyNotSpyware clip was preserved. Physical opening and offline results are pending the owner; no icon has been opened by automation. The small and large URL strings are about 2 KB and 978 KB respectively. Generated artifacts live outside Git.
+On 2026-10-30 these two uniquely named WebClip folders were added to `/var/mobile/Library/WebClips/` with mobile ownership, then `uicache` completed. The original TotallyNotSpyware clip was preserved. The owner subsequently reported that the small icon was missing. Directory presence plus successful `uicache` was insufficient evidence of icon registration; neither physical opening nor offline operation has passed. No icon has been opened by automation. The small and large URL strings are about 2 KB and 978 KB respectively. Generated artifacts live outside Git.
 
 Test one step at a time:
 
-1. With the iPad awake and unlocked, open **Offline probe small** and record PASS/error/blank/missing icon.
+1. Install the generated `small.mobileconfig` through Safari and Settings to let iOS register the shortcut. It contains only one removable WebClip, with no certificates, VPN, restrictions or MDM. The owner must confirm the Settings installation. Acceptance of a `data:` URL through this path is itself unverified. Then open **Offline probe small** and record PASS/error/blank/missing icon. Serve the profile only temporarily from a reachable Mac address, using content type `application/x-apple-aspen-config`; stop that task-owned server after acceptance.
 2. Only if the small probe passes, open **Offline probe large**. Confirm `Verified 548984 embedded bytes`.
 3. Only after both pass, disable Wi-Fi and cellular data, then reopen the small probe and confirm a fresh opening timestamp. Repeat for the large probe. These pages are harmless while already jailbroken.
 4. Re-enable the network for further diagnostics. A successful `data:` WebClip proves a potential offline delivery vehicle; it does not establish TNS's JIT execution or native payload behavior in that context.
