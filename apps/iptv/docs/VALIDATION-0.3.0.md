@@ -33,4 +33,32 @@ The checked-in guide images contain only public game/network metadata. Player ev
 
 ## Physical acceptance
 
-No physical iPad install or test. All human checks remain unchecked in `Tests/DEVICE_CHECKLIST.md`, including iOS 10 HLS, smooth 720p60/1080p60, audio/routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
+The owner-approved USB install completed on the physical iPad mini 2 / iOS 10.3.3; a subsequent installed-app query reports TV 0.3.0. The owner confirmed populated guide rendering, RedZone HLS picture and good audio through the USB bridge. Remaining checks in `Tests/DEVICE_CHECKLIST.md` include startup timing, source resolution/frame rate, smooth 720p60/1080p60, audio routes, touch, rotation, memory/endurance and background recovery. The legacy relay remains compiled and available in source until that acceptance passes.
+
+Read-only acceptance preflight on 2026-10-29 found zero USB/Wi-Fi devices through usbmuxd; T3 Device panel discovery exposed simulators only. No install or physical test followed. See the device checklist acceptance log for the next step.
+
+The owner then reported that the iPad battery was depleted and requested stopping device work until it is charged and rejailbroken. No physical playback results were collected. The owner subsequently resumed: read-only USB/Wi-Fi queries confirmed iPad4,5 / iOS 10.3.3, with TV 0.2.0 installed. The owner then approved installing 0.3.0 over USB. The release IPA SHA256 matched `dist/SHA256SUMS`, installation reported `Install: Complete`, and `ideviceinstaller list` returned `CFBundleShortVersionString` **0.3.0** for `com.local.iptv`. On first launch, the owner reported a blank Gateway URL and a retained Dispatcharr URL. The iPad and Mac are away from the home LAN; guide/playback checks remain pending until secure remote access is configured. No video stream was opened for physical acceptance.
+
+## Network-logo follow-up — 2026-10-29
+
+Reproduced upstream 404s for ESPN, NFL Network and CBS Sports Network. The source repository owner was misspelled (`tv-logos` instead of `tv-logo`). All 18 configured filenames exist in the corrected public repository. Requests through raygun's running `/logo` endpoint with the corrected URLs returned HTTP 200, `image/png`, and 96×96 PNGs for all 18. The gateway Python suite passes all 7 tests, including the corrected NFL Network URL assertion. No video streams were opened.
+
+The gateway source fix is prepared for review; the live gateway has not been redeployed, and its generated guide still needs verification after deployment. This is gateway endpoint evidence, not physical-device logo/rendering acceptance. No app version or package changed.
+
+## USB bridge and guide-group recovery — 2026-10-29
+
+The owner approved a Mac/USB bridge for offsite testing and closed TV before provisioning. Existing SSH key authentication to the physical iPad succeeded. A loopback-only Mac adapter, USB reverse SSH forward and SSH/Tailscale forwards now connect the iPad to a temporary gateway candidate on raygun. Private configuration and the original preferences backup are outside Git. Only the gateway preference was changed; the Dispatcharr preference was preserved. No app rebuild or reinstall was needed.
+
+Reproduced a new source mismatch: production `/guide.json` had zero games/tiles in every league while its health showed 41 channels. Dispatcharr group labels had provider prefixes/suffixes (`US| NFL PPV`, etc.), but grouping required exact NFL/NBA/NCAAF equality. Match league names as whole tokens instead; the regression test includes decorated groups and rejects a WNBA false match. All 8 gateway tests pass. A candidate container using the corrected source runs on raygun loopback only; production was not redeployed.
+
+A guide request made **from the physical iPad** through the bridge returned NFL 14 games / 3 tiles, NBA 3 / 1 and NCAAF 1 / 18 at the snapshot. All emitted stream URLs used iPad loopback. The adapter's 5 tests pass, including a synthetic HTTP redirect→playlist→segment round trip and conditional-guide responses. This does not prove live HLS playback or UIKit rendering. Owner confirmation of the visible guide is next; no video stream has been opened in this acceptance run.
+
+The bridge forwards HLS without transcoding or TS segmentation. Later startup/throughput results must be labeled as using this USB/Mac/tailnet path. Keep the legacy relay until physical acceptance is complete. See `../../../tools/tv-usb/README.md` for task-owned process cleanup and preference restoration.
+
+### First owner-reported guide and HLS result
+
+After reopening TV with the private bridge configured, the owner confirmed that the guide was populated and reported successful NFL RedZone playback on the physical iPad mini 2 / iOS 10.3.3. This establishes visible guide content and a working HLS picture through the USB/Mac/tailnet adapter. In response to the audio/synchronization check, the owner reported that audio is good. Startup time, codec/resolution/frame rate, sustained performance, controls, background recovery and rotation have not yet been verified. No second acceptance stream was started by the agent. Keep the legacy relay while the remaining acceptance is incomplete.
+
+## Archived-session checkpoint
+
+The owner requested stopping and saving a handoff. 0.3.0 remains installed; 0.3.1 UI/packages are prepared separately and are not physically accepted. Temporary bridge/candidate/simulator processes were stopped. USB SSH dropped before the gateway preference could be restored, so it may still reference the stopped bridge. See `HANDOFF.md` and `BACKLOG.md` before resuming.

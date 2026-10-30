@@ -1,4 +1,8 @@
 1afa2785a7a911724014901ed5ddcd010be7d74fcbfebb09b744f66205cb6a5b  ./IPTV-0.2.0.ipa
 d36fe24652af744410fdf080a2e922e3d80cd20d309add4353df839a9bbb9d8d  ./IPTV-0.3.0.ipa
+0f4d8ffee2fa76685e37ea4fbfd12b22afe3e16b7600923e42f21fe6a24bf525  ./IPTV-0.3.1.ipa
+c512c71f1e2b1109c33678af4662673d91c707311a0808343334b3d6e5a43c63  ./IPTV-0.3.2.ipa
 3de9ada100b7ddd26c732841dd4d77f4570bc5a91c68065723efdd2547610060  ../packages/com.local.iptv_0.2.0_iphoneos-arm.deb
 85d39c38259ebed9b3371b3163123b6032a24f5ba38efcee20efabeb0c2fc910  ../packages/com.local.iptv_0.3.0_iphoneos-arm.deb
+9b1eb4c37e1f1a7a224bc39ac4d6abc465cafd32beb9c666b5422410f17761a7  ../packages/com.local.iptv_0.3.1_iphoneos-arm.deb
+2217fae5ba1b600edf83a56b2bc23502b02d7b5f4a2f3393e1ab196efc0d773c  ../packages/com.local.iptv_0.3.2_iphoneos-arm.deb

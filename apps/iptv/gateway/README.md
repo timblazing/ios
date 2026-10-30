@@ -46,11 +46,11 @@ About 25 KB, or about 4 KB gzipped. Supports `ETag`/`If-None-Match` (returns 304
   "epg": [ { "title": "...", "start": "...Z", "end": "...Z" } ] }   // now and next, may be empty
 ```
 
-Games with no channel are dropped. A game is matched to a channel when both teams' nickname, location or short name appear as whole words in the channel name (`PELICANS vs KINGS`, `Panthers at Packers`, `NFL | 02 - 1pm Ravens at Bills`, `NC State at Wake Forest`). Network channels (ESPN, CBSSN, NFL NETWORK…) are added as feeds for the games ESPN says they carry. Name aliases live in `NETWORKS`/`ALIASES` in `gateway.py`.
+Games with no channel are dropped. A game is matched to a channel when both teams' nickname, location or short name appear as whole words in the channel name (`PELICANS vs KINGS`, `Panthers at Packers`, `NFL | 02 - 1pm Ravens at Bills`, `NC State at Wake Forest`). Network channels (ESPN, CBSSN, NFL NETWORK…) are added as feeds for the games ESPN says they carry. League group names are matched as whole tokens, so both `NFL` and provider labels such as `US| NFL PPV` are accepted without matching WNBA as NBA. Name aliases live in `NETWORKS`/`ALIASES` in `gateway.py`.
 
 ### `GET /logo?u=<url>&s=<px>`
 
-Fetches, fits into an `s`×`s` transparent PNG (default 96, 16–256), and caches it on disk for good. Only ESPN's CDN, `raw.githubusercontent.com` (tv-logos) and the Dispatcharr host are allowed. Use `s=96` for 48 pt marks on Retina. The response has `Cache-Control: max-age=604800`.
+Fetches, fits into an `s`×`s` transparent PNG (default 96, 16–256), and caches it on disk for good. Only ESPN's CDN, `raw.githubusercontent.com` ([tv-logo/tv-logos](https://github.com/tv-logo/tv-logos)) and the Dispatcharr host are allowed. Use `s=96` for 48 pt marks on Retina. The response has `Cache-Control: max-age=604800`.
 
 ### `GET /health`
 
@@ -65,6 +65,7 @@ Fetches, fits into an `s`×`s` transparent PNG (default 96, 16–256), and cache
 | `DISPATCHARR_URL` | `http://192.0.2.10:9191` |
 | `TZ` | `America/Chicago` (decides "today" for NBA and NCAAF scoreboards) |
 | `PORT` | `9292` |
+| `EXCLUDED_CHANNEL_NUMBERS` | Empty by default; private comma-separated channel numbers verified incompatible with this iPad |
 
 ## Run, test, deploy
 
@@ -79,3 +80,15 @@ ssh raygun 'curl -s localhost:9292/health'
 ```
 
 Standard library only, plus Pillow for logos.
+
+## Network-logo source repair — 2026-10-29
+
+The original source used the nonexistent `tv-logos/tv-logos` repository, causing upstream and gateway 404s. The source is now `tv-logo/tv-logos`; all 18 configured filenames exist there. Through the running gateway on raygun, each corrected source URL returned HTTP 200, `image/png`, and a 96×96 PNG. This exercised the existing allowlist, fetch, resize and cache path without opening video streams.
+
+The owner-approved fixes were deployed to the live gateway in the 2026-10-29 evening continuation. Running source matches this checkout, all three generated leagues are populated, generated network-logo URLs use the corrected repository, and all 18 network-logo endpoints pass again. See [deployment evidence](../docs/VALIDATION-0.3.1.md#gateway-deployment--2026-10-29-continuation) and [rollback details](../docs/HANDOFF.md#continuation--2026-10-29-evening). Check the app after a guide refresh/relaunch. Physical iPad logo rendering remains unverified. The app's abbreviation fallback stays available.
+
+## Excluding a confirmed incompatible source
+
+The gateway can omit privately configured `EXCLUDED_CHANNEL_NUMBERS` from game feeds and channel tiles while preserving other sources for the same matchup. An excluded feed cannot be selected as a backup. This does not modify Dispatcharr, transcode, or automatically identify codecs. Use a bounded media probe to confirm incompatibility before configuring an exclusion; quality labels alone are unreliable. Keep real selections in the server `.env`, outside Git, and recheck after channel rebuilding/renumbering. A changed `.env` requires recreating the gateway container.
+
+Physical testing found the NFL primary to be 2160p60 HEVC Main 10/AC-3, incompatible with the A7, while its regular backup was 720p60 H.264/HE-AAC. A tested exclusion candidate selects only the compatible regular feed for that matchup. The owner-approved source/config change is now deployed and verified in production: only the regular feed remains for this NFL matchup, with all leagues populated. Dispatcharr channels remain unchanged. See the latest [handoff](../docs/HANDOFF.md#incompatible-source-filter-deployed--2026-10-29-evening) for source/config backup and rollback. Physical retest remains pending.

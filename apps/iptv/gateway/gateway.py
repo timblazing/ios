@@ -14,6 +14,8 @@ DISPATCHARR = os.environ.get("DISPATCHARR_URL", "").rstrip("/")
 PORT = int(os.environ.get("PORT", "9292"))
 TZ = ZoneInfo(os.environ.get("TZ", "America/Chicago"))
 CACHE_DIR = os.environ.get("CACHE_DIR", "/cache")
+# Private, probe-confirmed exclusions for this legacy client; labels do not prove codecs.
+EXCLUDED_CHANNEL_NUMBERS = frozenset(n.strip() for n in os.environ.get("EXCLUDED_CHANNEL_NUMBERS", "").split(",") if n.strip())
 LEAGUES = [  # tab order in the app; NFL asks for the whole current week, the others for today and tomorrow
     ("nfl", "NFL", "football/nfl", None),
     ("nba", "NBA", "basketball/nba", ""),
@@ -21,7 +23,7 @@ LEAGUES = [  # tab order in the app; NFL asks for the whole current week, the ot
 ]
 ESPN = "https://site.api.espn.com/apis/site/v2/sports/{}/scoreboard"
 LOGO_HOSTS = ("a.espncdn.com", "raw.githubusercontent.com")
-TV_LOGOS = "https://raw.githubusercontent.com/tv-logos/tv-logos/main/countries/united-states/{}.png"
+TV_LOGOS = "https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/{}.png"
 # Normalized network name -> tv-logos file. ESPN broadcast names and channel names both normalize here.
 NETWORKS = {
     "espn": "espn-us", "espn2": "espn-2-us", "espnu": "espn-u-us", "abc": "abc-us",
@@ -209,7 +211,7 @@ class Guide:
     def rebuild(self):
         leagues = []
         for lid, title, _, _ in LEAGUES:
-            chans = [c for c in self.chans if c["group"].upper() == title]
+            chans = [c for c in self.chans if words(title) in words(c["group"]) and c["number"] not in EXCLUDED_CHANNEL_NUMBERS]
             leagues.append(build_league(lid, title, chans, self.scores.get(lid, []), self.epg))
         doc = {"updated": iso(datetime.now(timezone.utc)), "leagues": leagues}
         body = json.dumps(doc, separators=(",", ":")).encode()

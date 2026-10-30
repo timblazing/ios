@@ -3,6 +3,20 @@
 #import <MediaPlayer/MediaPlayer.h>
 
 static void *IPTVStatusContext = &IPTVStatusContext;
+static void *IPTVPictureContext = &IPTVPictureContext;
+
+static UIImage *IPTVAirPlayImage(void) {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(26, 26), NO, 0);
+    [UIColor.whiteColor setStroke]; [UIColor.whiteColor setFill];
+    UIBezierPath *screen = [UIBezierPath bezierPath]; screen.lineWidth = 1.8; screen.lineJoinStyle = kCGLineJoinRound;
+    [screen moveToPoint:CGPointMake(7, 19)]; [screen addLineToPoint:CGPointMake(3, 19)];
+    [screen addLineToPoint:CGPointMake(3, 5)]; [screen addLineToPoint:CGPointMake(23, 5)];
+    [screen addLineToPoint:CGPointMake(23, 19)]; [screen addLineToPoint:CGPointMake(19, 19)]; [screen stroke];
+    UIBezierPath *arrow = [UIBezierPath bezierPath];
+    [arrow moveToPoint:CGPointMake(13, 16)]; [arrow addLineToPoint:CGPointMake(20, 24)];
+    [arrow addLineToPoint:CGPointMake(6, 24)]; [arrow closePath]; [arrow fill];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext(); UIGraphicsEndImageContext(); return image;
+}
 
 @interface IPTVPlayerButton : UIButton
 @property(nonatomic) BOOL back;
@@ -47,14 +61,14 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     UIView *_chrome, *_top, *_bottom;
     CAGradientLayer *_topShade, *_bottomShade;
     IPTVPlayerButton *_back, *_pause;
-    UIButton *_live;
-    UILabel *_titleLabel, *_networkLabel, *_message, *_toast;
-    MPVolumeView *_volume;
+    UILabel *_titleLabel, *_message, *_toast;
+    MPVolumeView *_volume, *_airplay;
+    UIImageView *_airplayUnavailable;
     UIActivityIndicatorView *_spinner;
-    NSTimer *_timer;
-    NSDate *_hideAt, *_toastUntil, *_lastProgress;
+    NSTimer *_timer, *_hideTimer;
+    NSDate *_toastUntil, *_lastProgress;
     double _lastTime;
-    BOOL _paused, _background, _closed, _exhausted;
+    BOOL _paused, _background, _closed, _exhausted, _hasPicture;
 #if TARGET_OS_SIMULATOR
     BOOL _reportedPlayback;
 #endif
@@ -80,6 +94,7 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryPlayback error:NULL];
     _video = [AVPlayerLayer layer];
     _video.videoGravity = AVLayerVideoGravityResizeAspect;
+    [_video addObserver:self forKeyPath:@"readyForDisplay" options:0 context:IPTVPictureContext];
     [self.view.layer addSublayer:_video];
     _chrome = [UIView new];
     [self.view addSubview:_chrome];
@@ -100,27 +115,28 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     [_top addSubview:_back];
     _titleLabel = [self labelWithSize:17];
     _titleLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightSemibold];
-    _networkLabel = [self labelWithSize:13];
-    _networkLabel.textColor = [UIColor colorWithWhite:0.65 alpha:1];
     [_top addSubview:_titleLabel];
-    [_top addSubview:_networkLabel];
-    _live = [UIButton buttonWithType:UIButtonTypeCustom];
-    _live.titleLabel.font = [UIFont systemFontOfSize:13 weight:UIFontWeightBold];
-    _live.layer.cornerRadius = 15;
-    [_live setTitle:@"● LIVE" forState:UIControlStateNormal];
-    _live.accessibilityLabel = @"Live, jump to live edge";
-    _live.backgroundColor = [UIColor colorWithWhite:1 alpha:0.12];
-    [_live addTarget:self action:@selector(goLive) forControlEvents:UIControlEventTouchUpInside];
-    [_top addSubview:_live];
+    UIImage *airplayImage = IPTVAirPlayImage();
+    _airplayUnavailable = [[UIImageView alloc] initWithImage:airplayImage];
+    _airplayUnavailable.contentMode = UIViewContentModeCenter; _airplayUnavailable.alpha = 0.35;
+    _airplayUnavailable.isAccessibilityElement = YES; _airplayUnavailable.accessibilityLabel = @"AirPlay unavailable";
+    [_top addSubview:_airplayUnavailable];
+    _airplay = [MPVolumeView new];
+    _airplay.showsRouteButton = YES;
+    _airplay.showsVolumeSlider = NO;
+    _airplay.tintColor = UIColor.whiteColor;
+    _airplay.accessibilityLabel = @"AirPlay";
+    [_airplay setRouteButtonImage:airplayImage forState:UIControlStateNormal];
+    [_top addSubview:_airplay];
     _pause = [IPTVPlayerButton buttonWithType:UIButtonTypeCustom];
     _pause.accessibilityLabel = @"Pause";
     [_pause addTarget:self action:@selector(togglePause) forControlEvents:UIControlEventTouchUpInside];
     [_bottom addSubview:_pause];
     _volume = [MPVolumeView new];
-    _volume.showsRouteButton = YES;
+    _volume.showsRouteButton = NO;
     _volume.showsVolumeSlider = YES;
     _volume.tintColor = UIColor.whiteColor;
-    _volume.accessibilityLabel = @"Volume and AirPlay";
+    _volume.accessibilityLabel = @"Volume";
     [_bottom addSubview:_volume];
     _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [self.view addSubview:_spinner];
@@ -167,9 +183,10 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     _topShade.frame = _top.bounds;
     _bottomShade.frame = _bottom.bounds;
     _back.frame = CGRectMake(12, 24, 44, 44);
-    _titleLabel.frame = CGRectMake(112, 26, w - 224, 22);
-    _networkLabel.frame = CGRectMake(112, 50, w - 224, 18);
-    _live.frame = CGRectMake(w - 108, 24, 96, 44);
+    _titleLabel.frame = CGRectMake(80, 24, w - 160, 44);
+    _airplay.frame = CGRectMake(w - 60, 24, 44, 44);
+    _airplayUnavailable.frame = _airplay.frame;
+    _airplayUnavailable.hidden = _airplay.areWirelessRoutesAvailable || _airplay.isWirelessRouteActive;
     _pause.frame = CGRectMake(16, 58, 48, 48);
     _volume.frame = CGRectMake(w - 266, 65, 250, 44);
     _spinner.center = CGPointMake(w / 2, h / 2);
@@ -181,11 +198,34 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     return YES;
 }
 - (void)setControlsVisible:(BOOL)visible {
+    [_hideTimer invalidate]; _hideTimer = nil;
     _chrome.userInteractionEnabled = visible;
+#if TARGET_OS_SIMULATOR
+    NSLog(@"TV controls visible=%d picture=%d", visible, _hasPicture);
+#endif
     [UIView animateWithDuration:UIAccessibilityIsReduceMotionEnabled() ? 0 : 0.2 animations:^{ self->_chrome.alpha = visible ? 1 : 0; }];
-    _hideAt = visible ? [NSDate dateWithTimeIntervalSinceNow:3] : nil;
+    if (visible && _hasPicture && !_paused && !_exhausted && !UIAccessibilityIsVoiceOverRunning()) {
+        __weak typeof(self) weakSelf = self;
+        _hideTimer = [NSTimer timerWithTimeInterval:2.5 repeats:NO block:^(NSTimer *timer) {
+            typeof(self) self = weakSelf;
+            if (self && !self->_closed && !self->_background && self->_hasPicture && self->_item &&
+                !self->_paused && !self->_exhausted && !UIAccessibilityIsVoiceOverRunning()) [self setControlsVisible:NO];
+        }];
+        [NSRunLoop.mainRunLoop addTimer:_hideTimer forMode:NSRunLoopCommonModes];
+    }
 }
-- (void)toggleControls { [self setControlsVisible:_chrome.alpha < 0.5]; }
+- (void)pictureStarted {
+    if (!_hasPicture && !_closed && !_background && _item.status == AVPlayerItemStatusReadyToPlay &&
+        _video.readyForDisplay && _player.rate > 0) {
+        _hasPicture = YES;
+        [_spinner stopAnimating];
+        [self setControlsVisible:YES];
+#if TARGET_OS_SIMULATOR
+        NSLog(@"TV first picture: controls hide in 2.5 seconds");
+#endif
+    }
+}
+- (void)toggleControls { [self setControlsVisible:!_hasPicture || _chrome.alpha < 0.5]; }
 - (void)selectGame {
     [self stopItem];
     _feedIndex = 0;
@@ -194,28 +234,17 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     IPTVGame *game = self.game;
     if (game) {
         _channel = game.channels.firstObject;
-        _titleLabel.text = [NSString stringWithFormat:@"%@ at %@", game.away.nick.length ? game.away.nick : game.away.name, game.home.nick.length ? game.home.nick : game.home.name];
-        _networkLabel.text = game.tv.length ? game.tv : _channel.name;
-    } else {
-        _titleLabel.text = _channel.name;
-        NSDate *now = NSDate.date;
-        for (NSDictionary *entry in _channel.epg) {
-            NSDate *start = [IPTVGuide dateFromString:entry[@"start"]], *end = [IPTVGuide dateFromString:entry[@"end"]];
-            if ([start compare:now] != NSOrderedDescending && [end compare:now] == NSOrderedDescending && [entry[@"title"] length]) _titleLabel.text = entry[@"title"];
-        }
-        _networkLabel.text = _channel.name;
-    }
+        _titleLabel.text = [NSString stringWithFormat:@"%@ @ %@", game.away.nick.length ? game.away.nick : game.away.name, game.home.nick.length ? game.home.nick : game.home.name];
+    } else _titleLabel.text = _channel.name;
     [self setControlsVisible:YES];
     if ([game.state isEqualToString:@"pre"]) {
         NSDateFormatter *date = [NSDateFormatter new];
         date.dateStyle = NSDateFormatterMediumStyle;
         date.timeStyle = NSDateFormatterShortStyle;
         _message.text = [NSString stringWithFormat:@"Starts %@", game.start ? [date stringFromDate:game.start] : game.detail];
-        _live.hidden = YES;
         _pause.hidden = YES;
         return;
     }
-    _live.hidden = NO;
     _pause.hidden = NO;
     [self startFeed];
 }
@@ -224,6 +253,7 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     if (_closed || _background) return;
     _message.text = nil;
     _exhausted = NO;
+    [self setControlsVisible:YES];
     if (!_channel.stream) { [self feedFailed]; return; }
     [_spinner startAnimating];
     _lastProgress = NSDate.date;
@@ -243,6 +273,8 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     [self updatePause];
 }
 - (void)stopItem {
+    [_hideTimer invalidate]; _hideTimer = nil;
+    _hasPicture = NO;
     [_player pause];
     _video.player = nil;
     if (_item) {
@@ -257,6 +289,11 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     [_spinner stopAnimating];
 }
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context == IPTVPictureContext) {
+        __weak typeof(self) weakSelf = self;
+        dispatch_async(dispatch_get_main_queue(), ^{ [weakSelf pictureStarted]; });
+        return;
+    }
     if (context != IPTVStatusContext) { [super observeValueForKeyPath:keyPath ofObject:object change:change context:context]; return; }
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -284,9 +321,10 @@ static void *IPTVStatusContext = &IPTVStatusContext;
 - (void)tick {
     if (_closed || _background) return;
     NSDate *now = NSDate.date;
+    _airplayUnavailable.hidden = _airplay.areWirelessRoutesAvailable || _airplay.isWirelessRouteActive;
     if (_toastUntil && [now compare:_toastUntil] != NSOrderedAscending) { _toast.hidden = YES; _toastUntil = nil; }
-    if (_hideAt && [now compare:_hideAt] != NSOrderedAscending && _item && !_paused && !_exhausted && !UIAccessibilityIsVoiceOverRunning()) [self setControlsVisible:NO];
     if (!_item) return;
+    [self pictureStarted];
     double current = CMTimeGetSeconds(_item.currentTime);
     if (isfinite(current) && current > 0.05 && current > _lastTime + 0.05) {
         #if TARGET_OS_SIMULATOR
@@ -297,36 +335,9 @@ static void *IPTVStatusContext = &IPTVStatusContext;
 #endif
         _lastTime = current;
         _lastProgress = now;
-        [_spinner stopAnimating];
+        if (_hasPicture) [_spinner stopAnimating];
     }
     if (!_paused && [now timeIntervalSinceDate:_lastProgress] > 20) { [self feedFailed]; return; }
-    BOOL behind = _paused;
-    NSValue *range = _item.seekableTimeRanges.lastObject;
-    if (range && isfinite(current)) {
-        double edge = CMTimeGetSeconds(CMTimeRangeGetEnd(range.CMTimeRangeValue));
-        behind |= isfinite(edge) && edge - current > 12;
-    }
-    NSMutableAttributedString *liveText = [[NSMutableAttributedString alloc] initWithString:behind ? @"GO LIVE" : @"● LIVE"
-                                                                                 attributes:@{NSForegroundColorAttributeName: behind ? [UIColor colorWithWhite:0.65 alpha:1] : UIColor.whiteColor}];
-    if (!behind) [liveText addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:1 green:0.23 blue:0.19 alpha:1] range:NSMakeRange(0, 1)];
-    [_live setAttributedTitle:liveText forState:UIControlStateNormal];
-    _live.backgroundColor = [UIColor colorWithWhite:1 alpha:behind ? 0.08 : 0.12];
-    _live.accessibilityLabel = behind ? @"Go live" : @"Live, jump to live edge";
-}
-- (void)goLive {
-    if (!_item || _exhausted) return;
-    NSValue *range = _item.seekableTimeRanges.lastObject;
-    _paused = NO;
-    _lastProgress = NSDate.date;
-    if (range) {
-        CMTimeRange r = range.CMTimeRangeValue;
-        double edge = CMTimeGetSeconds(CMTimeRangeGetEnd(r));
-        double start = CMTimeGetSeconds(r.start);
-        if (isfinite(edge) && isfinite(start)) [_player seekToTime:CMTimeMakeWithSeconds(MAX(start, edge - 3), 600)];
-    }
-    [_player play];
-    [self updatePause];
-    [self setControlsVisible:YES];
 }
 - (void)updatePause {
     _pause.paused = _paused;
@@ -354,7 +365,7 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     if (gesture.direction == UISwipeGestureRecognizerDirectionLeft) _gameIndex = (_gameIndex + 1) % _games.count;
     else _gameIndex = (_gameIndex + _games.count - 1) % _games.count;
     [self selectGame];
-    [self showToast:[NSString stringWithFormat:@"%@\n%@", _titleLabel.text, _networkLabel.text]];
+    [self showToast:_titleLabel.text];
 }
 - (void)cancelInteractions {
     for (UIGestureRecognizer *gesture in self.view.gestureRecognizers) {
@@ -362,6 +373,7 @@ static void *IPTVStatusContext = &IPTVStatusContext;
         gesture.enabled = YES;
     }
     [_volume endEditing:YES];
+    [_airplay endEditing:YES];
 }
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [self cancelInteractions];
@@ -371,7 +383,7 @@ static void *IPTVStatusContext = &IPTVStatusContext;
 - (void)backgrounded {
     [self cancelInteractions];
     _background = YES;
-    _hideAt = nil;
+    [_hideTimer invalidate]; _hideTimer = nil;
     _toast.hidden = YES;
     [self stopItem];
 }
@@ -398,6 +410,8 @@ static void *IPTVStatusContext = &IPTVStatusContext;
     [self stopItem];
 }
 - (void)dealloc {
+    [_video removeObserver:self forKeyPath:@"readyForDisplay" context:IPTVPictureContext];
+    [_hideTimer invalidate];
     [_timer invalidate];
     [NSNotificationCenter.defaultCenter removeObserver:self];
     [self stopItem];

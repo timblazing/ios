@@ -93,10 +93,17 @@ When the iPad is plugged in you can read from it with the bundled tools, e.g. `t
   xcrun clang -target arm64-apple-ios13.0-simulator -isysroot $SDK -fobjc-arc \
     -framework UIKit -framework Foundation -framework SpriteKit -framework CoreGraphics \
     Application/*.m Application/*/*.m -o /tmp/sim/<App>.app/<App>
-  # copy Resources/* into /tmp/sim/<App>.app, then simctl boot / install / launch / io screenshot
+  # copy Resources/* into /tmp/sim/<App>.app, then use the T3 Device panel workflow below
   ```
 
-  Current simulators are modern iPads (home indicator, different sizes), so this checks rendering, not the exact mini 2 layout. Rotation can't be driven headlessly here. Shut the simulator down afterwards (`xcrun simctl shutdown all`).
+  In T3 Code, use the built-in **Device panel** so the owner can watch and interact:
+
+  1. Call `device_list` to discover the host and device; call `device_open` with that `hostId` and `deviceId`.
+  2. Use the returned device-bound `agent-device` command for app launch/relaunch, deep links, taps, typing, swipes, alerts, settings, screenshots and recordings. Run `open <app>` before snapshots, screenshots or input; use `help <command>` for supported options.
+  3. Call `device_screenshot` to inspect the screen. Do not drive those interactions with `simctl`, `idb`, SSH or wrapper scripts. Builds, installs, code sync, logs and unsupported operations may still use the appropriate command-line tools.
+  4. If a device tool or its returned command fails, quote the error and follow its advice once. If it still fails, report the blocker and stop device automation; do not silently bypass the panel or reuse/close another session. SSH driving requires the owner's explicit request.
+
+  Current simulators are modern iPads (home indicator, different sizes), so this checks rendering, not the exact mini 2 layout, iOS 10 compatibility, audio, touch feel or A7 performance. Record simulator and physical-device results separately. When the owner is done interacting, shut down only the simulator started for this task; do not shut down every simulator. Physical iPad installs still require the approval described above; use read-only libimobiledevice discovery if the legacy iPad is unavailable in the panel.
 - **HTML tools** (like Solitaire's design playground) are opened with `file://` by the user. Playwright blocks `file:`, so serve the folder with `python3 -m http.server` to test, and keep test fixtures inside the repo's `.playwright-mcp/` (Playwright's allowed root). Delete that folder afterwards; it isn't gitignored.
 
 ## Git
@@ -135,9 +142,9 @@ A T3 Code companion: UIKit shell, bundled HTML/CSS/JS UI in WKWebView, native ne
 
 ### TV (`apps/iptv/`)
 
-A live TV player for a Dispatcharr server, v0.2.0 prototype. Read `README.md` first.
+A native guide and direct-HLS player for a Dispatcharr server, v0.3.2 installed (short home checks accepted; physical USB fallback and extended coverage deferred). Read `apps/iptv/README.md`, `apps/iptv/docs/BACKLOG.md` and `apps/iptv/docs/HANDOFF.md` first.
 
-- AVPlayer can't play raw MPEG-TS, so `Application/Stream/` repackages the channel's TS into HLS in memory and serves it on 127.0.0.1. No transcoding: only H.264 video plays; other codecs (4K HEVC) are detected and reported.
-- The server URL is entered on the device. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.
-- Direction (see `docs/NEXT.md`): play Dispatcharr's own HLS (`?output_format=hls`) in AVPlayer and retire the relay; the guide comes from `gateway/`, a Python service running in Docker on the home server `raygun` (`~/docker/tv-gateway/`, port 9292, reachable with `ssh raygun`). Docker is allowed there, never on the Mac.
+- The guide/player uses Dispatcharr HLS (`?output_format=hls`) directly in AVPlayer. The legacy TS relay in `Application/Stream/` remains in the source/build until physical iOS 10 acceptance; the new player does not use it. The A7 requires H.264/AAC; HEVC needs a server-side H.264 profile.
+- Server URLs are privately provisioned through device defaults or an external on-device profile; there is no in-app settings UI. 0.3.2 tries the privately configured home gateway first, then an optional USB bridge fallback; the bridge must still be running. Never commit server addresses or channel stream IDs; tests use `192.0.2.x` and zero UUIDs.
+- Next (see `apps/iptv/docs/NEXT.md`): physical-device acceptance, then relay retirement only if supported by device evidence. The guide comes from `gateway/`, a Python service running in Docker on the home server `raygun` (`~/docker/tv-gateway/`, port 9292, reachable with `ssh raygun`). Docker is allowed there, never on the Mac.
 - The provider allows 2 concurrent streams: capture or test one channel at a time and stop sessions when done.

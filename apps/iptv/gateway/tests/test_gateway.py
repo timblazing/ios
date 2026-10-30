@@ -1,5 +1,7 @@
 import os, sys, unittest
+from unittest.mock import patch
 from datetime import datetime, timezone
+from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import gateway as gw
@@ -58,7 +60,8 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual([c["number"] for c in lg["games"][0]["channels"]], ["1402", "1403", "1400"])  # event feeds, then the network
         self.assertEqual(lg["games"][0]["away"]["score"], "7")
         self.assertEqual([c["name"] for c in lg["channels"]], ["NFL NETWORK"])
-        self.assertIn("nfl-network-us", lg["channels"][0]["logo"])
+        self.assertEqual(parse_qs(urlparse(lg["channels"][0]["logo"]).query)["u"],
+                         ["https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/united-states/nfl-network-us.png"])
 
     def test_nba_uppercase_home_vs_away(self):
         games = gw.parse_scoreboard({"events": [
@@ -93,9 +96,35 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual([p["title"] for p in epg["1500"]], ["Now", "Next"])
         self.assertNotIn("9999", epg)
 
+    def test_guide_accepts_provider_prefixed_league_groups(self):
+        guide = gw.Guide()
+        guide.chans = [dict(c, group={"NFL": "US| NFL PPV", "NBA": "US| NBA PASS PPV ⁸ᴷ",
+                                     "NCAAF": "US| NCAAF PPV"}[c["group"]]) for c in self.chans]
+        guide.chans.append(dict(self.chans[0], group="US| WNBA PPV"))
+        guide.rebuild()
+        import json
+        leagues = json.loads(guide.body)["leagues"]
+        self.assertEqual([(l["id"], len(l["channels"])) for l in leagues],
+                         [("nfl", 4), ("nba", 1), ("ncaaf", 2)])
+
     def test_logo_host_allowlist(self):
         with self.assertRaises(PermissionError):
             gw.logo_png("http://203.0.113.9/x.png", 64)
+
+    def test_excluded_feed_never_reaches_game_or_network_tiles(self):
+        guide = gw.Guide()
+        guide.chans = self.chans
+        guide.scores = {"nfl": gw.parse_scoreboard({"events": [
+            event("1", ("CAR", "Carolina", "Panthers"), ("GB", "Green Bay", "Packers"), ["NFL Net"], "in")
+        ]})}
+        with patch.object(gw, "EXCLUDED_CHANNEL_NUMBERS", frozenset(["1402", "1400"])):
+            guide.rebuild()
+        import json
+        leagues = json.loads(guide.body)["leagues"]
+        nfl = next(l for l in leagues if l["id"] == "nfl")
+        self.assertEqual([c["number"] for c in nfl["games"][0]["channels"]], ["1403"])
+        self.assertNotIn("1400", [c["number"] for c in nfl["channels"]])
+        self.assertEqual(next(l for l in leagues if l["id"] == "nba")["channels"][0]["number"], "1200")
 
 
 if __name__ == "__main__":
