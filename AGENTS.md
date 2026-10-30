@@ -4,7 +4,7 @@ Notes for agents working in this repo. Read this before changing code or the bui
 
 ## What this is
 
-Small native games and apps for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; the T3 Code companion app connects to a T3 Code host; TV plays live channels from a user-configured Dispatcharr server. No ads or analytics. Never commit credentials or private server configuration.
+**ios** (`timblazing/ios`) is a hub for iOS app development and projects for one device: a jailbroken **iPad mini 2** (A7, 1 GB RAM, 2048×1536 Retina at 326 ppi, 1024×768 points) on **iOS 10.3.3**, jailbroken with TNS Sockport and AppSync Unified. Modern iOS devices are not a target. Solitaire and Paint are offline. Wordle fetches puzzle answers; Rent Trivia optionally streams from a user-configured Jellyfin server; the T3 Code companion app connects to a T3 Code host; TV plays live channels from a user-configured Dispatcharr server. No ads or analytics. Never commit credentials or private server configuration.
 
 ```
 games/<name>/      one self-contained Theos project per game (Makefile, control, Resources/, scripts/, Tests/, docs/)
@@ -12,10 +12,10 @@ apps/<name>/       one self-contained Theos project per non-game app
 docs/              shared notes, including the original stack research
 install.sh         interactive IPA installer for the USB-connected iPad (macOS)
 tools/             shared tooling: bundled libimobiledevice binaries for install.sh
-.clang-format      applies to all games
+.clang-format      applies throughout
 ```
 
-Build, test, and package from inside `games/<name>/` or `apps/<name>/`. Each game's README is the source of truth for that game. Specs live in `games/<name>/docs/`.
+Build, test, and package from inside `games/<name>/` or `apps/<name>/`. Each project's README is the source of truth for that project. Specs live in its `docs/` folder where provided.
 
 ## Stack
 
@@ -108,7 +108,7 @@ When the iPad is plugged in you can read from it with the bundled tools, e.g. `t
 
 ## Git
 
-- `main` is the only long-lived branch. The user is `timblazing`; remote is `github.com/timblazing/ios-games`.
+- `main` is the only long-lived branch. The user is `timblazing`; remote is `github.com/timblazing/ios`.
 - Don't commit build output other than the release `.deb`/`.ipa`/`SHA256SUMS`, test binaries, or `.playwright-mcp/`.
 
 ## Game notes

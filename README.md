@@ -1,6 +1,14 @@
-# ios-games
+# ios
 
-Native games and apps for a jailbroken **iPad mini 2 running iOS 10.3.3** (A7, TNS Sockport, AppSync Unified). Modern iOS devices are not the target.
+[timblazing/ios](https://github.com/timblazing/ios) is my hub for iOS app development and projects for a jailbroken **iPad mini 2 running iOS 10.3.3** (A7, TNS Sockport, AppSync Unified). It includes everyday apps, companion tools, and games built for this device. Modern iOS devices are not the target.
+
+## Apps
+
+| App | Version | Installable release |
+|---|---|---|
+| [Paint](apps/paint/) | 2.0.0 | [IPA](apps/paint/dist/Paint-2.0.0.ipa) · [checksums](apps/paint/dist/SHA256SUMS) |
+| [T3 Code](apps/t3code/) | 0.3.1 | [IPA](apps/t3code/dist/T3Code-0.3.1.ipa) · [checksums](apps/t3code/dist/SHA256SUMS) |
+| [TV](apps/iptv/) | 0.3.2 | [IPA](apps/iptv/dist/IPTV-0.3.2.ipa) · [checksums](apps/iptv/dist/SHA256SUMS) |
 
 ## Games
 
@@ -10,17 +18,9 @@ Native games and apps for a jailbroken **iPad mini 2 running iOS 10.3.3** (A7, T
 | [Wordle](games/wordle/) | 1.0.0 | [IPA](games/wordle/dist/Wordle-1.0.0.ipa) · [checksums](games/wordle/dist/SHA256SUMS) |
 | [Rent Trivia](games/rent-trivia/) | 1.1.1 | [IPA](games/rent-trivia/dist/RentTrivia-1.1.1.ipa) · [checksums](games/rent-trivia/dist/SHA256SUMS) |
 
-## Apps
-
-| App | Version | Installable release |
-|---|---|---|
-| [Paint](apps/paint/) | 2.0.0 | [IPA](apps/paint/dist/Paint-2.0.0.ipa) · [checksums](apps/paint/dist/SHA256SUMS) |
-| [T3 Code](apps/t3code/) | 0.3.1 | [IPA](apps/t3code/dist/T3Code-0.3.1.ipa) · [checksums](apps/t3code/dist/SHA256SUMS) |
-| [TV](apps/iptv/) | 0.3.1 prepared | [IPA](apps/iptv/dist/IPTV-0.3.1.ipa) · [checksums](apps/iptv/dist/SHA256SUMS) |
-
 Solitaire and Paint are offline. Wordle fetches and caches daily answers from the NYT. Rent Trivia can optionally stream a movie from a user-configured Jellyfin server; public packages contain no server credentials. The T3 Code companion connects to a T3 Code host on another computer. TV plays live channels from a user-configured Dispatcharr server on the home network.
 
-For “IPTV backlog/next steps,” start with [TV backlog](apps/iptv/docs/BACKLOG.md) and [handoff](apps/iptv/docs/HANDOFF.md). The physical iPad still has 0.3.0; 0.3.1 is packaged for review and awaits installation approval.
+For “IPTV backlog/next steps,” start with [TV backlog](apps/iptv/docs/BACKLOG.md) and [handoff](apps/iptv/docs/HANDOFF.md). TV 0.3.2 is installed on the physical iPad; the agreed short home checks passed by owner report. Physical USB fallback and extended coverage remain unverified.
 
 ## Stack and layout
 

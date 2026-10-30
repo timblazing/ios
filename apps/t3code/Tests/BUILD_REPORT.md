@@ -17,7 +17,7 @@ Date: 2026-10-26 (local). Target: iPad4,5, iOS 10.3.3.
 
 Host remained running: **0.1.3-nightly.20261026.3726**, protocol **2**, on its existing loopback listener. The separate trusted-LAN adapter was replaced with its opt-in chat version; the desktop T3 process was not restarted.
 
-A separate validation session requested exactly conversation read + operate permissions. Through the adapter, real discovery, shell/bounded reads and filtered provider/model catalog succeeded. A labeled validation thread was created in the existing ios-games project workspace using GPT-6 Luna, approval required. Test prompts instructed the model not to use shell/file tools.
+A separate validation session requested exactly conversation read + operate permissions. Through the adapter, real discovery, shell/bounded reads and filtered provider/model catalog succeeded. A labeled validation thread was created in the existing project workspace (then named ios-games, now ios) using GPT-6 Luna, approval required. Test prompts instructed the model not to use shell/file tools.
 
 - The host accepted create/send; the model replied **“T3 Code connected.”**
 - Replaying the exact create/send commands returned the same sequence receipts. The transcript contained one copy of each message.

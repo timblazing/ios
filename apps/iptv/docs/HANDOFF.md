@@ -80,7 +80,7 @@ This section supersedes the earlier production-deployment and installation-appro
 ## Repository and delivery
 
 - Base `main`: `97c5949`, TV 0.3.0 via merged PR #4.
-- Current branch: `docs/t3-device-panel`; [PR #5](https://github.com/timblazing/ios-games/pull/5), left for owner review. No merge performed.
+- Current branch: `docs/t3-device-panel`; [PR #5](https://github.com/timblazing/ios/pull/5), left for owner review. No merge performed.
 - Prepared package: **0.3.1**, bundle build **4**, in `dist/` and `packages/`, with updated `SHA256SUMS`. Not installed on the physical iPad.
 - Unrelated archived files and backup branch were not touched.
 - T3 Device panel workflow documented here and in [scores PR #7](https://github.com/timblazing/scores/pull/7). Shared Claude Code/Codex instructions were updated through their common linked `skills/config/AGENTS.md` (skills commit `b59f6fe`). Check live PR state before resuming.
@@ -108,3 +108,7 @@ Simulator, through T3 Device panel: checked portrait/landscape guide, all three 
 - The iPad USB SSH connection dropped during cleanup (`Connection reset by peer`) before restoration could be confirmed. **Assume `gateway.baseURL` may still be `http://127.0.0.1:19494` pointing to the stopped bridge.** Recheck and restore/provision on reconnect. Dispatcharr was never changed by the bridge setup.
 - Durable private files on this Mac: `~/.config/ios-games/iptv/session-2026-10-29/` (mode 700, files mode 600), including `config.json`, `simulator-config.json` and `preferences-before.plist`. These contain private addresses/settings and are intentionally outside Git. The portable synthetic HLS fixture and original simulator timing recording are also saved in this private directory; they can be reused without this chat. The original gateway was absent/blank; preserve other preferences when restoring.
 - Private shell/session IDs and temporary sockets are not a durable restart mechanism. Recreate forwarding using `tools/tv-usb/README.md` only after identifying the current device and confirming the owner wants it. Never expose the proxy publicly or run containers on this Mac.
+
+## Repository name
+
+This project now lives in `timblazing/ios`. The `~/.config/ios-games/` paths above are historical private backup locations and remain unchanged.
