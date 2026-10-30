@@ -3,7 +3,8 @@
 For the full TV work queue and archived-chat checkpoint, start at [IPTV backlog](../apps/iptv/docs/BACKLOG.md).
 
 - [x] Research re-jailbreak automation for iPad mini 2 (iPad4,5, iOS 10.3.3), starting with LukeZGD/tns-sockport. [Deeper findings](IPAD-REJAILBREAK-RESEARCH.md): ap0110 provides a concrete legacy-VoIP auto-launch lead, the existing WebClip cache contains the matching TNS payload, and self-contained offline WebClips are worth testing. These are not yet physical cold-boot acceptance.
-- [ ] Complete the [harmless offline WebClip probes](../tools/rejailbreak-lab/README.md) copied to the iPad; then test offline TNS page loading without running the exploit while already jailbroken.
+- [x] Complete the [harmless offline WebClip probes](../tools/rejailbreak-lab/README.md): owner confirmed small and payload-sized pages pass with fresh timestamps online and offline after profile installation.
+- [ ] Validate the TNS check-only profile on-device, then test the separate manually triggered offline TNS candidate after the recovery/bootstrap checkpoint and a normal reboot. Automatic launch is a later experiment.
 - [ ] Obtain valid signing/provisioning for the prepared legacy-VoIP launch canary and its modern-SDK control, then test post-boot launch separately from any jailbreak. Preserve TNS, its bootstrap and installed tweaks.
 
 - [x] Preconfigure TV for the current USB acceptance run without publishing private URLs: device-only gateway preference, private original-preferences backup and Mac bridge config outside the repo. Public IPA/DEB packages remain unconfigured.
