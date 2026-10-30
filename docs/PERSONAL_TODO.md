@@ -2,7 +2,8 @@
 
 For the full TV work queue and archived-chat checkpoint, start at [IPTV backlog](../apps/iptv/docs/BACKLOG.md).
 
-- [ ] Research whether re-jailbreaking the iPad mini 2 (iPad4,5, iOS 10.3.3) after each restart can be automated or made less manual. Start with [LukeZGD/tns-sockport](https://github.com/LukeZGD/tns-sockport). Determine what is possible after a cold boot, what still needs an on-device interaction, and whether any option depends on a Mac/USB connection or works over Wi-Fi. Research only: no boot or jailbreak changes are authorized by this note, and automation feasibility has not been established.
+- [x] Research re-jailbreak automation for iPad mini 2 (iPad4,5, iOS 10.3.3), starting with LukeZGD/tns-sockport. [Findings and physical-test checkpoint](IPAD-REJAILBREAK-RESEARCH.md): no supported cold-boot untether found; existing Home Screen TNS icon needs opening and sliding, without a Mac/USB requirement. A separate auto-start page is a promising lead, with only its slider wrapper tested in a harmless mock. Offline use and one-tap re-jailbreaking remain unverified. Read-only device inspection and a private tweak/preferences snapshot completed; no jailbreak or boot changes made.
+- [ ] Test a separate harmless auto-start WebClip and its offline cache on iOS 10, then consider one-tap TNS reactivation using the checkpoint above. Preserve the existing TNS recovery icon and installed tweaks.
 
 - [x] Preconfigure TV for the current USB acceptance run without publishing private URLs: device-only gateway preference, private original-preferences backup and Mac bridge config outside the repo. Public IPA/DEB packages remain unconfigured.
 - [ ] Add convenient persistent home/travel configuration after choosing the long-term access route.
