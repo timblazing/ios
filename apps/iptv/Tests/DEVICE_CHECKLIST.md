@@ -96,3 +96,7 @@ Owner refreshed/reopened TV and selected Panthers @ Packers. First attempt displ
 ## Pause/resume — owner pass
 
 On the playing NCAAF stream, owner showed controls, paused for five seconds and resumed; reported picture and sound continue normally ("works great"). This accepts short pause/resume on installed 0.3.2. Long-pause/token-expiry recovery is separate. Next interaction: background TV for more than two minutes and reopen, then report playback recovery. No concurrent agent stream is running.
+
+## Background recovery — owner pass
+
+On installed 0.3.2, owner pressed Home, left TV in the background for just over two minutes, reopened it, and confirmed picture and sound returned without selecting the game again. This accepts the sampled >2-minute recovery path. Rotation, first-picture control timing, AirPlay/volume, longer endurance and initial-start reliability remain separate. Next check: rotate portrait/landscape during playback and verify video/controls remain usable.

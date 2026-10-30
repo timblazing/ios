@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Latest check — background recovery passes
+
+Owner confirms picture/audio returned without reselecting the game after pressing Home, leaving TV backgrounded for just over two minutes and reopening on 0.3.2. Pause/resume and sampled NFL/NCAAF/NBA playback passes remain recorded separately. Next check: rotate portrait/landscape during playback and confirm video/controls remain usable. Initial-start reliability, first-picture control timing, AirPlay/volume, extended endurance and USB fallback remain unaccepted.
+
 ## Latest check — pause/resume passes
 
 Owner confirms NCAAF picture/audio continue normally after showing controls, pausing five seconds and resuming on 0.3.2. Next physical interaction: press Home, leave TV in the background for more than two minutes, then reopen and check playback recovery. Initial-start reliability and the rest of the checklist remain open. No concurrent agent capture is running.
