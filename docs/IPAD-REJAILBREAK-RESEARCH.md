@@ -2,13 +2,28 @@
 
 Investigated 2026-10-30 for **iPad4,5, A7, iOS 10.3.3**, currently using TNS Sockport.
 
-## Result
+## Result after the deeper investigation
 
-No supported fully automatic cold-boot jailbreak was found for this exact device/OS. This is a bounded research finding, not proof that a future or experimental untether is impossible.
+**There is a concrete post-boot automation lead: ap0110's legacy VoIP app-launch mechanism.** The first pass missed it and focused too narrowly on a fully untethered boot chain. ap0110 explicitly lists iPad mini 2 and reports iPhone 5s / iOS 10.3.3 testing, the same A7/OS pairing. We should test its launch trigger independently of its jailbreak/bootstrap code.
 
-The practical route remains **unlock → open the existing TotallyNotSpyware Home Screen icon → slide → let TNS reactivate the jailbreak**. It does not require a Mac, USB, sideloading or an Apple signing certificate. Online use needs the iPad to reach the public website, normally over Wi-Fi. The actual cold-boot sequence was not repeated in this session.
+Two useful offline leads are also concrete: the current iPad already has TNS's payload and scripts in its WebClip ApplicationCache, and a self-contained `data:` WebClip could remove cache/server dependence entirely. Harmless small and payload-sized WebClip probes have been copied to the device for physical acceptance. A pair of native launch canaries has been built, with stock-boot testing gated on valid signing.
 
-The best development lead is a **separate, opt-in TNS page that starts after opening**, removing the slider. Source inspection and a mocked JavaScript test support this lead; actual iOS 10 exploit execution, offline operation and preservation across a cold boot remain unverified. This would reduce interaction, not make the jailbreak run automatically at power-on.
+The existing manual recovery route remains **unlock → open TotallyNotSpyware → slide**. There is no need to replace that route to test these hypotheses. No cold boot or actual exploit was performed during either research pass. See [the lab and test steps](../tools/rejailbreak-lab/README.md).
+
+### Ranked leads worth pursuing
+
+1. **Legacy VoIP auto-launch, then recovery.** [ap0110's source](https://github.com/athenusdev/ap0110/tree/2b2f4a21993f696df7c820708365001dcc38a3b4) declares `UIBackgroundModes` audio/voip, calls its routine from `didFinishLaunchingWithOptions:`, requests background time and then runs its exploit. Read-only inspection of the published [1.1b4 IPA](https://github.com/athenusdev/ap0110/releases/tag/1.1b4) also confirmed that its arm64 slice reports linked SDK 9.3 and declares audio/voip modes. Its [device/test list](https://github.com/ap0110site/ap0110site.github.io/blob/82121912e542a479ff5c078d45e1ce46eb5c1113/README.md) is directly relevant to this iPad. [Apple QA1938](https://developer.apple.com/library/archive/qa/qa1938/_index.html) confirms that iOS 10 retains old VoIP behavior for old-linked SDK apps and disables it for iOS 10 SDK builds. This is app execution after stock boot, not an iBoot untether. A valid Apple app signature/profile remains necessary. **Experiment prepared:** otherwise identical harmless loggers with modern versus SDK-9.3 metadata; no exploit, native launch, or reboot tested yet.
+2. **Use the already-cached TNS clip offline.** Read-only inspection found its complete 548,984-byte payload with an exact upstream match, along with matching compiled scripts. Its cached HTML inlines the redirect code. This materially strengthens offline feasibility compared with merely inspecting the current upstream manifest. **Next experiment:** disable all iPad network access, open the existing TNS icon, inspect that the page renders, and stop before sliding while already jailbroken. Successful rendering alone would not prove offline re-jailbreaking; the later cold-boot exploit needs its own acceptance.
+3. **A self-contained, auto-start WebClip.** Put all HTML/JavaScript and payload bytes in a `data:` URL stored in the WebClip's on-disk plist. If accepted by iOS 10, this uses Apple's existing signed web-app host and needs neither a new IPA signature nor a network resource/AppCache hit. This is a proposed delivery technique, not a demonstrated TNS capability. **Experiment installed:** a 32-byte probe and a 548,984-byte dummy buffer probe. Desktop decoding passes; physical URL acceptance, standalone mode, URL length and offline execution remain pending. Then test TNS's JIT requirements separately.
+4. **Reuse the VoIP trigger with a small native recovery helper.** If the signed canary proves launch after first unlock, test whether it can open the offline TNS clip from the background. If iOS blocks that or the WebKit context is unsuitable, evaluate a minimal audited native reactivation entry point that preserves TNS's existing bootstrap. Neither opening Safari from background nor native bootstrap compatibility follows automatically from the canary. A published [Amethyst experiment](https://github.com/uzmanwebmaster/amethyst-auto-rejailbreak/blob/8b2a45b566335f7ea9a8a8459e45f4bc18911f65/docs/HOW-IT-WORKS.md) demonstrates the linked-SDK metadata technique on iPhone 6 / iOS 12.5.8, including synchronous registration, first-unlock handling and boot-ID guards. That is useful implementation evidence, not acceptance on this iPad.
+
+A later auto-start TNS wrapper must replace the upstream `fail()` implementation, which reloads the page. Otherwise an exploit failure could reload an auto-start page and create a retry loop. The harmless probes include no upstream exploit code at all.
+
+### Filesystem-trigger hypothesis
+
+Writing a file is a viable *configuration/storage* mechanism when an already-trusted stock component consumes it: the new WebClip plist is an example. It does not by itself establish a boot launch trigger or grant native executable trust. The VoIP experiment supplies a specific stock launch mechanism to test rather than assuming a new shell script will run.
+
+The native canary avoids changing Apple's signed executables, launchd configuration, trust caches, or the current jailbreak. Single App Mode is another stock launch mechanism ([Apple AppLock documentation](https://developer.apple.com/documentation/devicemanagement/applock)), but supervision, kiosk lock-in and removal must be understood first. Do not prepare/erase the iPad or modify its supervision state just to test it.
 
 ## What a cold boot changes
 
@@ -23,8 +38,9 @@ Activator is installed, but using it to open Safari at startup would depend on i
 | Route | Interaction after cold boot | Mac / USB | Network | Finding |
 | --- | --- | --- | --- | --- |
 | Existing TNS Home Screen icon | Unlock if needed, open icon, slide; handle failures/retries | Neither required | Website reachable, normally Wi-Fi | Established upstream method; existing icon verified read-only |
-| Cached TNS icon | Same interaction | Neither if cache works | Potentially none | Manifest exists, but offline device operation unverified |
+| Cached TNS icon | Same interaction | Neither if cache works | Potentially none | Matching cached payload/scripts verified; physical offline operation pending |
 | Custom auto-start TNS page | Unlock and open page/icon; potentially no slider | Neither at runtime if hosted/cached independently | Hosting or verified offline cache | Best scoped lead; mock test only |
+| Legacy VoIP native helper | Potentially first unlock only | Signing/setup may need a computer; runtime potentially independent | Runtime potentially offline; signing renewal separate | ap0110 source lead; harmless canaries built, stock-boot test pending valid signing |
 | Activator / SSH / added launch daemon | Cannot assume any can run before jailbreak activation | USB does not fix the missing bootstrap | Wi-Fi does not fix it either | Not a demonstrated cold-boot solution |
 | Signed doubleH3lix / sockH3lix IPA | Launch app and use its jailbreak button | Computer/signing setup may be needed; renewal depends on signing method | Potentially offline while signature remains valid | Adds signing maintenance; no demonstrated boot automation |
 | checkm8 / custom boot research | DFU/boot workflow, tool-specific | Host and USB for exploit delivery | Not a Wi-Fi boot exploit | Hardware exploit is not a ready-made iOS 10 jailbreak |
@@ -53,7 +69,7 @@ The repo ships a prebuilt payload. This session inspected source and dependencie
 - [checkra1n](https://checkra.in/) supports **iOS 12 and later**. Its A7 hardware support does not make it a drop-in jailbreak for 10.3.3. No DFU, restore, downgrade or boot-chain experiments were performed.
 - [AppSync Unified](https://github.com/akemin-dayo/AppSync#im-a-developer--do-you-have-a-rough-high-level-explanation-as-to-how-this-all-works) documents Substrate-based signature-validation hooks. It is not a persistent stock-boot signing solution.
 
-## Evidence from this session
+## Evidence from the first pass
 
 - Read-only USB queries confirmed `iPad4,5`, `10.3.3`, and the installed user-app list.
 - USB SSH with the existing key worked. Initial uptime was about 18 hours 52 minutes; no reboot was requested or performed.
@@ -62,12 +78,8 @@ The repo ships a prebuilt payload. This session inspected source and dependencie
 - Saved a private Mac-side snapshot of dpkg status, launch-daemon definitions, Substrate tweak files, mobile preferences and WebClips. Archive creation succeeded and all 459 entries were read successfully. **This is not a full device backup, a complete reinstallable package archive, or a tested restoration procedure.** It remains outside Git, under the owner's private local state directory.
 - A Node JavaScript harness evaluated only upstream `slider.js`, with a mocked `go()`. Page load made zero calls; the slider made one call and did not repeat on a second mouse-up; a direct call worked without a trusted touch. No WebKit or kernel exploit code ran. This proves wrapper behavior only.
 - T3 Device panel discovery exposed simulators only, not the physical iOS 10 iPad. No screen automation was attempted or bypassed over SSH.
-- No app installation, jailbreak execution, respring, reboot, package change, boot-file change, preference edit or icon edit was performed. Task-owned USB forwarding was stopped afterward.
+- During the first pass, no app installation, jailbreak execution, respring, reboot, package change, boot-file change, preference edit or icon edit was performed. Task-owned USB forwarding was stopped afterward.
 
-## Next bounded experiment
+## Current checkpoint
 
-1. Keep the current stock TNS icon as the recovery route. Retain private backups and capture any additional package installation archives needed before exploit testing.
-2. Prepare a separate, opt-in page based on the pinned TNS assets. First use a harmless stub in place of the exploit to test Home Screen launch, load-once behavior and iOS 10 offline caching. Use a distinct icon/origin and an explicit ready indicator; preserve the stock page and its cache. Serve staging assets independently of the iPad's jailbreak services.
-3. With the owner handling the screen, test the harmless page online and then with network access disabled **without rebooting**. Resolve the missing cache dependency and verify every requested resource rather than assuming the manifest works.
-4. Only after that passes, test the actual exploit from a normal unjailbroken boot with the owner available to unlock and recover through the stock TNS icon. Record attempts, extra prompts, successful tweak reactivation and USB/Wi-Fi independence separately. Do not run the exploit again just to test while already jailbroken.
-5. Call it one-tap re-jailbreaking only after that physical acceptance passes. Automatic operation immediately after cold boot remains a separate, unresolved problem.
+Harmless offline probes are installed; the owner is testing the small probe first. Native canaries compile and their final ad-hoc signatures/SDK metadata validate, but a matching Apple provisioning profile is still needed for a meaningful stock-boot test. Detailed per-step acceptance and cleanup live in [the lab README](../tools/rejailbreak-lab/README.md).
