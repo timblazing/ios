@@ -63,7 +63,7 @@ Both request legacy VoIP keep-alive and log app lifecycle events, `kern.boottime
 
 The API is resolved dynamically with a selector-existence check because this is explicitly an experiment with a deprecated legacy API, including on systems where it may no longer exist. This is not a recommendation for production app background execution.
 
-**These ad-hoc signatures do not permit a stock-boot test.** AppSync can permit installation while jailbroken, but cold-boot execution requires valid Apple signing and an unexpired profile matching the app ID, certificate/team and target iPad. Never treat “installed through AppSync” as satisfying that gate. No matching local profile was found in this session; the canaries were built but not installed. Do not replace another app's bundle ID or provisioning profile to get around this.
+**These ad-hoc signatures do not establish stock-boot execution.** AppSync can permit installation while jailbroken. Valid Apple signing and a matching unexpired device profile provide the conventional stock-trust path; an AppSync-only native app is expected to fail stock enforcement, but these canaries have not been physically tested after reboot on this iPad. Never treat “installed through AppSync” as satisfying that gate. No matching local profile was found in this session; the canaries were built but not installed. Do not replace another app's bundle ID or provisioning profile to get around this.
 
 After obtaining suitable signing, re-sign each bundle and preserve/reinspect its SDK metadata. For each final IPA, validate its signature and profile, then inspect the extracted executable:
 
@@ -74,7 +74,9 @@ xcrun vtool -show-build /path/to/Payload/LaunchCanary.app/LaunchCanary
 
 `codesign --verify` alone does not establish that the profile authorizes this iPad or remains valid. A final signing tool may alter metadata; inspect **its output**, not just the intermediate build.
 
-### Dedicated development signing
+### Dedicated development signing (historical; currently prohibited)
+
+The owner subsequently prohibited signing or using their Apple Account for this iPad. Do not run this workflow or request credentials. Account-free stock-boot execution remains unproven; it has not been ruled out by a physical canary test.
 
 `sign-canary.py` signs only the two canary bundle IDs with an exact-ID Apple development profile. It refuses unrelated or wildcard profiles, expired/not-yet-valid profiles, an unenrolled target device, and a certificate not listed in the profile. Inputs and output stay outside Git. The source app is copied, never modified. The final app must pass the Apple signature-chain requirement, exact entitlement and signing-certificate checks, and unchanged linked-SDK metadata before the IPA is emitted. The modern metadata check is pinned to the current builder's SDK 16.4; inspect/revise that explicit gate if the build SDK changes.
 
