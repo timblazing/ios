@@ -1,6 +1,7 @@
 #import "IPTVChannelListController.h"
 #import "IPTVPlayerController.h"
 #import "../Guide/IPTVGuide.h"
+#import "../Guide/IPTVGuideClient.h"
 
 static UIColor *TVColor(unsigned rgb) {
     return [UIColor colorWithRed:((rgb >> 16) & 255)/255.0 green:((rgb >> 8) & 255)/255.0 blue:(rgb & 255)/255.0 alpha:1];
@@ -35,15 +36,14 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     NSCache *_logos;
     NSMutableDictionary<NSString *, NSURLSessionDataTask *> *_logoTasks;
     NSMutableSet *_failedLogos;
-    NSURLSessionDataTask *_task;
-    NSString *_etag;
+    IPTVGuideClient *_client;
     NSTimer *_poll;
     BOOL _visible;
-    NSUInteger _generation;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = TVColor(0x0b0c0f);
+    _client = [IPTVGuideClient new];
     _logos = [NSCache new]; _logos.totalCostLimit = 8 * 1024 * 1024;
     _logoTasks = [NSMutableDictionary new]; _failedLogos = [NSMutableSet new];
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
@@ -125,34 +125,27 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     [super viewWillAppear:animated]; self.navigationController.navigationBarHidden = YES; _visible = YES; [self foreground];
 }
 - (void)viewWillDisappear:(BOOL)animated { [super viewWillDisappear:animated]; _visible = NO; [self background]; }
-- (void)background { [_poll invalidate]; _poll = nil; [_task cancel]; _task = nil; _generation++; }
+- (void)background { [_poll invalidate]; _poll = nil; [_client cancel]; }
 - (void)foreground {
     if (!_visible) return;
     [self reload]; [_poll invalidate];
     _poll = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(reload) userInfo:nil repeats:YES];
 }
 - (void)reload {
-    NSString *base = [NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"];
-    if (!base.length || _task) return;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[base stringByAppendingString:@"/guide.json"]] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:15];
-    if (_etag) [request setValue:_etag forHTTPHeaderField:@"If-None-Match"];
-    NSUInteger generation = _generation;
+    NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+    NSArray *bases = @[[defaults stringForKey:@"gateway.baseURL"] ?: @"",
+                       [defaults stringForKey:@"gateway.fallbackBaseURL"] ?: @""];
     __weak typeof(self) weakSelf = self;
-    _task = [NSURLSession.sharedSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        NSHTTPURLResponse *http = (NSHTTPURLResponse *)response;
-        NSError *parseError = nil;
-        IPTVGuide *guide = http.statusCode == 200 && data ? [[IPTVGuide alloc] initWithData:data error:&parseError] : nil;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            typeof(self) self = weakSelf; if (!self || generation != self->_generation) return;
-            self->_task = nil;
-            if (guide) { self->_guide = guide; self->_etag = [http.allHeaderFields objectForKey:@"Etag"] ?: [http.allHeaderFields objectForKey:@"ETag"]; [self selectTab]; }
-            else if (http.statusCode == 304 && self->_guide) { [self selectTab]; }
-            else {
-                self->_message.text = self->_guide ? @"Guide unavailable. Showing last update; retrying in 30 seconds." : @"Can’t load guide. Check the connection; retrying automatically.";
-                self->_message.hidden = NO;
-            }
-        });
-    }]; [_task resume];
+    [_client reloadBaseURLs:bases completion:^(BOOL success) {
+        typeof(self) self = weakSelf; if (!self) return;
+        if (success) {
+            self->_guide = self->_client.guide;
+            [self selectTab];
+        } else {
+            self->_message.text = self->_guide ? @"Guide unavailable. Showing last update; retrying in 30 seconds." : @"Can’t load guide. Check the connection; retrying automatically.";
+            self->_message.hidden = NO;
+        }
+    }];
 }
 - (IPTVLeague *)league {
     NSString *identifier = @[@"nfl", @"nba", @"ncaaf"][_selectedTab];
@@ -202,7 +195,7 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     unsigned rgb = 0x333333; [[NSScanner scannerWithString:hex ?: @""] scanHexInt:&rgb];
     badge.backgroundColor = TVColor(rgb); badge.textAlignment = NSTextAlignmentCenter; badge.layer.cornerRadius = frame.size.height/2; badge.clipsToBounds = YES;
     if (![path hasPrefix:@"/logo?"]) return;
-    NSString *base = [NSUserDefaults.standardUserDefaults stringForKey:@"gateway.baseURL"];
+    NSString *base = _client.baseURL;
     NSURLComponents *components = [NSURLComponents componentsWithString:[base stringByAppendingString:path]];
     NSMutableArray *query = [NSMutableArray new]; for (NSURLQueryItem *item in components.queryItems) if (![item.name isEqual:@"s"]) [query addObject:item];
     [query addObject:[NSURLQueryItem queryItemWithName:@"s" value:@"96"]]; components.queryItems = query;
@@ -303,7 +296,7 @@ static UILabel *TVLabel(UIView *parent, NSString *text, CGFloat size, UIColor *c
     } else [self presentViewController:[[IPTVPlayerController alloc] initWithChannel:(IPTVGuideChannel *)object] animated:YES completion:nil];
 }
 - (void)dealloc {
-    [NSNotificationCenter.defaultCenter removeObserver:self]; [_poll invalidate]; [_task cancel];
+    [NSNotificationCenter.defaultCenter removeObserver:self]; [_poll invalidate]; [_client cancel];
     for (NSURLSessionDataTask *task in _logoTasks.allValues) [task cancel];
 }
 @end

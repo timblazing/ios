@@ -2,6 +2,12 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Automatic gateway selection — 2026-10-29 evening
+
+The owner asked TV to choose between home and USB routes automatically. Prepared **0.3.2 / build 5** implements home-first requests, then optional `gateway.fallbackBaseURL` on HTTP/network/timeout/parse failure. Each later refresh retries home. Guide data, absolute stream addresses, logo origin and ETag remain associated with the successful endpoint. Exhausting both routes preserves the last valid guide; cancellation suppresses stale completions. [0.3.2 validation](VALIDATION-0.3.2.md) records tests and package checks. New build installation awaits explicit approval; **0.3.1 / build 4 remains installed**.
+
+The owner is at home and confirmed TV closed. Verified the home gateway directly from the physical iPad without opening video. Backed up preferences privately under `~/.config/ios-games/iptv/acceptance-2026-10-29/`, then used mobile preferences to save the home primary plus the existing loopback bridge as fallback. Read-back verifies both and confirms all other preferences are unchanged. No private launch profile was present. The stale-primary loopback issue is resolved. No video bridge or reverse forwarding is running; automatic selection cannot create a bridge when away.
+
 ## Physical installation resumed — 2026-10-29 evening
 
 The owner connected the iPad by USB. Read-only queries confirmed iPad4,5 / iOS 10.3.3 with TV 0.3.0 / build 3 installed. After verifying the committed IPA checksum and bundle identity/version/build, installed the owner-approved TV 0.3.1 / build 4 over USB (`Install: Complete`). A separate installed-app query confirms 0.3.1 / build 4. The earlier connectivity/install blocker below is resolved. Private gateway preferences and physical guide/playback acceptance remain pending; installation alone does not validate them. No app launch or touch was automated.

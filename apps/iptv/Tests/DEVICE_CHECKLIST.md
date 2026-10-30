@@ -35,6 +35,13 @@ The owner approved installing 0.3.1, but no install was attempted: USB discovery
 
 - **Pass — 0.3.1 USB installation:** owner connected the device; verified iPad4,5 / iOS 10.3.3 and previous TV 0.3.0 / build 3. Verified committed IPA checksum and bundle identity/version/build, then installed with existing owner approval (`Install: Complete`). Independent installed-app query confirms **0.3.1 / build 4**. The earlier discovery blocker is resolved. Private routing/preferences and all 0.3.1 functional/visual checks remain pending. No launch/touch automation or playback test occurred.
 
+## 0.3.2 routing preparation
+
+- **Pass — device transport only:** owner is home and confirmed TV closed. Direct guide request from the physical iPad to the home gateway succeeded. Saved home-primary and USB-fallback defaults, read both back and confirmed Dispatcharr/unrelated settings unchanged. This resolves the stale primary loopback preference. No private profile was present. No video stream was opened.
+- **Prepared:** 0.3.2 / build 5 with automatic home-first fallback; installation approval and functional acceptance pending. Foundation HTTP fixture tests exercise switching/recovery, not the physical app.
+- [ ] On 0.3.2, confirm home guide/logos render without a Mac video bridge.
+- [ ] With an explicitly established USB bridge, confirm unavailable home falls back and returning home selects the home guide on a subsequent refresh.
+
 ## Guide and interaction
 
 - [ ] Privately provision gateway/Dispatcharr configuration for 0.3.1; relaunch and verify persistence without a settings screen.
