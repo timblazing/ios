@@ -2,6 +2,17 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Continuation — 2026-10-29 evening
+
+This section supersedes the earlier production-deployment and installation-approval status below. The owner explicitly approved deploying the gateway fixes and installing the prepared 0.3.1 IPA; no merge was authorized.
+
+- Deployed only the provider-group matching and network-logo repository fixes to production `tv-gateway` on raygun. Verified running-container source SHA256 `84806f368af8c1ab99de506394286a8bb5328fa8bb8956670c5dd08140ca5777` matches this checkout. Dispatcharr configuration was unchanged; no video streams were opened.
+- Live guide: NFL 14 games / 3 tiles, NBA 13 / 1, NCAAF 1 / 67 at the verification snapshot; 100 source channels and no source errors. All 18 network-logo endpoints return HTTP 200, `image/png`, 96×96.
+- Original deployed source is backed up on raygun at `~/docker/tv-gateway/backups/pr5-20261030T005127Z/gateway.py`. To roll back only these fixes, restore that file to `~/docker/tv-gateway/gateway.py`, then run `docker compose up -d --build tv-gateway` from that directory and verify guide/health. No Mac containers were started.
+- Fresh Theos compile, iOS 10.0 minimum, guide/configuration tests, gateway 8 tests, bridge 5 tests, all six release checksums, and prepared IPA integrity/identity/version/build/private-filename checks pass.
+- **Physical installation remains blocked:** no USB device was found. usbmuxd listed a Wi-Fi entry, but device-information queries returned no model/version. No install was attempted, and the iPad's current installed version and preferences could not be reverified. The installation approval persists; reconnect and positively identify iPad4,5 / iOS 10.3.3 before installing. Physical interaction remains owner-driven when the legacy device is unavailable in the Device panel.
+- The possibly stale loopback gateway preference still needs inspection/repair. No bridge, simulator or temporary server was started by this continuation; production gateway remains running.
+
 ## Repository and delivery
 
 - Base `main`: `97c5949`, TV 0.3.0 via merged PR #4.

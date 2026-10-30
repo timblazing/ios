@@ -1,6 +1,6 @@
 # TV physical-device checklist
 
-Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. These checks require a person; simulator evidence is in `docs/VALIDATION-0.3.0.md`. No 0.3.0 device checks have been marked complete. Historical 0.1.0 relay playback passed on 720p channels; that is not direct-HLS acceptance.
+Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. These checks require a person; simulator evidence is in `docs/VALIDATION-0.3.0.md`. The owner-reported 0.3.0 picture/audio checks below are historical; 0.3.1 physical checks remain pending. Historical 0.1.0 relay playback passed on 720p channels; that is not direct-HLS acceptance.
 
 ## Acceptance log — 2026-10-29
 
@@ -26,6 +26,10 @@ Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. Thes
 The owner requested a saved handoff. **0.3.0 remains installed**; 0.3.1 is packaged/simulator-checked but not installed. The 0.3.0 guide/RedZone picture/audio results above do not accept the revised UI. The owner also confirmed 0.3.0 tap-to-show and three-second hide, then requested hiding only after first picture. See [backlog](../docs/BACKLOG.md) for resuming 0.3.1 acceptance.
 
 All task-owned test services and the simulator are stopped. **Gateway restoration is unconfirmed:** USB SSH dropped during cleanup; the iPad may still point at the stopped bridge's loopback URL. Original private preferences/config were saved outside Git; restore/provision on reconnect before playback. Do not mark unrun checks as passed.
+
+## Continuation — 2026-10-29 evening
+
+The owner approved installing 0.3.1, but no install was attempted: USB discovery found no device and the usbmuxd Wi-Fi entry returned no model/version. Reconnect and identify the iPad before proceeding; approval persists. The production gateway fixes are deployed and verified independently. Device preferences, installed version and all revised UI checks remain unverified.
 
 ## Guide and interaction
 
