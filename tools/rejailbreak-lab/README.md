@@ -1,6 +1,6 @@
-# Re-jailbreak experiments (no exploit code)
+# Re-jailbreak lab and staged probes
 
-For iPad4,5 / iOS 10.3.3. These probes isolate two questions before involving the working TNS jailbreak. They do not modify boot files, install a bootstrap, run an exploit, contact a server, or change another app's preferences.
+For iPad4,5 / iOS 10.3.3. The harmless dummy WebClips and native canaries isolate delivery and startup behavior. They do not modify boot files, install a bootstrap, run an exploit, contact a server, or change another app's preferences. The separate offline TNS packager described below includes actual upstream exploit assets when built; its check-only mode never dispatches the exploit.
 
 ## Self-contained WebClip
 
@@ -44,7 +44,7 @@ The only upstream JavaScript changes are replacing the failure handler's reload 
 
 The wrapper disables repeat dispatch, stops on errors and performs no automatic reload/retry. A browser process crash could erase an in-memory guard, which is why this first live experiment retains a manual run button after page opening. One-tap auto-start is a later experiment, not a property of this build. The native payload is unchanged; its conditional bootstrap download paths still exist. Verify existing bootstrap markers/files before an actual offline attempt.
 
-Generated HTML includes upstream license notices. Generated profiles/binaries remain outside Git. The current check/live data URLs are about 1.06 MB, slightly larger than the 978 KB dummy probe, and need their own physical installation/opening acceptance. The live profile is prepared but not served or installed.
+Generated HTML includes upstream license notices. Generated profiles/binaries remain outside Git. The current check/live data URLs are about 1.06 MB, slightly larger than the 978 KB dummy probe, and need their own physical installation/opening acceptance. The live profile is prepared but was not served or installed. The owner confirmed **TNS Offline Check** verifies the payload and parses the scripts on-device with renderer `Apple A7 GPU` and target `true`, including with network access disabled. Actual TNS/JIT execution and cold-boot recovery remain deferred. The temporary profile server has been stopped; installed test profiles/icons were left in place.
 
 Local validation: a mocked controller test uses the exact embedded payload and verifies CRC, check-only mode, no execution on load, explicit click dispatch, one attempt, incorrect checksum/target rejection, and script-error cancellation including before a queued attempt. No upstream exploit code is loaded by that test. The check-only HTML parsed the real TNS scripts and verified the payload in desktop Chrome; desktop and phone screenshots were inspected. No exploit was executed in these checks.
 
@@ -90,3 +90,5 @@ If the legacy canary launches automatically and the control does not, the next s
 - No reboot, actual jailbreak execution, bootstrap replacement, signature bypass installation or stock executable modification was performed.
 
 Primary research and ranked leads: [research report](../../docs/IPAD-REJAILBREAK-RESEARCH.md).
+
+Resume legacy-VoIP work from [the dedicated handoff](../../docs/AP0110-VOIP-HANDOFF.md).

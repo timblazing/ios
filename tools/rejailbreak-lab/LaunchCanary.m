@@ -24,7 +24,7 @@
                      app.protectedDataAvailable];
     NSString *path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject
         stringByAppendingPathComponent:@"launches.txt"];
-    // ProtectionNone permits recording a background launch before the first unlock.
+    // Container access before first unlock still needs testing, even with ProtectionNone.
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         [[NSFileManager defaultManager] createFileAtPath:path contents:[NSData data]
             attributes:@{NSFileProtectionKey : NSFileProtectionNone}];
