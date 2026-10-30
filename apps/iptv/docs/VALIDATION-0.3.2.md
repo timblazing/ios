@@ -55,3 +55,7 @@ After refreshing TV, owner reports Panthers–Packers initially showed a static 
 ## Owner stability and NCAAF retest results
 
 Owner reports NFL played fine through the requested approximately one-minute observation. Then returned to the guide and selected Troy Trojans @ James Madison Dukes; owner confirmed picture and sound work. This accepts sampled NCAAF playback and short NFL stability. It does not explain the prior startup failures, prove consistent first-attempt startup or establish longer endurance/measured synchronization. No parallel agent captures were opened. Next physical check is pause/resume on the existing NCAAF stream.
+
+## Owner rotation result
+
+Owner confirms portrait → landscape rotation preserves playing video and correctly positioned, working controls. Pause/resume and >2-minute Home/background recovery also passed in subsequent owner checks (see device checklist). Initial-start reliability remains unresolved; remaining short home checks are consolidated at the top of that checklist.

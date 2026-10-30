@@ -2,6 +2,19 @@
 
 Run on the iPad mini 2 / iOS 10.3.3 with gateway and Dispatcharr reachable. These checks require a person; simulator evidence is in `docs/VALIDATION-0.3.0.md`. The owner-reported 0.3.0 picture/audio checks below are historical; 0.3.1 physical checks remain pending. Historical 0.1.0 relay playback passed on 720p channels; that is not direct-HLS acceptance.
 
+## Current 0.3.2 acceptance summary
+
+Owner-reported passes: home guide/cards/logos, sampled NBA/NFL/NCAAF playback, approximately one minute of NFL stability, short pause/resume, Home/background recovery after >2 minutes, and portrait/landscape playback with usable controls. NFL first-attempt startup failed before succeeding on retry; reliability remains unresolved. Historical sections below retain the sequence and version boundaries; they do not override this current summary.
+
+Remaining short home checks (owner requested all questions together):
+
+1. On a fresh channel open, controls remain visible until picture, then hide in about 2.5 seconds; tap restores them and Back returns to the guide.
+2. Bottom volume slider changes actual sound level.
+3. League tabs and guide scrolling are responsive, last rows clear the floating controls, and a future game shows its start time rather than opening playback.
+4. Open/close the regular NFL matchup three times, one stream at a time; report startup delays, frozen pictures or retries.
+
+Optional/deferred: real AirPlay when a receiver is available; extended endurance; accessibility/Reduce Transparency and interruption/network-loss edge cases; physical USB fallback/home-return with an explicitly running bridge. These remain unverified, not required as extra questions in this short home check. Keep the legacy relay while startup/acceptance work remains.
+
 ## Acceptance log — 2026-10-29
 
 - **Initial preflight (historical):** read-only usbmuxd discovery returned zero USB/Wi-Fi connections. T3 `device_list` listed simulators only; no physical iPad was exposed.
@@ -68,7 +81,7 @@ The owner approved installing 0.3.1, but no install was attempted: USB discovery
 - [ ] Swipe left/right changes games and shows the correct toast; pre-game targets show start time without streaming.
 - [ ] A failed primary feed switches to a backup; all failed feeds show an inline error with a usable Back control.
 - [ ] Closing and reopening channels works ten times without overlapping provider streams.
-- [ ] Rotation during playback preserves video, controls and touch handling.
+- [x] **0.3.2 owner pass:** portrait → landscape rotation during playback preserves video and correctly positioned, working controls.
 - [ ] Home/lock stops video; after 2+ minutes returning re-requests the original endpoint and resumes.
 - [ ] Silent switch/audio interruptions and route changes behave sensibly.
 - [ ] 30 minutes without memory termination, stutter or increasing live delay.
@@ -100,3 +113,7 @@ On the playing NCAAF stream, owner showed controls, paused for five seconds and 
 ## Background recovery — owner pass
 
 On installed 0.3.2, owner pressed Home, left TV in the background for just over two minutes, reopened it, and confirmed picture and sound returned without selecting the game again. This accepts the sampled >2-minute recovery path. Rotation, first-picture control timing, AirPlay/volume, longer endurance and initial-start reliability remain separate. Next check: rotate portrait/landscape during playback and verify video/controls remain usable.
+
+## Rotation — owner pass
+
+Owner confirms video keeps playing through portrait then landscape rotation, with controls positioned correctly and working on 0.3.2. Owner asked for all remaining checks together and a short finish; the current summary at the top is the consolidated remaining question set. No agent stream was opened.

@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Current checkpoint — short remaining home checks
+
+Owner confirms portrait/landscape rotation preserves playback and usable controls. Prior sampled NBA/NFL/NCAAF playback, home guide/logos, short pause/resume and >2-minute Home/background recovery pass. NFL first-start reliability is still unresolved. Owner requested all remaining questions together; use the consolidated four short checks at the top of [DEVICE_CHECKLIST.md](../Tests/DEVICE_CHECKLIST.md): controls/Back, actual volume, guide tabs/scroll/future game, and three sequential NFL startup attempts. AirPlay, extended endurance, accessibility/edge cases and physical USB fallback remain explicitly deferred/unverified. Do not start concurrent agent probes while the owner is testing. No merge is authorized.
+
 ## Latest check — background recovery passes
 
 Owner confirms picture/audio returned without reselecting the game after pressing Home, leaving TV backgrounded for just over two minutes and reopening on 0.3.2. Pause/resume and sampled NFL/NCAAF/NBA playback passes remain recorded separately. Next check: rotate portrait/landscape during playback and confirm video/controls remain usable. Initial-start reliability, first-picture control timing, AirPlay/volume, extended endurance and USB fallback remain unaccepted.
