@@ -51,3 +51,7 @@ Owner-approved deployment completed at approximately 01:33 UTC October 30 (Octob
 ## Owner NFL retest after deployment
 
 After refreshing TV, owner reports Panthers–Packers initially showed a static image and failed. Exiting and selecting it again produced a frozen image for roughly 4–5 seconds, then played fine. Playback is a partial pass on the second attempt; startup/reliability remains unresolved. No synchronized-audio or sustained-stability pass is inferred. No parallel agent stream was opened. Continue with the same stream for a one-minute stability/audio observation before further diagnostic captures.
+
+## Owner stability and NCAAF retest results
+
+Owner reports NFL played fine through the requested approximately one-minute observation. Then returned to the guide and selected Troy Trojans @ James Madison Dukes; owner confirmed picture and sound work. This accepts sampled NCAAF playback and short NFL stability. It does not explain the prior startup failures, prove consistent first-attempt startup or establish longer endurance/measured synchronization. No parallel agent captures were opened. Next physical check is pause/resume on the existing NCAAF stream.

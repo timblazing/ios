@@ -14,7 +14,8 @@ Start here when the owner says “let’s work on my IPTV backlog/next steps.”
 ## Playback issue follow-up
 
 - [x] Owner approved and deployed the tested gateway exclusion change/private setting. Source and `.env` backed up; running source matches checkout, incompatible source is absent from every guide selection and only the regular H.264 NFL feed remains. Dispatcharr is unchanged. See latest handoff for rollback.
-- [ ] Retest NFL and NCAAF on the physical iPad after probe sessions have drained. Current bounded server captures succeed for the regular NFL and NCAAF sources; earlier upstream failures remain unexplained.
+- [x] Physical retest: NFL plays on retry and stayed smooth for approximately one minute; NCAAF picture/sound now work.
+- [ ] Resolve first-attempt startup reliability: NFL initially showed a static image and failed even after exclusion, then played on retry. Earlier upstream failures remain unexplained. Keep this separate from successful playback observations.
 
 ## 2. Review and finish the prepared changes
 

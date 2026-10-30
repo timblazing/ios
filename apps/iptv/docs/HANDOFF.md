@@ -2,6 +2,10 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Latest physical results — NFL short stability and NCAAF playback pass
+
+On 0.3.2, owner reports NFL played fine during the requested approximately one-minute observation. Then returned to the guide, selected Troy @ James Madison and confirmed picture/sound work. Prior NBA successes and home cards/logos remain recorded. Earlier first-start failures are unresolved; do not mark startup, long endurance, synchronization measurement or automatic USB fallback accepted. Owner is currently watching NCAAF; no concurrent agent probe should be opened. Next interaction: show controls, pause for five seconds, resume and confirm picture/audio continue. [Device checklist](../Tests/DEVICE_CHECKLIST.md) contains the per-check log.
+
 ## Current owner retest — NFL plays on retry, startup still fails
 
 After guide refresh, owner reports Panthers–Packers first showed a static image and failed. On exiting/reselecting, it froze for approximately 4–5 seconds, then played fine. Treat this as second-attempt playback success with unresolved first-start reliability, not completed acceptance. Audio synchronization/endurance are unverified. Do not start agent captures while the owner is watching. Next interaction is a one-minute stability/audio observation on this same stream. NCAAF retest remains pending.

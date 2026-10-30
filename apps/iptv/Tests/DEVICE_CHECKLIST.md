@@ -86,3 +86,9 @@ Test one stream at a time; the provider allows only two connections. Ask before 
 ## NFL retest after incompatible-source exclusion
 
 Owner refreshed/reopened TV and selected Panthers @ Packers. First attempt displayed a static image and failed. After exiting/reselecting, the picture froze for approximately 4–5 seconds, then playback worked fine. This is a partial pass for playback on the second attempt; first-attempt startup/reliability remains a failure and is not accepted. Owner has not separately confirmed audio synchronization or sustained stability. No agent probe was opened during the owner retest. Next check: leave this single stream playing for one minute and report freezes and audio synchronization.
+
+## Continued physical playback checks — 0.3.2
+
+- **Pass — NFL short stability observation:** owner left Panthers @ Packers playing for approximately one minute and reported it played fine. This does not resolve the failed first attempt or establish longer endurance/measured synchronization.
+- **Pass — NCAAF retest:** after returning to the guide and selecting Troy Trojans @ James Madison Dukes, owner confirmed picture and sound work. Earlier failure remains historical evidence of startup unreliability; no blanket reliability pass inferred.
+- Current owner stream is NCAAF; do not start concurrent agent probes. Next interaction: show controls, pause, wait five seconds, resume and confirm picture/audio continue.
