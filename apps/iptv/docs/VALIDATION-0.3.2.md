@@ -21,3 +21,7 @@ Foundation-only `IPTVGuideClient` tries the private primary gateway first and th
 With TV closed by the owner, verified home guide reachability from iPad4,5 / iOS 10.3.3. Backed up preferences privately and saved home-primary plus USB-fallback defaults through mobile preferences. Read back both values and verified every unrelated preference was preserved. No private profile exists to override them. No video stream was opened and no physical guide/UI/playback claim follows from the transport check.
 
 Owner-approved USB installation passed after reverifying iPad4,5 / iOS 10.3.3 and the IPA checksum/identity/version/build (`Install: Complete`). Independent installed-app query confirms 0.3.2 / build 5. The owner has been asked to open TV and confirm guide cards/logos. Physical route switching and the UI/playback checklist remain pending. The USB video bridge is stopped; no fallback playback has been attempted. Keep the legacy relay compiled.
+
+## Owner-reported home rendering
+
+On installed 0.3.2 / build 5, the owner opened TV at home and confirmed game/channel cards and logos appear. No Mac video bridge was running. This accepts home guide/logo rendering; playback, route switching and the remaining physical checklist are pending.
