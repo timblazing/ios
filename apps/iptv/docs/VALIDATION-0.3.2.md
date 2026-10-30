@@ -43,3 +43,7 @@ Owner confirmed returning to the guide. Sequential, bounded captures through Dis
 Gateway exclusion support passes 9 tests, including primary/backup/tile exclusion and unrelated league preservation. An in-memory candidate against current M3U/EPG/scoreboards selects the regular NFL source without the incompatible primary. Deployment of this new gateway source and private exclusion setting awaits owner approval. There is no new app package/install in this investigation.
 
 Final read-only Dispatcharr cleanup check: zero active proxy clients. No agent capture remains running.
+
+## Incompatible-source filter deployment
+
+Owner-approved deployment completed at approximately 01:33 UTC October 30 (October 29 Central). Backed up source and private environment; preserved unrelated environment values and recreated only `tv-gateway`. Running source SHA256 `f29125939d5caf5d6013e04eb24be5e172278e1de051116bfc3310df81ec835f` matches the tested checkout. Live guide verification confirms the incompatible NFL source is absent from games, backups and tiles, and the regular H.264 feed is the sole feed for Panthers–Packers. All three leagues remain populated (NFL 14/3, NBA 13/1, NCAAF 1/67 games/tiles), health reports 100 input channels and no source errors. Nine gateway tests pass. Dispatcharr was unchanged and no video capture was opened by this deployment. Owner physical retest is pending; rollback details are in the latest handoff.

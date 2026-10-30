@@ -13,7 +13,7 @@ Start here when the owner says “let’s work on my IPTV backlog/next steps.”
 
 ## Playback issue follow-up
 
-- [ ] Get approval for the tested gateway exclusion change and private configuration that omits the probe-confirmed HEVC NFL primary; deploy with backup/rollback and verify only the regular H.264 feed remains.
+- [x] Owner approved and deployed the tested gateway exclusion change/private setting. Source and `.env` backed up; running source matches checkout, incompatible source is absent from every guide selection and only the regular H.264 NFL feed remains. Dispatcharr is unchanged. See latest handoff for rollback.
 - [ ] Retest NFL and NCAAF on the physical iPad after probe sessions have drained. Current bounded server captures succeed for the regular NFL and NCAAF sources; earlier upstream failures remain unexplained.
 
 ## 2. Review and finish the prepared changes

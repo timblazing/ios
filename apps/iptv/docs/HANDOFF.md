@@ -2,6 +2,16 @@
 
 The owner asked to archive the chat and stop at a saved checkpoint. Resume from [BACKLOG.md](BACKLOG.md). Do not infer authorization to install or merge from this handoff.
 
+## Incompatible-source filter deployed — 2026-10-29 evening
+
+Owner approved the gateway filter deployment. Backed up the pre-filter `gateway.py` and private `.env` on raygun at `~/docker/tv-gateway/backups/pr5-hevc-20261030T013256Z/` (directory 700, files 600). Set only the private known-incompatible channel exclusion, preserving unrelated environment settings, then rebuilt/recreated only `tv-gateway`. Dispatcharr and the installed iPad app were unchanged.
+
+Running-container source SHA256 `f29125939d5caf5d6013e04eb24be5e172278e1de051116bfc3310df81ec835f` matches the tested checkout. Live guide omits the incompatible NFL primary everywhere and retains only its regular H.264 backup for Panthers–Packers. All three leagues remain populated: NFL 14 games / 3 tiles, NBA 13 / 1, NCAAF 1 / 67 at verification; health reports 100 source channels and no source errors. No new video capture was opened during deployment.
+
+Rollback: restore both `gateway.py` and `.env` from that backup into `~/docker/tv-gateway/`, preserving file permissions, then run `docker compose up -d --build tv-gateway` there and verify health/guide. The `.env` backup contains private configuration and must stay outside Git/chat.
+
+Owner was asked to close/reopen TV to refresh the guide, then retry Panthers–Packers alone and report picture/audio. Physical retest remains pending. Both Dispatcharr channels remain available to other clients; exclusion applies only to this gateway guide.
+
 ## Source diagnosis — after owner stopped playback
 
 Sequential bounded Dispatcharr HLS captures confirm the NFL primary is 2160p59.94 HEVC Main 10/AC-3 (incompatible A7), while its regular backup and the selected NCAAF ESPN2 source now deliver 720p59.94 H.264 Main/HE-AAC video. NFL first frame shows Panthers–Packers; NCAAF first frame shows an ESPN2 studio segment. Earlier brief upstream failures remain unexplained; physical retest is still required.
