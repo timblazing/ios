@@ -1,6 +1,6 @@
 # IPTV backlog and next steps
 
-Start here when the owner says “let’s work on my IPTV backlog/next steps.” Read [HANDOFF.md](HANDOFF.md), the app [README](../README.md), and repository `AGENTS.md` before acting. The current work is on `docs/t3-device-panel`, [PR #5](https://github.com/timblazing/ios-games/pull/5); check its live status rather than assuming it merged.
+Start here when the owner says “let’s work on my IPTV backlog/next steps.” Read [HANDOFF.md](HANDOFF.md), the app [README](../README.md), and repository `AGENTS.md` before acting. The current work is on `docs/t3-device-panel`, [PR #5](https://github.com/timblazing/ios/pull/5); check its live status rather than assuming it merged.
 
 ## 1. Home acceptance complete; follow-up coverage
 
