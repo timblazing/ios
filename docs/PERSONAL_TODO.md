@@ -2,7 +2,11 @@
 
 For the full TV work queue and archived-chat checkpoint, start at [IPTV backlog](../apps/iptv/docs/BACKLOG.md).
 
-- [ ] Research whether re-jailbreaking the iPad mini 2 (iPad4,5, iOS 10.3.3) after each restart can be automated or made less manual. Start with [LukeZGD/tns-sockport](https://github.com/LukeZGD/tns-sockport). Determine what is possible after a cold boot, what still needs an on-device interaction, and whether any option depends on a Mac/USB connection or works over Wi-Fi. Research only: no boot or jailbreak changes are authorized by this note, and automation feasibility has not been established.
+- [x] Research re-jailbreak automation for iPad mini 2 (iPad4,5, iOS 10.3.3), starting with LukeZGD/tns-sockport. [Deeper findings](IPAD-REJAILBREAK-RESEARCH.md): ap0110 provides a concrete legacy-VoIP auto-launch lead, the existing WebClip cache contains the matching TNS payload, and self-contained offline WebClips are worth testing. These are not yet physical cold-boot acceptance.
+- [x] Complete the [harmless offline WebClip probes](../tools/rejailbreak-lab/README.md): owner confirmed small and payload-sized pages pass with fresh timestamps online and offline after profile installation.
+- [x] Validate the TNS check-only profile on-device, including offline: payload verified, scripts parsed, Apple A7 GPU and target true.
+- [ ] Optionally test the separate manually triggered offline TNS candidate after the recovery/bootstrap checkpoint and a normal reboot. Deferred while focusing on legacy-VoIP auto-launch; actual offline re-jailbreak has not been verified.
+- [ ] Complete the [ap0110 legacy-VoIP work](AP0110-VOIP-HANDOFF.md): valid signing/provisioning, prepared launch canary/control, physical post-boot launch proof, then compatible recovery integration. Preserve TNS, its bootstrap and installed tweaks.
 
 - [x] Preconfigure TV for the current USB acceptance run without publishing private URLs: device-only gateway preference, private original-preferences backup and Mac bridge config outside the repo. Public IPA/DEB packages remain unconfigured.
 - [ ] Add convenient persistent home/travel configuration after choosing the long-term access route.
